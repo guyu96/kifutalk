@@ -38,8 +38,47 @@ Board.prototype.addStone = function(row, col, type) {
 		console.log('Invalid type');
 };
 
+Board.prototype.isValidLocation = function(row, col) {
+	if (row < 0 || row >= this.size)
+		return false;
+	if (col < 0 || col >= this.size)
+		return false;
+	return true;
+};
+
+Board.prototype.chainAtHelper = function(row, col, color, chain, visitedFlags) {
+	if (!this.isValidLocation(row, col))
+		return
+	if (this.grid[row][col] !== color)
+		return
+	if (visitedFlags[row][col])
+		return
+
+	chain.push([row, col]);
+	visitedFlags[row][col] = true;
+
+	this.chainAtHelper(row+1, col, color, chain, visitedFlags);
+	this.chainAtHelper(row-1, col, color, chain, visitedFlags);
+	this.chainAtHelper(row, col+1, color, chain, visitedFlags);
+	this.chainAtHelper(row, col-1, color, chain, visitedFlags);
+};
+
 Board.prototype.chainAt = function(row, col) {
-		
+	var color = this.grid[row][col];
+	if (color !== 'b' && color !== 'w')
+		return [];
+
+	var visitedFlags = [];
+	for (var i = 0; i < this.size; i++) {
+		visitedFlags.push([]);
+		for (var j = 0; j < this.size; j++)
+			visitedFlags[i].push(false);
+	}
+
+	var chain = [];
+	this.chainAtHelper(row, col, color, chain, visitedFlags);
+
+	return chain;
 };
 
 var test = function () {
