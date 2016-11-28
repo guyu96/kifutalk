@@ -46,6 +46,16 @@ Board.prototype.isValidLocation = function(row, col) {
 	return true;
 };
 
+Board.prototype.getFlags = function() {
+	var flags = [];
+	for (var i = 0; i < this.size; i++) {
+		flags.push([]);
+		for (var j = 0; j < this.size; j++)
+			flags[i].push(false);
+	}
+	return flags;
+};
+
 Board.prototype.chainAtHelper = function(row, col, color, chain, visitedFlags) {
 	if (!this.isValidLocation(row, col))
 		return
@@ -68,12 +78,7 @@ Board.prototype.chainAt = function(row, col) {
 	if (color !== 'b' && color !== 'w')
 		return [];
 
-	var visitedFlags = [];
-	for (var i = 0; i < this.size; i++) {
-		visitedFlags.push([]);
-		for (var j = 0; j < this.size; j++)
-			visitedFlags[i].push(false);
-	}
+	var visitedFlags = this.getFlags();
 
 	var chain = [];
 	this.chainAtHelper(row, col, color, chain, visitedFlags);
@@ -81,15 +86,50 @@ Board.prototype.chainAt = function(row, col) {
 	return chain;
 };
 
-var test = function () {
+Board.prototype.libertyHelper = function(row, col, flags) {
+	if (this.isValidLocation(row, col))
+		if (this.grid[row][col] === '.' && !flags[row][col]) {
+			flags[row][col] = true;
+			return 1;
+		}
+	return 0;
+};
+
+Board.prototype.countLiberty = function(chain) {
+	var flags = this.getFlags();
+	var lib = 0;
+	for (var i = 0; i < chain.length; i++) {
+		var row = chain[i][0];
+		var col = chain[i][1];
+		if (flags[row][col]) {
+			console.log('oopsie');
+			continue;
+		}
+		// if not counted previously then proceed
+		lib += this.libertyHelper(row+1, col, flags);
+		lib += this.libertyHelper(row-1, col, flags);
+		lib += this.libertyHelper(row, col+1, flags);
+		lib += this.libertyHelper(row, col-1, flags);
+	}
+	return lib;
+};
+
+
+// var test = function () {
 	var stars = [
 		[3, 3], [3, 9], [3, 15],
 		[9, 3], [9, 9], [9, 15],
 		[15, 3], [15, 9], [15, 15]
 	];
 	var board = new Board(19, stars);
-	board.addStone(3, 3, 'b');
-	board.printToConsole();
-};
 
-test();
+	board.addStone(3, 3, 'b');
+	board.addStone(3, 4, 'b');
+	board.addStone(4, 4, 'b');
+	board.addStone(5, 4, 'b');
+	board.addStone(4, 5, 'w');
+
+	board.printToConsole();
+// };
+
+// test();
