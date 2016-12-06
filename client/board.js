@@ -142,4 +142,17 @@ var test = function () {
   board.printToPage();
 };
 
-test();
+// test();
+
+var stars = [
+  [3, 3], [3, 9], [3, 15],
+  [9, 3], [9, 9], [9, 15],
+  [15, 3], [15, 9], [15, 15]
+];
+
+var board = new Board(19, stars);
+board.addStone(3, 3, 'b');
+board.addStone(3, 4, 'b');
+board.addStone(4, 4, 'b');
+board.addStone(5, 4, 'b');
+board.addStone(4, 5, 'w');
