@@ -6,9 +6,40 @@ var colors = {
   'w': '#F8F8F8'
 };
 
+var config = {
+  'lw': 1, // line width
+  'sp': 30 // spacing
+};
+
 // convert board coordinates to canvas coordinates
-function b2c(x, spacing, lineWidth) {
-  return (x + 1) * spacing + x * lineWidth;
+function b2c(i, spacing, lineWidth) {
+  return (i + 1) * spacing + i * lineWidth;
+}
+
+// convert canvas cordinates to board coordinates
+// allowed error range = 20% of spacing
+function c2b(x, spacing, lineWidth) {
+  var offset = (x - spacing) % (spacing + lineWidth);
+  var bc = Math.floor((x - spacing) / (spacing + lineWidth));
+  var error = 0.2 * spacing;
+  if (offset < error)
+    return bc;
+  if (spacing - offset < error)
+    return bc + 1;
+  return -1;
+}
+
+// handle click event
+function handleClick(event) {
+  var rect = canvas.getBoundingClientRect();
+  var bx = c2b(event.clientX - rect.left, config.sp, config.lw);
+  var by = c2b(event.clientY - rect.top, config.sp, config.lw);
+  if (bx == -1 || by == -1)
+    return;
+
+  // if click position is valid
+  board.addStone(by, bx, 'b');
+  renderBoard(board, config.sp, config.lw, canvas, ctx);
 }
 
 // render a board object
@@ -82,4 +113,4 @@ var canvas = document.getElementById('board');
 var ctx = canvas.getContext('2d');
 
 
-renderBoard(board, 30, 1, canvas, ctx);
+renderBoard(board, config.sp, config.lw, canvas, ctx);
