@@ -8,7 +8,9 @@ var colors = {
 
 var config = {
   'lw': 1, // line width
-  'sp': 30 // spacing
+  'sp': 30, // spacing
+  'er': 0.3, // click error range (see function c2b)
+  'st': 0.48 // stone radius relative to spacing
 };
 
 // convert board coordinates to canvas coordinates
@@ -21,7 +23,7 @@ function b2c(i, spacing, lineWidth) {
 function c2b(x, spacing, lineWidth) {
   var offset = (x - spacing) % (spacing + lineWidth);
   var bc = Math.floor((x - spacing) / (spacing + lineWidth));
-  var error = 0.2 * spacing;
+  var error = config.er * spacing;
   if (offset < error)
     return bc;
   if (spacing - offset < error)
@@ -38,7 +40,14 @@ function handleClick(event) {
     return;
 
   // if click position is valid
-  board.addStone(by, bx, 'b');
+  // get placement setting
+  var placement = document.querySelector('input[name="placement"]:checked').value;
+  console.log(placement);
+  if (placement !== 'alt') {
+    board.addStone(by, bx, placement);
+  } else {
+    board.play(by, bx);
+  }
   renderBoard(board, config.sp, config.lw, canvas, ctx);
 }
 
@@ -96,13 +105,12 @@ function renderBoard(board, spacing, lineWidth, canvas, ctx) {
       if (stone === 'b' || stone === 'w') {
         ctx.beginPath();
         ctx.fillStyle = colors[stone];
-        console.log(ctx.fillStyle);
         // find canvas coordinates
         x = b2c(j, spacing, lineWidth);
         y = b2c(i, spacing, lineWidth);
         ctx.moveTo(x, y);
         // draw stone
-        ctx.arc(x, y, 0.48*spacing, 0, 2*Math.PI, false);
+        ctx.arc(x, y, config.st*spacing, 0, 2*Math.PI, false);
         ctx.fill();
       }
     }

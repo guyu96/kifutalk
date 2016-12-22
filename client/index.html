@@ -2,12 +2,20 @@
 <html>
 <head>
 	<title>KifuTalk</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
 <canvas id="board" width="0" height="0" onclick='handleClick(event)'></canvas>
-<script type="text/javascript" src="board.js"></script>
-<script type="text/javascript" src="board_canvas.js"></script>
+
+<form id="placement-control" action="">
+  <input type="radio" name="placement" checked value="alt"> Alternate <br>
+  <input type="radio" name="placement" value="b"> Black<br>
+  <input type="radio" name="placement" value="w"> White
+</form>
+
+<script type="text/javascript" src="js/board.js"></script>
+<script type="text/javascript" src="js/board_canvas.js"></script>
 
 </body>
 </html>
