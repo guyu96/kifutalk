@@ -6,6 +6,13 @@ var directions = [
   [-1, 0] // up
 ];
 
+// coordinates of star points
+var stars = [
+  [3, 3], [3, 9], [3, 15],
+  [9, 3], [9, 9], [9, 15],
+  [15, 3], [15, 9], [15, 15]
+];
+
 // go board class declaration
 var Board = function (size, stars, toPlay) {
   this.size = size; // board dimension
@@ -20,14 +27,11 @@ var Board = function (size, stars, toPlay) {
     this.grid.push(row);
   }
 
-  for (var i = 0; i < stars.length; i++) {
-    var row = stars[i][0];
-    var col = stars[i][1];
-    this.grid[row][col] = '*';
-  }
-
-  this.prevGrid = null; // previous board configuration
+  this.prevGrid = null; // previous board configuration, used for KO checking
   this.toPlay = toPlay? toPlay: 'b'; // black plays first
+
+  // a list of moves played, along with the stones captured by each move
+  this.history = [];
 };
 
 
@@ -189,7 +193,7 @@ Board.prototype.play = function(row, col) {
   this.grid[row][col] = this.toPlay;
 
   // suicide move
-  if (this.countLiberty(this.chainAt(row, col)) == 0) {
+  if (this.countLiberty(this.chainAt(row, col)) === 0) {
     this.grid = gridCopy;
     console.error('Suicide move is illegal');
     return;
@@ -211,33 +215,48 @@ Board.prototype.play = function(row, col) {
     }
   }
   // legal move
+  this.history.push({
+    'player': this.toPlay,
+    'pos': [row, col],
+    'cap': captures
+  });
   this.prevGrid = gridCopy;
   this.toPlay = (this.toPlay === 'b') ? 'w' : 'b';
 }
 
-var test = function () {
-  var stars = [
-    [3, 3], [3, 9], [3, 15],
-    [9, 3], [9, 9], [9, 15],
-    [15, 3], [15, 9], [15, 15]
-  ];
-  var board = new Board(19, stars);
+// undo the move from grid
+Board.prototype.undoHelper = function(move, grid) {
+  // remove move from grid
+  grid[move.pos[0]][move.pos[1]] = '.';
 
-  board.addStone(3, 3, 'b');
-  board.addStone(3, 4, 'b');
-  board.addStone(4, 4, 'b');
-  board.addStone(5, 4, 'b');
-  board.addStone(4, 5, 'w');
+  // restore captured stones
+  var capColor = move.player === 'b' ? 'w': 'b';
+  move.cap.forEach(function(capChain) {
+    capChain.forEach(function(c) {
+      grid[c[0]][c[1]] = capColor;
+    })
+  });
+}
 
-  board.printToPage();
+// undo the most recent move
+Board.prototype.undo = function() {
+  // if there is no move to undo
+  if (history.length === 0) {
+    return;
+  }
+
+  // remove last move from grid
+  var lastMove = this.history.pop();
+  this.undoHelper(lastMove, this.grid);
+  // reset toPlay
+  this.toPlay = lastMove.player;
+
+  // restore prevGrid
+  if (history.length === 0) {
+    this.prevGrid = null;
+  } else {
+    this.undoHelper(this.history[this.history.length - 1], this.prevGrid);
+  }
 };
-
-// test();
-
-var stars = [
-  [3, 3], [3, 9], [3, 15],
-  [9, 3], [9, 9], [9, 15],
-  [15, 3], [15, 9], [15, 15]
-];
 
 var board = new Board(19, stars);
