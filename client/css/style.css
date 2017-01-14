@@ -1,4 +1,7 @@
-#placement-control {
-  float: right;
+header {
+  clear: both;
 }
 
+#board {
+  float: left;
+}

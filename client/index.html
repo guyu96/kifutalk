@@ -6,16 +6,47 @@
 </head>
 <body>
 
-<canvas id="board" width="0" height="0" onclick='handleClick(event)'></canvas>
-
-<form id="placement-control" action="">
-  <input type="radio" name="placement" checked value="alt"> Alternate <br>
-  <input type="radio" name="placement" value="b"> Black<br>
-  <input type="radio" name="placement" value="w"> White
-</form>
+<header>
+  <h1>Game Title</h1>
+</header>
+<main>
+  <canvas id="board" width="0" height="0" onclick='handleClick(event)'></canvas>
+  <section id="controls">
+    <div id="navigation">
+      <button id="beginning">|<</button>
+      <button id="multprev"><<</button>
+      <button id='prev'><</button>
+      <button id='next'>></button>
+      <button id='multnext'>>></button>
+      <button id='end'>>|</button>
+    </div>
+    <form id="placement" action="">
+      <input type="radio" name="placement" value="ALT"> ALT
+      <input type="radio" name="placement" value="AB"> BLK
+      <input type="radio" name="placement" value="AW"> WHT
+      <input type="radio" name="placement" value="MA"> X
+      <input type="radio" name="placement" value="TR"> TRG
+      <input type="radio" name="placement" value="CR"> CIR
+      <input type="radio" name="placement" value="SQ"> SQR
+    </form>
+    <div id="comment-display">
+      <h4>Sample User</h4>
+      <p>
+        This is a sample comment.
+      </p>
+    </div>
+    <form id="comment" action="">
+      <input type="text">
+      <input type="submit" value="Submit">
+    </form>
+  </section>
+</main>
 
 <script type="text/javascript" src="js/board.js"></script>
 <script type="text/javascript" src="js/board_canvas.js"></script>
+<script type="text/javascript" src="js/sgf.js"></script>
+<script type="text/javascript" src="js/sgf_driver.js"></script>
+<script type="text/javascript" src="js/main.js"></script>
 
 </body>
 </html>
