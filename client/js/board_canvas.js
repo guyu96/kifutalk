@@ -8,7 +8,7 @@ var colors = {
 
 var config = {
   'lw': 1, // line width
-  'sp': 30, // spacing
+  'sp': 25, // spacing
   'er': 0.3, // click error range (see function c2b)
   'st': 0.48 // stone radius relative to spacing
 };
@@ -19,7 +19,6 @@ function b2c(i, spacing, lineWidth) {
 }
 
 // convert canvas cordinates to board coordinates
-// allowed error range = 20% of spacing
 function c2b(x, spacing, lineWidth) {
   var offset = (x - spacing) % (spacing + lineWidth);
   var bc = Math.floor((x - spacing) / (spacing + lineWidth));
@@ -42,18 +41,15 @@ function handleClick(event) {
   // if click position is valid
   // get placement setting
   var placement = document.querySelector('input[name="placement"]:checked').value;
-  console.log(placement);
-  if (placement !== 'alt') {
-    board.addStone(by, bx, placement);
-  } else {
-    board.play(by, bx);
-  }
-  renderBoard(board, config.sp, config.lw, canvas, ctx);
+  // placement setting is ignored atm
+  board.play(by, bx);
+  renderBoard(board, canvas, ctx);
 }
 
 // render a board object
-// spacing denotes the space between grid lines
-function renderBoard(board, spacing, lineWidth, canvas, ctx) {
+function renderBoard(board, canvas, ctx) {
+  var spacing = config.sp;
+  var lineWidth = config.lw;
   var size = board.size;
   var grid = board.grid;
   var stars = board.stars;
@@ -98,27 +94,24 @@ function renderBoard(board, spacing, lineWidth, canvas, ctx) {
   });
   ctx.fill();
 
-  // draw stones
+  // draw stones/markers
   for (i = 0; i < size; i++) {
     for (j = 0; j < size; j++) {
       stone = grid[i][j];
-      if (stone === 'b' || stone === 'w') {
-        ctx.beginPath();
-        ctx.fillStyle = colors[stone];
-        // find canvas coordinates
-        x = b2c(j, spacing, lineWidth);
-        y = b2c(i, spacing, lineWidth);
-        ctx.moveTo(x, y);
-        // draw stone
-        ctx.arc(x, y, config.st*spacing, 0, 2*Math.PI, false);
-        ctx.fill();
+      switch (stone) {
+        case 'b':
+        case 'w':
+          ctx.beginPath();
+          ctx.fillStyle = colors[stone];
+          // find canvas coordinates
+          x = b2c(j, spacing, lineWidth);
+          y = b2c(i, spacing, lineWidth);
+          ctx.moveTo(x, y);
+          // draw stone
+          ctx.arc(x, y, config.st*spacing, 0, 2*Math.PI, false);
+          ctx.fill();
+          break;
       }
     }
   }
 }
-
-var canvas = document.getElementById('board');
-var ctx = canvas.getContext('2d');
-
-
-renderBoard(board, config.sp, config.lw, canvas, ctx);

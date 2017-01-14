@@ -258,5 +258,3 @@ Board.prototype.undo = function() {
     this.undoHelper(this.history[this.history.length - 1], this.prevGrid);
   }
 };
-
-var board = new Board(19, stars);
