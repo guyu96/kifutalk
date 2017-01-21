@@ -8,7 +8,7 @@ var colors = {
 
 var config = {
   'lw': 1, // line width
-  'sp': 25, // spacing
+  'sp': 30, // spacing
   'er': 0.3, // click error range (see function c2b)
   'st': 0.48 // stone radius relative to spacing
 };
@@ -40,7 +40,7 @@ function handleClick(event) {
 
   // if click position is valid
   // get placement setting
-  var placement = document.querySelector('input[name="placement"]:checked').value;
+  // var placement = document.querySelector('input[name="placement"]:checked').value;
   // placement setting is ignored atm
   board.play(by, bx);
   renderBoard(board, canvas, ctx);

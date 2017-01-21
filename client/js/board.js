@@ -241,7 +241,7 @@ Board.prototype.undoHelper = function(move, grid) {
 // undo the most recent move
 Board.prototype.undo = function() {
   // if there is no move to undo
-  if (history.length === 0) {
+  if (this.history.length === 0) {
     return;
   }
 
@@ -252,7 +252,7 @@ Board.prototype.undo = function() {
   this.toPlay = lastMove.player;
 
   // restore prevGrid
-  if (history.length === 0) {
+  if (this.history.length === 0) {
     this.prevGrid = null;
   } else {
     this.undoHelper(this.history[this.history.length - 1], this.prevGrid);
