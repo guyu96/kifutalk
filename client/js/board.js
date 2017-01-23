@@ -13,6 +13,14 @@ var stars = [
   [15, 3], [15, 9], [15, 15]
 ];
 
+// valid stone/marker types
+var stmk = [
+  '.', // empty
+  'b', // black stone
+  'w', // white stone
+  'n'  // next move
+]
+
 // go board class declaration
 var Board = function (size, stars, toPlay) {
   this.size = size; // board dimension
@@ -34,14 +42,23 @@ var Board = function (size, stars, toPlay) {
   this.history = [];
 };
 
+// remove all markers from board
+Board.prototype.removeMarkers = function() {
+  for (var i = 0; i < this.size; i++) {
+    for (var j = 0; j < this.size; j++) {
+      if (this.grid[i][j] !== 'b' && this.grid[i][j] !== 'w') {
+        this.grid[i][j] = '.';
+      } 
+    }
+  }
+}
 
-// add stone (or marker) to board
-Board.prototype.addStone = function(row, col, type) {
+// add stone or marker to board
+Board.prototype.add = function(row, col, type) {
   // row and col are 0-indexed
-  if (type === 'b' || type === 'w')
+  if (stmk.indexOf(type) !== -1)
     this.grid[row][col] = type;
   else
-    // @todo handle marker stones.
     console.log('Invalid type');
 };
 

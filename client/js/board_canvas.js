@@ -3,14 +3,17 @@ var colors = {
   'line': '#623F16',
   'star': '#623F16',
   'b': '#464646',
-  'w': '#F8F8F8'
+  'w': '#F8F8F8',
+  'n': '#E87566'
 };
 
 var config = {
   'lw': 1, // line width
-  'sp': 30, // spacing
+  'sp': 30, // spacing relative to line width
   'er': 0.3, // click error range (see function c2b)
-  'st': 0.48 // stone radius relative to spacing
+  'st': 0.48, // stone radius relative to spacing
+  'sr': 0.1, // star point radius relative to spacing
+  'nx': 0.25 // next move marker radius relative to spacing
 };
 
 // convert board coordinates to canvas coordinates
@@ -54,7 +57,7 @@ function renderBoard(board, canvas, ctx) {
   var grid = board.grid;
   var stars = board.stars;
 
-  var px = (size+1) * spacing + size * lineWidth;
+  var px = (size+1) * spacing + size * lineWidth; 
   var i, j, x, y;
   var stone;
 
@@ -90,27 +93,36 @@ function renderBoard(board, canvas, ctx) {
     x = b2c(star[1], spacing, lineWidth);
     y = b2c(star[0], spacing, lineWidth);
     ctx.moveTo(x, y);
-    ctx.arc(x, y, lineWidth*3, 0, 2*Math.PI, false);
+    ctx.arc(x, y, spacing*config.sr, 0, 2*Math.PI, false);
   });
   ctx.fill();
 
   // draw stones/markers
   for (i = 0; i < size; i++) {
     for (j = 0; j < size; j++) {
-      stone = grid[i][j];
-      switch (stone) {
-        case 'b':
-        case 'w':
-          ctx.beginPath();
-          ctx.fillStyle = colors[stone];
-          // find canvas coordinates
-          x = b2c(j, spacing, lineWidth);
-          y = b2c(i, spacing, lineWidth);
-          ctx.moveTo(x, y);
-          // draw stone
-          ctx.arc(x, y, config.st*spacing, 0, 2*Math.PI, false);
-          ctx.fill();
-          break;
+      if (grid[i][j] !== '.') {
+        ctx.beginPath();
+        ctx.fillStyle = colors[grid[i][j]];
+
+        // find canvas coordinates
+        x = b2c(j, spacing, lineWidth);
+        y = b2c(i, spacing, lineWidth);
+        ctx.moveTo(x, y);
+
+        // draw stone/markers
+        switch (grid[i][j]) {
+          // stones
+          case 'b':
+          case 'w':
+            ctx.arc(x, y, config.st*spacing, 0, 2*Math.PI, false);
+            ctx.fill();
+            break;
+          // marker indicating next moves
+          case 'n':
+            ctx.arc(x, y, config.nx*spacing, 0, 2*Math.PI, false);
+            ctx.fill();
+            break;
+        }
       }
     }
   }

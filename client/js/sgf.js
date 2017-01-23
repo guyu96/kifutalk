@@ -21,7 +21,7 @@ function parseActions(actionsStr) {
   var lastActionProp = '';
   while (bracketIndex !== -1) {
     var i = actionsStr.indexOf('[', start);
-    var prop = actionsStr.substring(start, i);
+    var prop = actionsStr.substring(start, i).toUpperCase();
     var value = actionsStr.substring(i+1, bracketIndex);
 
     actions.push(

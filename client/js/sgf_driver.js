@@ -23,6 +23,31 @@ var SGFDriver = function(sgfStr) {
   this.bind();
 }
 
+// display possible next moves as red markers
+SGFDriver.prototype.displayNext = function() {
+  var i, action;
+  this.move.children.forEach(function(child) {
+    for (i = 0; i < child.actions.length; i++) { 
+      action = child.actions[i];
+      if (action.prop === 'B' || action.prop === 'W') {
+        if (this.board.toPlay.toUpperCase() !== action.prop) {
+          console.log('SGF error: wrong player');
+        }
+        this.board.add(l2n(action.value[0]), l2n(action.value[1]), 'n');
+        break;
+      }
+    }
+  }, this);
+}
+
+// render board and info
+SGFDriver.prototype.render = function() {
+  this.board.removeMarkers();
+  this.displayNext();
+  renderBoard(this.board, canvas, ctx);
+  document.querySelector('#comment-display p').textContent = this.comment;
+}
+
 // set the game up by reading the root's child
 SGFDriver.prototype.setup = function() {
   // the root's (only) child contains the game's information
@@ -32,19 +57,29 @@ SGFDriver.prototype.setup = function() {
     this.execAction(action);
   }, this);
 
-  renderBoard(this.board, canvas, ctx);
-  document.querySelector('#comment-display p').textContent = this.comment;
+  this.render();
 }
 
 // Add event listeners to buttons
 SGFDriver.prototype.bind = function() {
+  var sd = this;
+
+  document.onkeydown = function(e) {
+    if (e.keyCode == '37') {
+       sd.prev();
+    }
+    else if (e.keyCode == '39') {
+       sd.next();
+    }
+  }
+
   document.querySelector('#next').addEventListener('click', function() {
-    this.next();
-  }.bind(this));
+    sd.next();
+  });
 
   document.querySelector('#prev').addEventListener('click', function() {
-    this.prev();
-  }.bind(this));
+    sd.prev();
+  });
 };
 
 // helper function that executes an action
@@ -53,11 +88,11 @@ SGFDriver.prototype.execAction = function(action) {
   switch(action.prop) {
     // add black stone
     case 'AB':
-      this.board.addStone(l2n(action.value[0]), l2n(action.value[1]), 'b');
+      this.board.add(l2n(action.value[0]), l2n(action.value[1]), 'b');
       break;
     // add white stone
     case 'AW':
-      this.board.addStone(l2n(action.value[0]), l2n(action.value[1]), 'w');
+      this.board.add(l2n(action.value[0]), l2n(action.value[1]), 'w');
       break;
     // read comment
     case 'C':
@@ -93,8 +128,8 @@ SGFDriver.prototype.next = function(childIndex) {
   this.move.actions.forEach(function(action) {
     this.execAction(action);
   }, this);
-  renderBoard(this.board, canvas, ctx);
-  document.querySelector('#comment-display p').textContent = this.comment;
+
+  this.render();
 }
 
 // go to the parent node in the game tree and undo changes in board
@@ -107,7 +142,6 @@ SGFDriver.prototype.prev = function() {
 
   this.move = this.move.parent;
   this.board.undo();
-  renderBoard(this.board, canvas, ctx);
 
   // restore past comment
   this.comment = '';
@@ -116,5 +150,6 @@ SGFDriver.prototype.prev = function() {
       this.comment = action.value;
     } 
   }, this);
-  document.querySelector('#comment-display p').textContent = this.comment;
+
+  this.render();
 }
