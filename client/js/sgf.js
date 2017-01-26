@@ -1,3 +1,5 @@
+// todo: prevent possible stack overflow errors
+
 var Node = function(parent) {
   this.parent = parent;
   this.children = [];
@@ -10,6 +12,13 @@ var Node = function(parent) {
 Node.prototype.addChild = function(child) {
   this.children.push(child);
 };
+
+Node.prototype.addAction = function(prop, val) {
+  this.actions.push({
+    'prop': prop,
+    'value': val
+  });
+}
 
 // parse a string containing actions into a list
 function parseActions(actionsStr) {
@@ -180,4 +189,39 @@ function traverseGameTree(root, i) {
   root.children.forEach(function(child) {
     traverseGameTree(child, i+3);
   });
+}
+
+// convert a game tree into a SGF string
+function printToSGF(root) {
+  var sgfStr = '';
+
+  var helper = function(node) {
+    // each variation starts with (
+    sgfStr += '(';
+    // print actions
+    node.actions.forEach(function(action, i) {
+      if (i === 0) {
+        sgfStr += ';';
+      }
+      sgfStr += action.prop + '[' + action.value + ']';
+    });
+    // if there is only one branch
+    while (node.children.length === 1) {
+      node = node.children[0];
+      node.actions.forEach(function(action, i) {
+        if (i === 0) {
+          sgfStr += ';';
+        }
+        sgfStr += action.prop + '[' + action.value + ']';
+      });
+    }
+    // more than one branch
+    node.children.forEach(function(child) {
+      helper(child);
+    });
+    sgfStr += ')';
+  }
+
+  helper(root);
+  return sgfStr;
 }
