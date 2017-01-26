@@ -178,14 +178,19 @@ Board.prototype.getCapture = function(row, col, stone) {
 
 // playing a move at row, col
 Board.prototype.play = function(row, col) {
+  // player passes
+  if (row === undefined || col === undefined) {
+    this.toPlay = (this.toPlay === 'b') ? 'w' : 'b';
+  }
+
   if (!this.isValidLocation(row, col)) {
     console.error('Out of bounds error');
-    return;
+    return false;
   }
 
   if (this.grid[row][col] === 'b' || this.grid[row][col] === 'w') {
     console.error('Cannot play on an occupied spot');
-    return;
+    return false;
   }
 
   // construct a copy of the current board state
@@ -213,7 +218,7 @@ Board.prototype.play = function(row, col) {
   if (this.countLiberty(this.chainAt(row, col)) === 0) {
     this.grid = gridCopy;
     console.error('Suicide move is illegal');
-    return;
+    return false;
   }
   // check for KO
   if (this.prevGrid) {
@@ -228,7 +233,7 @@ Board.prototype.play = function(row, col) {
     if (identicalFlag) {
       this.grid = gridCopy;
       console.error('Cannot retake KO immediately');
-      return;
+      return false;
     }
   }
   // legal move
@@ -239,6 +244,7 @@ Board.prototype.play = function(row, col) {
   });
   this.prevGrid = gridCopy;
   this.toPlay = (this.toPlay === 'b') ? 'w' : 'b';
+  return true;
 }
 
 // undo the move from grid
