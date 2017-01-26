@@ -1,9 +1,18 @@
+// For this program to function properly, a global
+// canvas and ctx must be declared before creating
+// any SGFDriver instances
+
+
 // convert letter coordinate to number
 function l2n(ch) {
   // 'A' has ASCII code 65
   return ch.toUpperCase().charCodeAt(0) - 65;
-}
+} 
 
+// convert number coordinate to letter
+function n2l(n) {
+  return String.fromCharCode(n + 65);
+}
 
 // implements game playback on a board
 var SGFDriver = function(sgfStr) {
@@ -23,27 +32,40 @@ var SGFDriver = function(sgfStr) {
   this.bind();
 }
 
-// display possible next moves as red markers
-SGFDriver.prototype.displayNext = function() {
-  var i, action;
-  this.move.children.forEach(function(child) {
-    for (i = 0; i < child.actions.length; i++) { 
-      action = child.actions[i];
+// get possible next moves
+SGFDriver.prototype.getNext = function() {
+  var nextMoves = [];
+  var i, j, action;
+  for (i = 0; i < this.move.children.length; i++) {
+    child = this.move.children[i];
+    for (j = 0; j < child.actions.length; j++) { 
+      action = child.actions[j];
       if (action.prop === 'B' || action.prop === 'W') {
         if (this.board.toPlay.toUpperCase() !== action.prop) {
           console.log('SGF error: wrong player');
+        } else {
+          nextMoves.push({
+            'chdIdx': i,
+            'row': l2n(action.value[1]),
+            'col': l2n(action.value[0])
+          });
         }
-        this.board.add(l2n(action.value[0]), l2n(action.value[1]), 'n');
         break;
       }
     }
-  }, this);
+  }
+  return nextMoves;
 }
 
 // render board and info
 SGFDriver.prototype.render = function() {
   this.board.removeMarkers();
-  this.displayNext();
+
+  // add next-move markers
+  this.getNext().forEach(function(move) {
+    this.board.add(move.row, move.col, 'n');
+  }, this);
+
   renderBoard(this.board, canvas, ctx);
   document.querySelector('#comment-display p').textContent = this.comment;
 }
@@ -58,6 +80,21 @@ SGFDriver.prototype.setup = function() {
   }, this);
 
   this.render();
+}
+
+function handleClick(event) {
+  var rect = canvas.getBoundingClientRect();
+  var bx = c2b(event.clientX - rect.left, config.sp, config.lw);
+  var by = c2b(event.clientY - rect.top, config.sp, config.lw);
+  if (bx == -1 || by == -1)
+    return;
+
+  // if click position is valid
+  // get placement setting
+  // var placement = document.querySelector('input[name="placement"]:checked').value;
+  // placement setting is ignored atm
+  board.play(by, bx);
+  renderBoard(board, canvas, ctx);
 }
 
 // Add event listeners to buttons
@@ -80,6 +117,38 @@ SGFDriver.prototype.bind = function() {
   document.querySelector('#prev').addEventListener('click', function() {
     sd.prev();
   });
+
+  canvas.addEventListener('click', function(e) {
+    var rect = canvas.getBoundingClientRect();
+    var bx = c2b(e.clientX - rect.left, config.sp, config.lw);
+    var by = c2b(e.clientY - rect.top, config.sp, config.lw);
+    var nextMoves, move, i;
+
+    if (bx !== -1 && by !== -1) {
+      nextMoves = sd.getNext();
+      // check if the click is on an existing game tree
+      for (i = 0; i < nextMoves.length; i++) {
+        move = nextMoves[i];
+        if (move.row === by && move.col === bx) {
+          sd.next(move.chdIdx);
+          return;
+        }
+      }
+      // the click is somewhere else on the board
+      if (sd.board.play(by, bx)) {
+        // create a new mode (node)
+        var node = new Node(sd.move);
+        node.addAction(
+          sd.board.toPlay === 'b' ? 'W' : 'B',
+          n2l(bx)+ n2l(by) 
+        );
+        // add it as a child of the current move
+        sd.move.addChild(node);
+        sd.move = node;
+        sd.render();
+      }
+    }
+  });
 };
 
 // helper function that executes an action
@@ -88,11 +157,11 @@ SGFDriver.prototype.execAction = function(action) {
   switch(action.prop) {
     // add black stone
     case 'AB':
-      this.board.add(l2n(action.value[0]), l2n(action.value[1]), 'b');
+      this.board.add(l2n(action.value[1]), l2n(action.value[0]), 'b');
       break;
     // add white stone
     case 'AW':
-      this.board.add(l2n(action.value[0]), l2n(action.value[1]), 'w');
+      this.board.add(l2n(action.value[1]), l2n(action.value[0]), 'w');
       break;
     // read comment
     case 'C':
@@ -104,7 +173,7 @@ SGFDriver.prototype.execAction = function(action) {
       if (this.board.toPlay.toUpperCase() !== action.prop) {
         console.log('SGF error: wrong player');
       } else {
-        this.board.play(l2n(action.value[0]), l2n(action.value[1]));
+        this.board.play(l2n(action.value[1]), l2n(action.value[0]));
       }
       break;
     default:
