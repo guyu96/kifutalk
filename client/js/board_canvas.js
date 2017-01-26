@@ -11,9 +11,9 @@ var config = {
   'lw': 1, // line width
   'sp': 30, // spacing relative to line width
   'er': 0.3, // click error range (see function c2b)
-  'st': 0.48, // stone radius relative to spacing
+  'st': 0.5, // stone radius relative to spacing
   'sr': 0.1, // star point radius relative to spacing
-  'nx': 0.25 // next move marker radius relative to spacing
+  'nx': 0.2 // next move marker radius relative to spacing
 };
 
 // convert board coordinates to canvas coordinates
