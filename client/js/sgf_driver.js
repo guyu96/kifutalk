@@ -118,6 +118,25 @@ SGFDriver.prototype.bind = function() {
     sd.prev();
   });
 
+  // right click anywhere on board delete last move
+  canvas.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+    var node = sd.move;
+    // undo last move
+    sd.prev();
+    // unlink the move
+    var i;
+    for (i = 0; i < sd.move.children.length; i++) {
+      if (sd.move.children[i] === node) {
+        break;
+      }
+    }
+    sd.move.children.splice(i, 1);
+    node.parent = null;
+    // rerender
+    sd.render();
+  });
+
   canvas.addEventListener('click', function(e) {
     var rect = canvas.getBoundingClientRect();
     var bx = c2b(e.clientX - rect.left, config.sp, config.lw);
@@ -125,6 +144,7 @@ SGFDriver.prototype.bind = function() {
     var nextMoves, move, i;
 
     if (bx !== -1 && by !== -1) {
+      // left click chooses/adds variation
       nextMoves = sd.getNext();
       // check if the click is on an existing game tree
       for (i = 0; i < nextMoves.length; i++) {
@@ -146,7 +166,7 @@ SGFDriver.prototype.bind = function() {
         sd.move.addChild(node);
         sd.move = node;
         sd.render();
-      }
+      }      
     }
   });
 };
