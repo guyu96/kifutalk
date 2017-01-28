@@ -12,6 +12,8 @@ var config = {
   'sp': 30, // spacing relative to line width
   'er': 0.3, // click error range (see function c2b)
   'st': 0.5, // stone radius relative to spacing
+  'mk': 0.3, // stone marker radius relative to spacing
+  'mw': 2.5, // stone marker width relative to line width
   'sr': 0.1, // star point radius relative to spacing
   'nx': 0.2 // next move marker radius relative to spacing
 };
@@ -125,5 +127,21 @@ function renderBoard(board, canvas, ctx) {
         }
       }
     }
+  }
+  ctx.closePath();
+
+  // mark the most recently placed stone
+  if (board.history.length > 0) {
+    var lastMove = board.history[board.history.length - 1];
+    ctx.strokeStyle = lastMove.player === 'b' ? colors.w : colors.b;
+    // move to canvas coordinate
+    x = b2c(lastMove.pos[1], spacing, lineWidth);
+    y = b2c(lastMove.pos[0], spacing, lineWidth);
+    ctx.moveTo(x, y);
+    // mark
+    ctx.beginPath();
+    ctx.lineWidth = config.mw * config.lw;
+    ctx.arc(x, y, config.mk*spacing, 0, 2*Math.PI, false);
+    ctx.stroke();
   }
 }
