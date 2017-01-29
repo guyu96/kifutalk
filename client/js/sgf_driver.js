@@ -5,13 +5,13 @@
 
 // convert letter coordinate to number
 function l2n(ch) {
-  // 'A' has ASCII code 65
-  return ch.toUpperCase().charCodeAt(0) - 65;
+  // 'a' has ASCII code 97
+  return ch.toLowerCase().charCodeAt(0) - 97;
 } 
 
 // convert number coordinate to letter
 function n2l(n) {
-  return String.fromCharCode(n + 65);
+  return String.fromCharCode(n + 97);
 }
 
 // implements game playback on a board
