@@ -132,16 +132,23 @@ function renderBoard(board, canvas, ctx) {
 
   // mark the most recently placed stone
   if (board.history.length > 0) {
-    var lastMove = board.history[board.history.length - 1];
-    ctx.strokeStyle = lastMove.player === 'b' ? colors.w : colors.b;
-    // move to canvas coordinate
-    x = b2c(lastMove.pos[1], spacing, lineWidth);
-    y = b2c(lastMove.pos[0], spacing, lineWidth);
-    ctx.moveTo(x, y);
-    // mark
-    ctx.beginPath();
-    ctx.lineWidth = config.mw * config.lw;
-    ctx.arc(x, y, config.mk*spacing, 0, 2*Math.PI, false);
-    ctx.stroke();
+    // skip all passes
+    i = board.history.length - 1;
+    while (i >= 0 && board.history[i] === 'p') {
+      i--;
+    }
+    if (i >= 0) {
+      var lastMove = board.history[i];
+      ctx.strokeStyle = lastMove.player === 'b' ? colors.w : colors.b;
+      // move to canvas coordinate
+      x = b2c(lastMove.pos[1], spacing, lineWidth);
+      y = b2c(lastMove.pos[0], spacing, lineWidth);
+      ctx.moveTo(x, y);
+      // mark
+      ctx.beginPath();
+      ctx.lineWidth = config.mw * config.lw;
+      ctx.arc(x, y, config.mk*spacing, 0, 2*Math.PI, false);
+      ctx.stroke();
+    }
   }
 }

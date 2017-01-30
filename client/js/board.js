@@ -56,12 +56,23 @@ Board.prototype.removeMarkers = function() {
 // add stone or marker to board
 Board.prototype.add = function(row, col, type) {
   // row and col are 0-indexed
-  if (stmk.indexOf(type) !== -1)
-    this.grid[row][col] = type;
-  else
+  if (!this.isValidLocation(row, col)) {
+    console.log('Invalid location');
+  } else if (stmk.indexOf(type) === -1) {
     console.log('Invalid type');
+  } else {
+    this.grid[row][col] = type;
+  }
 };
 
+// remove a stone or marker from board
+Board.prototype.remove = function(row, col) {
+  if (!this.isValidLocation(row, col)) {
+    console.log('Invalid location');
+  } else {
+    this.grid[row][col] = '.';
+  }
+}
 
 // check if row, col are valid
 Board.prototype.isValidLocation = function(row, col) {
@@ -178,11 +189,6 @@ Board.prototype.getCapture = function(row, col, stone) {
 
 // playing a move at row, col
 Board.prototype.play = function(row, col) {
-  // player passes
-  if (row === undefined || col === undefined) {
-    this.toPlay = (this.toPlay === 'b') ? 'w' : 'b';
-  }
-
   if (!this.isValidLocation(row, col)) {
     console.error('Out of bounds error');
     return false;
@@ -247,6 +253,14 @@ Board.prototype.play = function(row, col) {
   return true;
 }
 
+// pass
+Board.prototype.pass = function() {
+  // switch player
+  this.toPlay = (this.toPlay === 'b') ? 'w' : 'b';
+  // add pass entry to history
+  this.history.push('p');
+}
+
 // undo the move from grid
 Board.prototype.undoHelper = function(move, grid) {
   // remove move from grid
@@ -270,14 +284,20 @@ Board.prototype.undo = function() {
 
   // remove last move from grid
   var lastMove = this.history.pop();
-  this.undoHelper(lastMove, this.grid);
-  // reset toPlay
-  this.toPlay = lastMove.player;
-
-  // restore prevGrid
-  if (this.history.length === 0) {
-    this.prevGrid = null;
+  // if last move is pass
+  if (lastMove === 'p') {
+    this.toPlay = (this.toPlay === 'b') ? 'w' : 'b';
+  // not pass
   } else {
-    this.undoHelper(this.history[this.history.length - 1], this.prevGrid);
+    this.undoHelper(lastMove, this.grid);
+    // reset toPlay
+    this.toPlay = lastMove.player;
+
+    // restore prevGrid
+    if (this.history.length === 0) {
+      this.prevGrid = null;
+    } else if (this.history[this.history.length - 1] !== 'p') {
+      this.undoHelper(this.history[this.history.length - 1], this.prevGrid);
+    }
   }
 };

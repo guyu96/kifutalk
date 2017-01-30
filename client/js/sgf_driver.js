@@ -42,13 +42,17 @@ SGFDriver.prototype.getNext = function() {
       action = child.actions[j];
       if (action.prop === 'B' || action.prop === 'W') {
         if (this.board.toPlay.toUpperCase() !== action.prop) {
+          console.log(action);
           console.log('SGF error: wrong player');
-        } else {
+        // [tt] also means pass
+        } else if (action.value !== '' && action.value !== 'tt') {
           nextMoves.push({
             'chdIdx': i,
             'row': l2n(action.value[1]),
             'col': l2n(action.value[0])
           });
+        } else {  
+          console.log('Next move is pass');
         }
         break;
       }
@@ -118,7 +122,21 @@ SGFDriver.prototype.bind = function() {
     sd.prev();
   });
 
-  // right click anywhere on board delete last move
+  // pass
+  document.querySelector('#pass').addEventListener('click', function() {
+    sd.board.pass();
+    // create new 'pass' node
+    var node = new Node(sd.move);
+    node.addAction(
+      sd.board.toPlay === 'b' ? 'W' : 'B',
+      ''
+    );
+    // add it as a child of the current move
+    sd.move.addChild(node);
+    sd.move = node;
+  });
+
+  // right click anywhere on board to delete last move
   canvas.addEventListener('contextmenu', function(e) {
     e.preventDefault();
     var node = sd.move;
@@ -137,6 +155,7 @@ SGFDriver.prototype.bind = function() {
     sd.render();
   });
 
+  // left click chooses/adds variation
   canvas.addEventListener('click', function(e) {
     var rect = canvas.getBoundingClientRect();
     var bx = c2b(e.clientX - rect.left, config.sp, config.lw);
@@ -144,7 +163,6 @@ SGFDriver.prototype.bind = function() {
     var nextMoves, move, i;
 
     if (bx !== -1 && by !== -1) {
-      // left click chooses/adds variation
       nextMoves = sd.getNext();
       // check if the click is on an existing game tree
       for (i = 0; i < nextMoves.length; i++) {
@@ -192,14 +210,47 @@ SGFDriver.prototype.execAction = function(action) {
     case 'W':
       if (this.board.toPlay.toUpperCase() !== action.prop) {
         console.log('SGF error: wrong player');
+      } else if (action.value === '' || action.value === 'tt') {
+        this.board.pass();
       } else {
-        this.board.play(l2n(action.value[1]), l2n(action.value[0]));
+        if (!this.board.play(l2n(action.value[1]), l2n(action.value[0]))) {
+          // illegal play
+          return false;
+        }
       }
       break;
     default:
       console.log('unknown sgf tag: ' + action.prop);
   }
+  // action execution successful
+  return true;
 };
+
+// helper function that undoes an action
+SGFDriver.prototype.undoAction = function(action) {
+  switch (action.prop) {
+    // remove a stone
+    case 'AB':
+    case 'AW':
+      this.board.remove(l2n(action.value[1]), l2n(action.value[0]));
+      break;
+    // clear comment
+    case 'C':
+      this.comment = '';
+      break;
+    // black or white plays
+    case 'B':
+    case 'W':
+      if (this.board.toPlay.toUpperCase() === action.prop) {
+        console.log('SGF error: wrong player');
+      } else {
+        this.board.undo();
+      }
+      break;
+    default:
+      console.log('unknown sgf tag: ' + action.prop);
+  }
+}
 
 // complete actions in current move and move to the next one
 // if there are multiple possible next moves, choose children[childIndex]
@@ -213,10 +264,23 @@ SGFDriver.prototype.next = function(childIndex) {
   childIndex = childIndex === undefined? 0: childIndex;
   this.move = this.move.children[childIndex];
 
+  // reset comments
+  var prevComment = this.comment;
   this.comment = '';
-  this.move.actions.forEach(function(action) {
-    this.execAction(action);
-  }, this);
+
+  // execute actions
+  for (var i = 0; i < this.move.actions.length; i++) {
+    // if action execution failed
+    if (!this.execAction(this.move.actions[i])) {
+      for (var j = i-1; j >= 0; j--) {
+        this.undoAction(this.move.actions[j]);
+      }
+      console.error('Action invalid: ', this.move.actions[i]);
+      // restore move pointer and previous comment
+      this.move = this.move.parent;
+      this.comment = prevComment;
+    }
+  }
 
   this.render();
 }
@@ -229,14 +293,17 @@ SGFDriver.prototype.prev = function() {
     return;
   }
 
-  this.move = this.move.parent;
-  this.board.undo();
-
-  // restore past comment
-  this.comment = '';
+  // undo current move
   this.move.actions.forEach(function(action) {
+    this.undoAction(action);
+  }, this);
+
+  this.move = this.move.parent;
+
+  this.move.actions.forEach(function(action) {
+    // restore past comment
     if (action.prop === 'C') {
-      this.comment = action.value;
+      this.execAction(action);
     } 
   }, this);
 
