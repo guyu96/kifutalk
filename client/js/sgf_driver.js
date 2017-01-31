@@ -112,10 +112,11 @@ SGFDriver.prototype.bind = function() {
 
   document.onkeydown = function(e) {
     if (e.keyCode == '37') {
-       sd.prev();
-    }
-    else if (e.keyCode == '39') {
-       sd.next();
+      sd.prev();
+    } else if (e.keyCode == '39') {
+      sd.next();
+    } else if (e.keyCode == '80') {
+      sd.pass();
     }
   }
 
@@ -127,67 +128,14 @@ SGFDriver.prototype.bind = function() {
     sd.prev();
   });
 
-  // pass
   document.querySelector('#pass').addEventListener('click', function() {
-    // look for existing pass node
-    var i, j, child, action;
-    var flag = false;
-    // set the flag if pass move found
-    for (i = 0; i < sd.move.children.length; i++) {
-      child = sd.move.children[i];
-      for (j = 0; j < child.actions.length; j++) {
-        action = child.actions[j];
-        if (action.prop === sd.board.toPlay.toUpperCase()) {
-          if (action.value === '' || action.value === 'tt') {
-            flag = true;
-          }
-        }
-        if (flag) {
-          break;
-        }
-      }
-      if (flag) {
-        break;
-      }
-    }
-
-    // if pass node found
-    if (flag) {
-      sd.next(i);
-    // no pass node found, create new pass node
-    } else {
-      var node = new Node(sd.move);
-      node.addAction(
-        sd.board.toPlay === 'b' ? 'B' : 'W',
-        ''
-      );
-      // add it as a child of the current move
-      sd.move.addChild(node);
-      sd.move = node;
-
-      sd.board.pass();
-    }
-
-    sd.render();
+    sd.pass();
   });
 
   // right click anywhere on board to delete last move
   canvas.addEventListener('contextmenu', function(e) {
     e.preventDefault();
-    var node = sd.move;
-    // undo last move
-    sd.prev();
-    // unlink the move
-    var i;
-    for (i = 0; i < sd.move.children.length; i++) {
-      if (sd.move.children[i] === node) {
-        break;
-      }
-    }
-    sd.move.children.splice(i, 1);
-    node.parent = null;
-    // rerender
-    sd.render();
+    sd.deleteLast();
   });
 
   // left click chooses/adds variation
@@ -219,7 +167,7 @@ SGFDriver.prototype.bind = function() {
         sd.move.addChild(node);
         sd.move = node;
         sd.render();
-      }      
+      }
     }
   });
 };
@@ -344,4 +292,66 @@ SGFDriver.prototype.prev = function() {
   }, this);
 
   this.render();
+}
+
+// player passes
+SGFDriver.prototype.pass = function() {
+  // look for existing pass node
+  var i, j, child, action;
+  var flag = false;
+  // set the flag if pass move found
+  for (i = 0; i < sd.move.children.length; i++) {
+    child = sd.move.children[i];
+    for (j = 0; j < child.actions.length; j++) {
+      action = child.actions[j];
+      if (action.prop === sd.board.toPlay.toUpperCase()) {
+        if (action.value === '' || action.value === 'tt') {
+          flag = true;
+        }
+      }
+      if (flag) {
+        break;
+      }
+    }
+    if (flag) {
+      break;
+    }
+  }
+
+  // if pass node found
+  if (flag) {
+    sd.next(i);
+  // no pass node found, create new pass node
+  } else {
+    var node = new Node(sd.move);
+    node.addAction(
+      sd.board.toPlay === 'b' ? 'B' : 'W',
+      ''
+    );
+    // add it as a child of the current move
+    sd.move.addChild(node);
+    sd.move = node;
+
+    sd.board.pass();
+  }
+
+  sd.render();
+}
+
+// delete the last move (and all its variations)
+SGFDriver.prototype.deleteLast = function() {
+  var node = sd.move;
+  // undo last move
+  sd.prev();
+  // unlink the move
+  var i;
+  for (i = 0; i < sd.move.children.length; i++) {
+    if (sd.move.children[i] === node) {
+      break;
+    }
+  }
+  sd.move.children.splice(i, 1);
+  node.parent = null;
+  // rerender
+  sd.render();
 }
