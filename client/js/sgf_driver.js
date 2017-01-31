@@ -42,7 +42,6 @@ SGFDriver.prototype.getNext = function() {
       action = child.actions[j];
       if (action.prop === 'B' || action.prop === 'W') {
         if (this.board.toPlay.toUpperCase() !== action.prop) {
-          console.log(action);
           console.log('SGF error: wrong player');
         // [tt] also means pass
         } else if (action.value !== '' && action.value !== 'tt') {
@@ -52,7 +51,7 @@ SGFDriver.prototype.getNext = function() {
             'col': l2n(action.value[0])
           });
         } else {  
-          console.log('Next move is pass');
+          nextMoves.push('p');
         }
         break;
       }
@@ -63,11 +62,17 @@ SGFDriver.prototype.getNext = function() {
 
 // render board and info
 SGFDriver.prototype.render = function() {
+  document.querySelector('#pass').style = '';
   this.board.removeMarkers();
 
   // add next-move markers
   this.getNext().forEach(function(move) {
-    this.board.add(move.row, move.col, 'n');
+    // handle pass
+    if (move === 'p') {
+      document.querySelector('#pass').style.color = 'red';
+    } else {
+      this.board.add(move.row, move.col, 'n');
+    }
   }, this);
 
   renderBoard(this.board, canvas, ctx);
@@ -124,16 +129,46 @@ SGFDriver.prototype.bind = function() {
 
   // pass
   document.querySelector('#pass').addEventListener('click', function() {
-    sd.board.pass();
-    // create new 'pass' node
-    var node = new Node(sd.move);
-    node.addAction(
-      sd.board.toPlay === 'b' ? 'W' : 'B',
-      ''
-    );
-    // add it as a child of the current move
-    sd.move.addChild(node);
-    sd.move = node;
+    // look for existing pass node
+    var i, j, child, action;
+    var flag = false;
+    // set the flag if pass move found
+    for (i = 0; i < sd.move.children.length; i++) {
+      child = sd.move.children[i];
+      for (j = 0; j < child.actions.length; j++) {
+        action = child.actions[j];
+        if (action.prop === sd.board.toPlay.toUpperCase()) {
+          if (action.value === '' || action.value === 'tt') {
+            flag = true;
+          }
+        }
+        if (flag) {
+          break;
+        }
+      }
+      if (flag) {
+        break;
+      }
+    }
+
+    // if pass node found
+    if (flag) {
+      sd.next(i);
+    // no pass node found, create new pass node
+    } else {
+      var node = new Node(sd.move);
+      node.addAction(
+        sd.board.toPlay === 'b' ? 'B' : 'W',
+        ''
+      );
+      // add it as a child of the current move
+      sd.move.addChild(node);
+      sd.move = node;
+
+      sd.board.pass();
+    }
+
+    sd.render();
   });
 
   // right click anywhere on board to delete last move
@@ -241,10 +276,10 @@ SGFDriver.prototype.undoAction = function(action) {
     // black or white plays
     case 'B':
     case 'W':
-      if (this.board.toPlay.toUpperCase() === action.prop) {
-        console.log('SGF error: wrong player');
-      } else {
+      if (this.board.toPlay.toUpperCase() !== action.prop) {
         this.board.undo();
+      } else {
+        console.log('SGF error: wrong player');
       }
       break;
     default:
@@ -272,6 +307,7 @@ SGFDriver.prototype.next = function(childIndex) {
   for (var i = 0; i < this.move.actions.length; i++) {
     // if action execution failed
     if (!this.execAction(this.move.actions[i])) {
+      // undo all previous actions (in reverse order)
       for (var j = i-1; j >= 0; j--) {
         this.undoAction(this.move.actions[j]);
       }
