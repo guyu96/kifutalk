@@ -1,5 +1,4 @@
-bin/*
-include/*
-lib/*
-local/*
-pip-selfcheck.json
+.venv/
+__pycache__/
+instance/
+*.py[cod]
