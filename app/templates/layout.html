@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}{% endblock %}</title>
+</head>
+<body>
+  {% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+  {% endwith %}
+
+  {% block body %}
+  <header>
+    <h1><a href="{{ url_for('index') }}">Kifutalk</a></h1>
+    <nav>
+      {% if current_user.is_authenticated %}
+        <a href="">{{ current_user.username }}</a>
+        <a href="{{ url_for('logout') }}">Log Out</a>
+      {% else %}
+        <a href="{{ url_for('login') }}">Log in</a>
+        <a href="{{ url_for('signup') }}">Sign up</a>
+      {% endif %}
+    </nav>
+  </header>
+  {% endblock %}
+</body>
+</html>

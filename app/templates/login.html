@@ -1,0 +1,14 @@
+{% extends 'layout.html' %}
+{% from 'macros.html' import render_field %}
+
+{% block title %}Log In - Kifutalk{% endblock %}
+{% block body %}
+  {{ super() }}
+  <form method="post">
+    {{ render_field(form.email) }}
+    {{ render_field(form.password) }}
+    {{ render_field(form.remember_me) }}
+    {{ form.submit }}
+    {{ form.csrf_token }}
+  </form>
+{% endblock %}
