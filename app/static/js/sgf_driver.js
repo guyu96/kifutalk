@@ -17,9 +17,12 @@ function n2l(n) {
 // implements game playback on a board
 var SGFDriver = function(sgfStr) {
   // parse sgfStr into a game tree
-  this.root = new Node(null);
-  parse(sgfStr, this.root, 0);
-
+  // this.root = new Node(null);
+  // parse(sgfStr, this.root, 0);
+  // TEMPORARY FIX FOR REVISED SGF API
+  var gt = parse(sgfStr);
+  this.root = gt.root;
+  
   // initialize new empty board
   this.board = new Board(19, stars);
 

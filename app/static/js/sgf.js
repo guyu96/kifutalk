@@ -1,13 +1,18 @@
 // todo: prevent possible stack overflow errors
 
 var Node = function(parent) {
+  // id used to identify the node in a game tree
+  // -1 is placeholder value, first node should start with 0
+  this.id = -1
+
   this.parent = parent;
   this.children = [];
+
   // an action is a prop-value pair
   // representation in sgf: P[V]
   // representation in javascript: {prop: P: value: V}
   this.actions = [];
-}
+};
 
 Node.prototype.addChild = function(child) {
   this.children.push(child);
@@ -18,7 +23,16 @@ Node.prototype.addAction = function(prop, val) {
     'prop': prop,
     'value': val
   });
-}
+};
+
+var GameTree = function(root, nextNodeID) {
+  // root of the game tree
+  this.root = root;
+  // integer ID used to identify nodes in the game tree
+  // increments when new node is added
+  // does NOT decrement when node is deleted
+  this.nextNodeID = nextNodeID;
+};
 
 // parse a string containing actions into a list
 function parseActions(actionsStr) {
@@ -28,6 +42,7 @@ function parseActions(actionsStr) {
 
   // handle cases where one action is executed many times
   var lastActionProp = '';
+
   while (bracketIndex !== -1) {
     var i = actionsStr.indexOf('[', start);
     var prop = actionsStr.substring(start, i).toUpperCase();
@@ -45,13 +60,12 @@ function parseActions(actionsStr) {
     bracketIndex = actionsStr.indexOf(']', start);
   }
 
-    return actions;
+  return actions;
 }
 
-// Parse sgf string with no variations
+// Parse sgf string containing only 1 variation
 // Square brackets escaping is not enabled
-// Note: sgf string does not contain ()
-function parseHelper(root, sgfStr) {
+function parseVar(root, sgfStr) {
   var parent = root;
   nodeStrList = sgfStr.split(';');
   // i starts at 1 because the split list starts
@@ -140,8 +154,8 @@ function findVarEndIdx(sgfStr, i) {
   return -1;
 }
 
-// parse sgf
-function parse(sgfStr, root, i) {
+// recursively parse sgf string and anchor them at root
+function parseHelper(sgfStr, root, i) {
   var parent = root;
   while (i < sgfStr.length) {
     // if whitespace
@@ -157,7 +171,7 @@ function parse(sgfStr, root, i) {
       var next = sgfStr[end] === '(' ? end : end+1;
       // parse the current variation and set 
       // parent to the last node of the variation
-      parent = parseHelper(parent, sgfStr.substring(i, end));
+      parent = parseVar(parent, sgfStr.substring(i, end));
       // move pointer i
       i = next;
     } else if (sgfStr[i] === '(') {
@@ -165,13 +179,37 @@ function parse(sgfStr, root, i) {
       var end = findValidPrtsMatch(sgfStr, i);
       // recursively parse the subvariation
       // delete the open parenthesis but keep the close one
-      parse(sgfStr.substring(i+1, end+1), parent, 0);
+      parseHelper(sgfStr.substring(i+1, end+1), parent, 0);
       i = end + 1;
     } else {
       console.error('Invalid SGF String.');
       break;
     }
   }
+}
+
+// add id to nodes in a game tree
+// return the next node's id shoud be
+function addID(root) {
+  var id = 0;
+  var helper = function(root) {
+    root.id = id++;
+    root.children.forEach(function(child) {
+      helper(child);
+    });
+  };
+
+  helper(root);
+  return id;
+}
+
+// parse sgf string and return a game tree
+function parse(sgfStr) {
+  var root = new Node(null);
+  parseHelper(sgfStr, root, 0);
+  var id = addID(root);
+  console.log(root);
+  return new GameTree(root, id);
 }
 
 // print out a list of actions
@@ -183,11 +221,11 @@ function printActions(actions, offset) {
   console.log(s);
 }
 
-// traverse the game tree and print out nodes
-function traverseGameTree(root, i) {
+// Print the game tree (including actions of each node)
+function printGameTree(root, i) {
   printActions(root.actions, i);
   root.children.forEach(function(child) {
-    traverseGameTree(child, i+3);
+    printGameTree(child, i+3);
   });
 }
 
@@ -214,7 +252,7 @@ function printToSGF(root) {
         }
         sgfStr += action.prop + '[' + action.value + ']';
       });
-    }
+    };
     // more than one branch
     node.children.forEach(function(child) {
       helper(child);

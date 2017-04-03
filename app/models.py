@@ -68,6 +68,7 @@ class Comment(db.Model):
   posted_by = db.Column(db.Integer, db.ForeignKey('users.id'))
   in_reply_to = db.Column(db.Integer, db.ForeignKey('users.id'))
   kifu_id = db.Column(db.Integer, db.ForeignKey('kifus.id'))
+  node_id = db.Column(db.Integer)
 
 class Country(db.Model):
   __tablename__ = 'countries'
