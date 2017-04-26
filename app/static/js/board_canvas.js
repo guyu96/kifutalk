@@ -3,10 +3,15 @@ var BoardCanvas = function(canvas, ctx, driver) {
   this.ctx = ctx;
   this.driver = driver;
 
-  // set canvas size (pixels)
-  this.px = (config.sz + 1) * config.canvas.sp + config.sz * config.canvas.lw;
-  this.canvas.width = this.px;
-  this.canvas.height = this.px;
+  // set canvas size in pixels
+  // this is twice as large as it should be for clarity
+  var px = (config.sz + 1) * config.canvas.sp + config.sz * config.canvas.lw;
+  this.canvas.width = px;
+  this.canvas.height = px;
+  // set actual size (after scaling)
+  var realPX = Math.floor(px / config.canvas.sc) + 'px';
+  this.canvas.style.width = realPX;
+  this.canvas.style.height = realPX;
 
   // attach event listener to canvas
   this.addBoardEventListeners();
@@ -18,7 +23,7 @@ var BoardCanvas = function(canvas, ctx, driver) {
 
 BoardCanvas.prototype.drawBackground = function() {
   this.ctx.fillStyle = config.colors.bg;
-  this.ctx.fillRect(0, 0, this.px, this.px);
+  this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 };
 
 BoardCanvas.prototype.drawGrid = function() {

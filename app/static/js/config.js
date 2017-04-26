@@ -15,7 +15,8 @@ var config = (function() {
   // canvas appearance configuration
   var canvas = {
     'lw': 1, // line width
-    'sp': 30, // spacing relative to line width
+    'sp': 60, // spacing relative to line width
+    'sc': 2, // scale factor
     'er': 0.3, // click error range (see utils.c2b)
     'st': 0.5, // stone radius relative to spacing
     'mk': 0.3, // stone marker radius relative to spacing
