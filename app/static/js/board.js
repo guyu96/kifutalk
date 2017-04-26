@@ -1,26 +1,3 @@
-// increments in row, col for each direction
-var directions = [
-  [0, 1], // right
-  [0, -1], // left
-  [1, 0], // down
-  [-1, 0] // up
-];
-
-// coordinates of star points
-var stars = [
-  [3, 3], [3, 9], [3, 15],
-  [9, 3], [9, 9], [9, 15],
-  [15, 3], [15, 9], [15, 15]
-];
-
-// valid stone/marker types
-var stmk = [
-  '.', // empty
-  'b', // black stone
-  'w', // white stone
-  'n'  // next move
-]
-
 // go board class declaration
 var Board = function (size, stars, toPlay) {
   this.size = size; // board dimension
@@ -58,7 +35,7 @@ Board.prototype.add = function(row, col, type) {
   // row and col are 0-indexed
   if (!this.isValidLocation(row, col)) {
     console.log('Invalid location');
-  } else if (stmk.indexOf(type) === -1) {
+  } else if (constants.stmk.indexOf(type) === -1) {
     console.log('Invalid type');
   } else {
     this.grid[row][col] = type;
@@ -106,7 +83,7 @@ Board.prototype.chainAtHelper = function(row, col, color, chain, visitedFlags) {
   chain.push([row, col]);
   visitedFlags[row][col] = true;
 
-  directions.forEach(function(d) {
+  constants.dir.forEach(function(d) {
     this.chainAtHelper(row+d[0], col+d[1], color, chain, visitedFlags);
   }, this);
 };
@@ -148,7 +125,7 @@ Board.prototype.countLiberty = function(chain) {
       continue;
     }
     // if not counted previously then proceed
-    directions.forEach(function(d) {
+    constants.dir.forEach(function(d) {
       lib += this.libertyHelper(row+d[0], col+d[1], flags);
     }, this);
   }
@@ -168,7 +145,7 @@ Board.prototype.getCapture = function(row, col, stone) {
 
   var capture = [];
   var chain, lib, r, c;
-  directions.forEach(function(d) {
+  constants.dir.forEach(function(d) {
     r = row + d[0];
     c = col + d[1];
     if (this.isValidLocation(r, c)) {
@@ -300,4 +277,16 @@ Board.prototype.undo = function() {
       this.undoHelper(this.history[this.history.length - 1], this.prevGrid);
     }
   }
+};
+
+// print board to page for debugging purposes
+Board.prototype.printToPage = function() {
+  document.open();
+  document.write('<pre>');
+  for (var i = 0; i < this.size; i++) {
+    document.write(this.grid[i].join(''));
+    document.write('\n');
+  }
+  document.write('</pre>');
+  document.close();
 };
