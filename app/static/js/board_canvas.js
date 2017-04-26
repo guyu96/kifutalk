@@ -208,8 +208,8 @@ BoardCanvas.prototype.addBoardEventListeners = function() {
   this.canvas.addEventListener('click', function(e) {
     // get board coordinates
     var rect = self.canvas.getBoundingClientRect();
-    var bx = utils.c2b(e.clientX - rect.left, config.canvas.sp, config.canvas.lw);
-    var by = utils.c2b(e.clientY - rect.top, config.canvas.sp, config.canvas.lw);
+    var bx = utils.c2b(e.clientX - rect.left, config.canvas.sp/config.canvas.sc, config.canvas.lw);
+    var by = utils.c2b(e.clientY - rect.top, config.canvas.sp/config.canvas.sc, config.canvas.lw);
 
     // check for invalid coordinates
     if (bx == -1 || by == -1) {
