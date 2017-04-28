@@ -6,9 +6,9 @@ var exceptions = (function() {
       this.code = code;
       this.message = message;
     }
-  }
+  };
 
   return {
     ParsingError: createCustomException('ParsingError')
   };
-});
+}());
