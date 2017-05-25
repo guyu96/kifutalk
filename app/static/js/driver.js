@@ -12,6 +12,7 @@ var Driver = function(sgfStr) {
     }
     this.markerLayer.push(row);
   }
+  this.updateMarkerLayer();
 };
 
 
@@ -189,3 +190,58 @@ Driver.prototype.clearMarkerLayer = function() {
   }
 };
 
+Driver.prototype.navigateTo = function(nodeID) {
+  // first go to root
+  while (this.gameTree.currentNode !== this.gameTree.root) {
+    this.prev();
+  }
+  // dfs to find node
+  var node = null;
+  var dfs = function(root) {
+    if (root.id === nodeID) {
+      node = root;
+    } else {
+      root.children.forEach(function(child) {
+        dfs(child);
+      });
+    }
+  };
+  dfs(this.gameTree.currentNode);
+  // node does not exist
+  if (!node) {
+    return false;
+  }
+  // node exists, backtrack to find the path
+  var path = [];
+  while (node !== this.gameTree.root) {
+    path.push(node);
+    node = node.parent;
+  }
+  // navigate to node
+  for (var i = path.length-1; i >= 0; i--) {
+    // get childIndex
+    var children = this.gameTree.currentNode.children;
+    for (var j = 0; j < children.length; j++) {
+      if (children[j] === path[i]) {
+        break;
+      }
+    }
+    // go to that child
+    this.next(j);
+  }
+  return true;
+}
+
+// create a deep clone of itself
+Driver.prototype.clone = function() {
+  var currentNodeID = this.gameTree.currentNode.id;
+  var sgfStr = SGF.print(this.gameTree.root);
+  // if currentNode has no valid ID
+  if (currentNodeID <= -1) {
+    return new Driver(sgfStr);
+  }
+  // advance to node with currentNodeID
+  var driver = new Driver(sgfStr);
+  driver.navigateTo(currentNodeID);
+  return driver;
+}

@@ -67,26 +67,91 @@ def post_comment(kifu_id, node_id):
 
 # kifu main page
 @app.route('/kifu/<int:kifu_id>', methods=['GET'])
-def kifu(kifu_id):
+def kifu_get(kifu_id):
   # get kifu
   kifu = Kifu.query.filter_by(id=kifu_id).first_or_404()
 
   # get and process comments for kifu
   comments = Comment.query.filter_by(kifu_id=kifu_id).all()
   comments_dict = {}
+
   # arrange comments by node_id
   for c in comments:
     if c.node_id not in comments_dict:
       comments_dict[c.node_id] = [c]
     else:
       comments_dict[c.node_id].append(c)
+
   # sort comments by timestamp for each node_id
   for node_id in comments_dict:
     comments_dict[node_id].sort(key=lambda c: c.timestamp)
     # serialize comments
     comments_dict[node_id] = [c.serialize for c in comments_dict[node_id]]
 
-  return render_template('kifu/kifu.html', kifu=kifu.serialize, kifu_comments=comments_dict)
+  # authentication status
+  # 0: not logged in
+  # 1: logged in but not owner of kifu
+  # 2: logged in and is owner of kifu
+  if not current_user.is_authenticated:
+    auth_status = 0
+  elif current_user.id != kifu.owner_id:
+    auth_status = 1
+  else:
+    auth_status = 2
+
+  return render_template(
+    'kifu/kifu.html',
+    kifu=kifu.serialize,
+    kifu_comments=comments_dict,
+    auth_status=auth_status
+  )
+
+# create a new, empty kifu
+@app.route('/kifu/<int:kifu_id>', methods=['POST'])
+def kifu_post():
+  pass
+
+@app.route('/kifu/<int:kifu_id>', methods=['UPDATE'])
+def kifu_update(kifu_id):
+  kifu = Kifu.query.filter_by(id=kifu_id).first_or_404()
+  if (kifu.owner_id != current_user.id):
+    abort(401)
+  kifu.update_sgf(request.get_json())
+  db.session.add(kifu)
+  db.session.commit()
+  return jsonify(kifu.serialize)
+
+@app.route('/kifu/<int:kifu_id>', methods=['DELETE'])
+def kifu_delete(kifu_id):
+  kifu = Kifu.query.filter_by(id=kifu_id).first_or_404()
+  if (kifu.owner_id != current_user.id):
+    abort(401)
+
+  # delete all comments posted on this kifu
+  kifu_comments = Comment.query.filter_by(kifu_id=kifu_id).all()
+  for kc in kifu_comments:
+    db.session.delete(kc)
+
+  # set child kifu's original/fork_from pointer to null
+  originial = Kifu.query.filter_by(original_kifu_id=kifu_id)
+  fork = Kifu.query.filter_by(forked_from_kifu_id=kifu_id)
+  for o in originial:
+    o.original_kifu_id = None
+    db.session.add(o)
+  for f in fork:
+    f.forked_from_kifu_id = None
+    db.session.add(f)
+
+  # delete and commit
+  db.session.delete(kifu)
+  db.session.commit()
+
+  # remove local file
+  os.remove(kifu.filepath)
+
+  return jsonify({
+    'redirect': url_for('index', _external=True)
+  })
 
 @app.route('/upload', methods=['GET'])
 @login_required
@@ -97,22 +162,24 @@ def upload_get():
 @login_required
 def upload_post():
   kifu_json = request.get_json()
+
   # insert kifu into database
   kifu = Kifu(
     title=kifu_json['title'],
     uploaded_on=datetime.datetime.now(),
     owner_id=current_user.id
   )
-  print(type(kifu))
+
   kifu.forked_from_kifu_id = kifu.id
   kifu.original_kifu_id = kifu.id
   db.session.add(kifu)
   db.session.commit()
+
   # write SGF to file
   sgf_path = os.path.join(current_app.config['SGF_FOLDER'], str(kifu.id) + '.sgf')
   with open(sgf_path, 'w') as f:
     f.write(kifu_json['sgf'])
 
   return jsonify({
-    'redirect': url_for('kifu', kifu_id=kifu.id, _external=True)
+    'redirect': url_for('kifu_get', kifu_id=kifu.id, _external=True)
   })

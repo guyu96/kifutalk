@@ -58,6 +58,7 @@ class Kifu(db.Model):
   id = db.Column(db.Integer, primary_key=True)
   title = db.Column(db.String(512))
   uploaded_on = db.Column(db.DateTime)
+  # modified_on = db.Column(db.DateTime)
   owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
   # for root kifus, the two foreign keys below are the same as the primary key
   forked_from_kifu_id = db.Column(db.Integer, db.ForeignKey('kifus.id'))
@@ -65,10 +66,14 @@ class Kifu(db.Model):
   upvotes = db.Column(db.Integer, default=0)
 
   @property
+  def filepath(self):
+    return os.path.join(current_app.config['SGF_FOLDER'], str(self.id) + '.sgf');
+
+  @property
   def sgf(self):
-    with open(os.path.join(current_app.config['SGF_FOLDER'], str(self.id) + '.sgf')) as f:
+    with open(self.filepath, 'r') as f:
       return f.read()
-  
+
   @property
   def serialize(self):
     uploaded_on = self.uploaded_on.strftime('%Y-%m-%d %H:%M:%S')
@@ -81,6 +86,10 @@ class Kifu(db.Model):
       'original': self.original_kifu_id,
       'sgf': self.sgf
     }
+
+  def update_sgf(self, newSGF):
+    with open(self.filepath, 'w') as f:
+      f.write(newSGF)
 
 class Comment(db.Model):
   __tablename__ = 'comments'

@@ -72,3 +72,15 @@
 #delete-node {
   width: 130px;
 }
+
+#play.playing {
+  background: #a8a8a8;
+}
+
+button:disabled {
+  color: #a8a8a8;
+}
+
+button:disabled:hover {
+  background: #d8d8d8;
+}

@@ -14,6 +14,9 @@ var GameTree = function(root, nextNodeID) {
   this.nextVar = {};
   this.updateNextVariations();
 
+  // set first node with valid variations
+  this.setFirstNode();
+
   // read game information
   this.gameInfo = {
     'PB': '', // black player
@@ -78,6 +81,14 @@ GameTree.prototype.hasValidNextVar = function() {
   return false;
 }
 
+// set and go to the first node that has a valid nextVar
+GameTree.prototype.setFirstNode = function() {
+  while (!this.atEnd() && !this.hasValidNextVar()) {
+    this.next();
+  }
+  this.firstNode = this.currentNode;
+}
+
 // find value of a given property using DFS (assume prop is unique)
 // used to extract game information
 GameTree.prototype.findValueByProp = function(prop) {
@@ -114,6 +125,11 @@ GameTree.prototype.atEnd = function() {
 GameTree.prototype.atBeginning = function() {
   return this.currentNode === this.root;
 };
+
+// check if at the first (valid) node of the game tree
+GameTree.prototype.atFirstNode = function() {
+  return this.currentNode === this.firstNode;
+}
 
 // advance to the next node in game tree
 GameTree.prototype.next = function(childIndex) {
