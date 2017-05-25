@@ -10,6 +10,7 @@ var exceptions = (function() {
 
   return {
     ParsingError: createCustomException('ParsingError'),
+    UploadError: createCustomException('UploadError'),
     NetworkError: createCustomException('NetworkError')
   };
 }());

@@ -168,7 +168,6 @@ Controller.prototype.addCanvasEventListeners = function() {
 
     // check if clicking on an existing variation
     var playVars = bc.driver.gameTree.nextVar.play;
-    console.log(playVars);
     var index = -1;
     for (var i = 0; i < playVars.length; i++) {
       if (playVars[i].row === by && playVars[i].col === bx) {

@@ -17,7 +17,7 @@ var generateTitle = function(gameTree) {
 var validateAndSubmit = function(sgfStr) {
   // validate
   if (!/\S/.test(sgfStr)) {
-    throw new exceptions.ParsingError(2, 'SGF String cannot be empty');
+    throw new exceptions.UploadError(0, 'SGF String cannot be empty');
   }
   try {
     var gameTree = SGF.parse(sgfStr);

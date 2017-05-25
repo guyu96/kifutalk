@@ -1,6 +1,8 @@
 // todo: prevent possible stack overflow errors
 
 var SGF = (function() {
+  var maxNodeID = -1;
+
   // parse a string containing actions into a list
   var parseActions = function(actionsStr) {
     var actions = [];
@@ -39,8 +41,28 @@ var SGF = (function() {
     // with the empty string
     for (var i = 1; i < nodeStrList.length; i++) {
       var node = new Node(parent);
-      parent.addChild(node);
       node.actions = parseActions(nodeStrList[i]);
+      // parse possible node id represented as an action
+      for (var j = 0; j < node.actions.length; j++) {
+        var action = node.actions[j];
+        // id is present
+        if (action.prop === 'ID') {
+          var id = Number(action.value);
+          if (Number.isNaN(id) || id < 0) {
+            throw new exceptions.ParsingError(2, 'Invalid id: ' + action.value);
+          // id is valid
+          } else {
+            // add id to node
+            node.id = id;
+            // update maxNodeID
+            maxNodeID = node.id > maxNodeID? node.id: maxNodeID;
+            // remove id from node.actions
+            node.actions.splice(j, 1);
+            break;
+          }
+        }
+      }
+      parent.addChild(node);
       parent = node;
     }
 
@@ -174,7 +196,14 @@ var SGF = (function() {
   var parse = function(sgfStr) {
     var root = new Node(null);
     parseHelper(sgfStr, root, 0);
-    return new GameTree(root, addID(root));
+    // if parsing new kifu (without id tag)
+    if (maxNodeID === -1) {
+      // reset maxNodeID
+      maxNodeID = -1;
+      return new GameTree(root, addID(root));
+    }
+    // parsing kifu retrieved from database
+    return new GameTree(root, maxNodeID+1);
   }
 
   // convert a game tree into a SGF string
@@ -191,7 +220,6 @@ var SGF = (function() {
         }
         sgfStr += action.prop + '[' + action.value + ']';
       });
-      // if there is only one branch
       while (node.children.length === 1) {
         node = node.children[0];
         node.actions.forEach(function(action, i) {
@@ -200,6 +228,14 @@ var SGF = (function() {
           }
           sgfStr += action.prop + '[' + action.value + ']';
         });
+        // print id
+        if (node.id !== -1) {
+          // in case the node has no actions
+          if (node.actions.length === 0) {
+            sgfStr += ';';
+          }
+          sgfStr += 'ID' + '[' + node.id + ']';
+        }
       };
       // more than one branch
       node.children.forEach(function(child) {
