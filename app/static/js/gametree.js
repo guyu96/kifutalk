@@ -69,6 +69,15 @@ GameTree.prototype.updateNextVariations = function() {
   }
 };
 
+// check if there exists a valid next variation
+GameTree.prototype.hasValidNextVar = function() {
+  var nv = this.nextVar;
+  if (nv.pass !== -1 || nv.play.length || nv.add.length) {
+    return true;
+  }
+  return false;
+}
+
 // find value of a given property using DFS (assume prop is unique)
 // used to extract game information
 GameTree.prototype.findValueByProp = function(prop) {
@@ -193,4 +202,15 @@ GameTree.prototype.pass = function(player) {
   // return a boolean to futureproof possible pass failures
   // current all passes should succeed
   return true;
+};
+
+GameTree.prototype.infoString = function() {
+  return {
+    'blackPlayer': this.gameInfo.PB? this.gameInfo.PB: 'Unknown',
+    'whitePlayer': this.gameInfo.PW? this.gameInfo.PW: 'Unknown',
+    'blackRank': '(' + (this.gameInfo.BR? this.gameInfo.BR: '?') + ')',
+    'whiteRank': '(' + (this.gameInfo.WR? this.gameInfo.WR: '?') + ')',
+    'komi': this.gameInfo.KM? this.gameInfo.KM: '?',
+    'result': this.gameInfo.RE? this.gameInfo.RE: '?'
+  };
 };

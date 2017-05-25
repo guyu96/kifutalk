@@ -1,0 +1,61 @@
+main {
+  margin: auto;
+  position: relative;
+  width: 1100px;
+  height: 660px;
+}
+
+#action-bar {
+  position: absolute;
+  width: 60px;
+  height: 660px;
+  left: 0;
+  top: 0;
+  margin-top: 10px;
+}
+
+#game {
+  position: absolute;
+  width: 620px;
+  height: 660px;
+  top: 0;
+  left: 60px;
+  margin-top: 10px;
+}
+
+#board {
+  width: 600px;
+  height: 600px;
+  margin: 0 10px;
+}
+
+#control {
+  position: absolute;
+  width: 400px;
+  height: 660px;
+  margin: 10px;
+  top: 0;
+  right: 0;
+}
+
+#navigation {
+  width: 400px;
+  height: 40px;
+}
+
+#edit {
+  width: 400px;
+  height: 40px;
+}
+
+#comment-list {
+  width: 400px;
+  height: 520px;
+  overflow: auto;
+}
+
+#comment-form {
+  width: 400px;
+  height: 60px;
+}
+

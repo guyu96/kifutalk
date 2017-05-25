@@ -86,7 +86,7 @@ var SGF = (function() {
   // only semantically valid parentheses are considered
   var findValidPrtsMatch = function(sgfStr, i) {
     if (sgfStr[i] !== '(' || !isSemValid(sgfStr, i)) {
-      throw new exceptions.ParsingError('0', 'Invalid Character: ' + sgfStr[i]);
+      throw new exceptions.ParsingError(0, 'Invalid Character: ' + sgfStr[i]);
       return -2;
     }
 
@@ -149,7 +149,7 @@ var SGF = (function() {
         parseHelper(sgfStr.substring(i+1, end+1), parent, 0);
         i = end + 1;
       } else {
-        throw new exceptions.ParsingError('0', 'Invalid SGF String');
+        throw new exceptions.ParsingError(1, 'Invalid SGF String');
         break;
       }
     }

@@ -1,0 +1,74 @@
+.navigation, .edit {
+  display: inline-block;
+  background: #e8e8e8;
+  margin: auto;
+  padding: 0;
+  border: 0;
+  letter-spacing: 0;
+  font-family: monospace;
+  height: 40px;
+  font-size: 24px;
+  color: #363636;
+  vertical-align: middle;
+}
+
+#navigation, #edit {
+  /* remove space between inline buttons */
+  font-size: 0;
+  border-bottom: 1px solid #a3a3a3;
+}
+
+.navigation:hover, .edit:hover {
+  background: #d8d8d8;
+}
+
+.navigation {
+  width: 50px;
+}
+
+.navigation .span, .edit .span{
+  display: block;
+  margin: auto;
+  vertical-align: middle;
+}
+
+.edit {
+  width: 50px;
+}
+
+#toggle-edit, #save, #cancel, #delete-node, #pass {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 16px;
+}
+
+#toggle-edit {
+  width: 150px;
+}
+
+#save {
+  width: 60px;
+  background: #499c88;
+  color: #e8e8e8;
+}
+
+#cancel {
+  width: 90px;
+  background: #938ad3;
+  color: #e8e8e8;
+}
+
+#save:hover {
+  background: #186652;
+}
+
+#cancel:hover {
+  background: #635aa7;
+}
+
+#pass {
+  width: 70px;
+}
+
+#delete-node {
+  width: 130px;
+}

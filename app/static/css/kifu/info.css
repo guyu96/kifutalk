@@ -1,0 +1,64 @@
+#info {
+  background: #4b5e76;
+  width: 600px;
+  height: 50px;
+  margin: 0 10px;
+  padding: 5px 0;
+}
+
+#black, #white {
+  display: inline-block;
+  margin: 0 10px;
+  color: #F8F8F8;
+  font-size: 15px;
+  max-width: 400px;
+  overflow: hidden;;
+}
+
+#players svg, #players span {
+  vertical-align: middle;
+  display: inline-block;
+}
+
+#players span {
+  margin: 0;
+}
+
+svg.black, svg.white {
+  height: 30px;
+  width: 30px;
+}
+
+svg.black circle {
+  fill: #363636;
+}
+
+svg.white circle {
+  fill: #F8F8F8;
+}
+
+#players {
+  display: inline-block;
+  margin-top: 10px;
+  height: 30px;
+}
+
+#meta {
+  display: inline-block;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 13px;
+  max-width: 600px;
+  overflow: hidden;
+  float: right;
+  line-height: 30px;
+  color: #c8c8c8;
+  margin-right: 10px;
+}
+
+#komi, #result, #upload-info {
+  display: block;
+  line-height: 16px;
+  margin: 0;
+  padding: 0;
+  text-align: right;
+}

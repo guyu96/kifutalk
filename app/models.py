@@ -2,6 +2,8 @@ from flask import current_app
 from flask_login import UserMixin
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 
+import os
+
 from . import db, bcrypt
 
 class User(UserMixin, db.Model):
@@ -52,23 +54,57 @@ class Role(db.Model):
 
 class Kifu(db.Model):
   __tablename__ = 'kifus'
+  # id also used as file paths, e.g. /kifus/1.sgf for kifu with id 1
   id = db.Column(db.Integer, primary_key=True)
-  sgf_string = db.Column(db.Text)
-  title = db.Column(db.String(256))
+  title = db.Column(db.String(512))
   uploaded_on = db.Column(db.DateTime)
   owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+  # for root kifus, the two foreign keys below are the same as the primary key
   forked_from_kifu_id = db.Column(db.Integer, db.ForeignKey('kifus.id'))
   original_kifu_id = db.Column(db.Integer, db.ForeignKey('kifus.id'))
+  upvotes = db.Column(db.Integer, default=0)
+
+  @property
+  def sgf(self):
+    with open(os.path.join(current_app.config['SGF_FOLDER'], str(self.id) + '.sgf')) as f:
+      return f.read()
+  
+  @property
+  def serialize(self):
+    uploaded_on = self.uploaded_on.strftime('%Y-%m-%d %H:%M:%S')
+    return {
+      'id': self.id,
+      'owner': User.query.get(self.owner_id).username,
+      'title': self.title,
+      'uploaded_on': uploaded_on,
+      'forked_from': self.forked_from_kifu_id,
+      'original': self.original_kifu_id,
+      'sgf': self.sgf
+    }
 
 class Comment(db.Model):
   __tablename__ = 'comments'
   id = db.Column(db.Integer, primary_key=True)
-  content = db.Column(db.Text)
-  timestamp = db.Column(db.DateTime)
-  posted_by = db.Column(db.Integer, db.ForeignKey('users.id'))
-  in_reply_to = db.Column(db.Integer, db.ForeignKey('users.id'))
-  kifu_id = db.Column(db.Integer, db.ForeignKey('kifus.id'))
-  node_id = db.Column(db.Integer)
+  content = db.Column(db.Text, nullable=False)
+  timestamp = db.Column(db.DateTime, nullable=False)
+  author = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+  in_reply_to = db.Column(db.Integer, db.ForeignKey('users.id')) # comment is reply to another user
+  read = db.Column(db.Boolean, default=False) # if reply read by the in_reply_to user
+  kifu_id = db.Column(db.Integer, db.ForeignKey('kifus.id'), nullable=False)
+  node_id = db.Column(db.Integer, nullable=False)
+  upvotes = db.Column(db.Integer, default=0)
+
+  @property
+  def serialize(self):
+    return {
+      'content': self.content,
+      'timestamp': self.timestamp.strftime('%Y-%m-%d %H:%M:%S'),
+      'author_id': self.author,
+      'author_username': User.query.get(self.author).username,
+      'in_reply_to': self.in_reply_to,
+      'kifu_id': self.kifu_id,
+      'node_id': self.node_id
+    }
 
 class Country(db.Model):
   __tablename__ = 'countries'

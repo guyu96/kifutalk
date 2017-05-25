@@ -1,3 +1,4 @@
+// maintain consistency between canvas and driver
 var BoardCanvas = function(canvas, ctx, driver) {
   this.canvas = canvas;
   this.ctx = ctx;
@@ -8,14 +9,12 @@ var BoardCanvas = function(canvas, ctx, driver) {
   var px = (config.sz + 1) * config.canvas.sp + config.sz * config.canvas.lw;
   this.canvas.width = px;
   this.canvas.height = px;
-  // set actual size (after scaling)
-  var realPX = Math.floor(px / config.canvas.sc) + 'px';
+  var realPX = config.canvas.px + 'px';
   this.canvas.style.width = realPX;
   this.canvas.style.height = realPX;
 
-  // attach event listener to canvas
-  this.addBoardEventListeners();
-  this.addGlobalEventListeners();
+  // calculate scale factor
+  this.scale = px / config.canvas.px;
 
   // first render
   this.render();
@@ -198,68 +197,4 @@ BoardCanvas.prototype.delete = function() {
     return true;
   }
   return false;
-};
-
-// attach event listeners to canvas
-BoardCanvas.prototype.addBoardEventListeners = function() {
-  var self = this;
-
-  // left click plays a move or chooses a variation
-  this.canvas.addEventListener('click', function(e) {
-    // get board coordinates
-    var rect = self.canvas.getBoundingClientRect();
-    var bx = utils.c2b(e.clientX - rect.left, config.canvas.sp/config.canvas.sc, config.canvas.lw);
-    var by = utils.c2b(e.clientY - rect.top, config.canvas.sp/config.canvas.sc, config.canvas.lw);
-
-    // check for invalid coordinates
-    if (bx == -1 || by == -1) {
-      return;
-    }
-
-    // check if clicking on an existing variation
-    var playVars = self.driver.gameTree.nextVar.play;
-    var index = -1;
-    for (var i = 0; i < playVars.length; i++) {
-      if (playVars[i].row === by && playVars[i].col === bx) {
-        index = playVars[i].index;
-        break;
-      }
-    }
-
-    // plays a move
-    if (index === -1) {
-      self.play(by, bx);
-    // chooses a variation
-    } else {
-      self.next(index);
-    }
-  });
-
-  // right click deletes the current node
-  this.canvas.addEventListener('contextmenu', function(e) {
-    e.preventDefault();
-    self.delete();
-  });
-};
-
-// attach event listeners to the entire page
-// this is for keyboard control
-BoardCanvas.prototype.addGlobalEventListeners = function() {
-  var self = this;
-  document.onkeydown = function(e) {
-    switch (e.keyCode) {
-      // left arrow goes to parent node 
-      case 37:
-        self.prev();
-        break;
-      // right arrow goes to next node (first child)
-      case 39:
-        self.next();
-        break;
-      // 'p' passes
-      case 80:
-        self.pass();
-        break;
-    }
-  }
 };

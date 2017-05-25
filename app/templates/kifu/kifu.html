@@ -1,0 +1,57 @@
+{% extends 'layout.html' %}
+
+{% block title %}Kifutalk - {{ kifu.title }}{% endblock %}
+{% block css %}
+  {{ super() }}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/kifu/kifu.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/svgicons.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/kifu/action-bar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/kifu/info.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/kifu/nav_edit.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/kifu/comment.css') }}">
+{% endblock %}
+{% block body %}
+  {{ super() }}
+  <main>
+    <div id="action-bar">
+      {% include('kifu/kifu-action-bar.html') %}
+    </div>
+    <div id="game">
+      <div id="info">
+        {% include('kifu/kifu-info.html') %}
+      </div>
+      <canvas id="board"></canvas>
+    </div>
+    <div id="control">
+      <div id="navigation">
+        {% include('kifu/kifu-navigation.html') %}
+      </div>
+      <div id="edit">
+        {% include('kifu/kifu-edit.html') %}
+      </div>
+      <div id="comments">
+        {% include('kifu/kifu-comment.html') %}
+      </div>
+    </div>
+  </main>
+
+  <script>
+    var kifu = {{ kifu|tojson }};
+    var kifuComments = {{ kifu_comments|tojson }};
+  </script>
+
+  <script src="{{ url_for('static', filename='js/config.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/constants.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/exceptions.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/utils.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/sgf.js') }}"></script>
+
+  <script src="{{ url_for('static', filename='js/node.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/gametree.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/board.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/driver.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/board_canvas.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/controller.js') }}"></script>
+
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+{% endblock %}

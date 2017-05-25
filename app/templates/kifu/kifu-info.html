@@ -1,0 +1,21 @@
+<div id="players">
+  <div id="black">
+    <svg class="black" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+     <circle cx="100" cy="100" r="100"/>
+    </svg>
+    <span>black</span>
+  </div>
+  <div id="white">
+    <span>white</span>
+    <svg class="white" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+     <circle cx="100" cy="100" r="100"/>
+    </svg>
+  </div>
+</div>
+<div id="meta">
+  <span id="komi"></span>
+  <span id="result"></span>
+  <span id="upload-info">
+    {{ kifu.uploaded_on.split(' ')[0] }} by {{ kifu.owner }}
+  </span>
+</div>

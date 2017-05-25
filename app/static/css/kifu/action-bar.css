@@ -1,0 +1,27 @@
+#action-bar {
+  background: none;
+}
+
+#action-bar button {
+  height: 60px;
+  width: 60px;
+  padding: 0;
+  display: block;
+  background: none;
+  border: 0;
+}
+
+#action-bar button:hover {
+  background: #1a3c67;
+}
+
+#action-bar svg {
+  height: 30px;
+  width: 30px;
+  margin: 0 15px;
+}
+
+#delete {
+  position: absolute;
+  bottom: 0;
+}

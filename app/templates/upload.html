@@ -1,0 +1,33 @@
+{% extends 'layout.html' %}
+{% from 'macros.html' import render_field %}
+
+{% block title %}Upload Kifu{% endblock %}
+{% block css %}
+  {{ super() }}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/upload.css') }}">
+{% endblock %}
+{% block body %}
+  {{ super() }}
+  <div id="upload">
+    <div class="upload-area">
+      <h2>Upload SGF File</h2>
+      <form id="upload-file-form" action="">
+        <input type="file" id="file-input">
+        <button id="file-submit" type="submit">Upload File</button>
+      </form>
+    </div>
+    <div class="upload-area">
+      <h2>Directly Input Raw SGF Text</h2>
+      <form id="upload-text-form" action="">
+        <textarea name="text-input" id="text-input" cols="30" rows="10"></textarea>
+        <button id="text-submit" type="submit">Upload Raw SGF</button>
+      </form>
+    </div>
+  </div>
+  
+  <script src="{{ url_for('static', filename='js/exceptions.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/node.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/gametree.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/sgf.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/upload.js') }}"></script>
+{% endblock %}

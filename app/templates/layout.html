@@ -3,8 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <title>{% block title %}{% endblock %}</title>
+  {% block css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/reset.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans|Patua+One" rel="stylesheet">
+  {% endblock %}
 </head>
 <body>
+  {# flash messages #}
   {% with messages = get_flashed_messages() %}
   {% if messages %}
     <ul class=flashes>
@@ -14,14 +20,15 @@
     </ul>
   {% endif %}
   {% endwith %}
-
+  
   {% block body %}
+  {# Only navigation bar is included #}
   <header>
     <h1><a href="{{ url_for('index') }}">Kifutalk</a></h1>
     <nav>
       {% if current_user.is_authenticated %}
         <a href="">{{ current_user.username }}</a>
-        <a href="{{ url_for('logout') }}">Log Out</a>
+        <a href="{{ url_for('logout') }}">Log out</a>
       {% else %}
         <a href="{{ url_for('login') }}">Log in</a>
         <a href="{{ url_for('signup') }}">Sign up</a>
@@ -29,5 +36,9 @@
     </nav>
   </header>
   {% endblock %}
+
+  <footer>
+    <p>Guyu Fan 2017</p>
+  </footer>
 </body>
 </html>

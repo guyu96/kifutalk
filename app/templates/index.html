@@ -4,6 +4,6 @@
 {% block body %}
   {{ super() }}
   <p>Welcome to Kifutalk!</p>
-  <a href="">Upload a kifu</a>
+  <a href="{{ url_for('upload_get') }}">Upload a kifu</a>
   <a href="">Browse Kifus</a>
 {% endblock %}
