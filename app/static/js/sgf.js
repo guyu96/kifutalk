@@ -156,6 +156,9 @@ var SGF = (function() {
       } else if (sgfStr[i] === ';') {
         // find the end index of current variation
         var end = findVarEndIdx(sgfStr, i);
+        if (end === -1) {
+          throw new exceptions.ParsingError(1, 'Invalid SGF String');
+        }
         // where to go after parsing current variation
         var next = sgfStr[end] === '(' ? end : end+1;
         // parse the current variation and set 
@@ -203,6 +206,8 @@ var SGF = (function() {
       return new GameTree(root, addID(root));
     }
     // parsing kifu retrieved from database
+    // reset maxNodeID
+    maxNodeID = -1;
     return new GameTree(root, maxNodeID+1);
   }
 
@@ -220,6 +225,14 @@ var SGF = (function() {
         }
         sgfStr += action.prop + '[' + action.value + ']';
       });
+      // print id
+      if (node.id !== -1) {
+        // in case the node has no actions
+        if (node.actions.length === 0) {
+          sgfStr += ';';
+        }
+        sgfStr += 'ID' + '[' + node.id + ']';
+      }
       while (node.children.length === 1) {
         node = node.children[0];
         node.actions.forEach(function(action, i) {
