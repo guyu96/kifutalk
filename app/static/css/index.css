@@ -1,0 +1,42 @@
+main {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 0;
+  width: 720px;
+  height: 180px;
+  margin: auto;
+  font-size: 0;
+}
+
+main a {
+  font-family: 'Open Sans', sans-serif;
+  text-decoration: none;
+  display: inline-block;
+  width: 160px;
+  padding: 40px 20px;
+  margin: 20px;
+  border: 0;
+  background: #499c88;
+  color: #d8d8d8;
+  text-align: center;
+}
+
+main a:hover {
+  width: 158px;
+  height: 18px;
+  border: 1px solid #51739e;
+  background: #186652;
+  cursor: pointer;
+}
+
+main a span {
+  font-size: 18px;
+  height: 20px;
+  text-align: center;
+  vertical-align: center;
+  display: block;
+  margin: auto;
+}

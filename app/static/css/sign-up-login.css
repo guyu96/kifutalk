@@ -1,0 +1,71 @@
+#sign-up, #login {
+  width: 500px;
+  padding: 30px;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  background: #499c88;
+  font-family: 'Open Sans', sans-serif;
+  color: #e8e8e8;;
+}
+
+#sign-up {
+  height: 380px;
+}
+
+#login {
+  height: 330px;
+}
+
+.field {
+  height: 35px;
+  padding: 15px;
+}
+
+.field label {
+  font-size: 16px;
+  display: inline-block;
+  line-height: 35px;
+  width: 170px;
+}
+
+.field input {
+  display: inline-block;
+  height: 25px;
+  width: 280px;
+  border: 0;
+  background: #ffffff;
+  padding: 5px 10px;
+  font-size: 16px;
+  color: #464646;
+  float: right;
+}
+
+#remember_me {
+  height: 30px;
+  width: 20px;
+  float: right;
+}
+
+#submit {
+  background: #186652;
+  color: #d8d8d8;
+  border: 0;
+  padding: 15px 20px;
+  margin: 30px 13.5px 0 0;
+  float: right;
+  font-size: 16px;
+}
+
+.errors li {
+  width: 440px;
+  height: 20px;
+  line-height: 20px;
+  font-size: 14px;
+  margin: 0 15px;
+  padding: 5px 15px;
+  background: #a49dd3;
+}
