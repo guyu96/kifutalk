@@ -23,3 +23,19 @@ Node.prototype.addAction = function(prop, val) {
     'value': val
   });
 };
+
+// return all children of the node (including itself)
+Node.prototype.getChildren = function() {
+  var children = [];
+
+  // dfs to get all children (including the node itself)
+  var dfs = function(root) {
+    children.push(root);
+    root.children.forEach(function(child) {
+      dfs(child);
+    });
+  }
+
+  dfs(this);
+  return children;
+}
