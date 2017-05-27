@@ -10,17 +10,6 @@
   {% endblock %}
 </head>
 <body>
-  {# flash messages #}
-  {% with messages = get_flashed_messages() %}
-  {% if messages %}
-    <ul class=flashes>
-    {% for message in messages %}
-      <li>{{ message }}</li>
-    {% endfor %}
-    </ul>
-  {% endif %}
-  {% endwith %}
-  
   {% block body %}
   {# Only navigation bar is included #}
   <header>
@@ -35,8 +24,19 @@
       {% endif %}
     </nav>
   </header>
-  {% endblock %}
 
+  {# flash messages #}
+  {% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+  {% endwith %}
+
+  {% endblock %}
   <footer>
     <p>Guyu Fan 2017</p>
   </footer>

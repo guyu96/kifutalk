@@ -1,9 +1,16 @@
 {% extends 'layout.html' %}
 
 {% block title %}Kifutalk{% endblock %}
+{% block css %}
+  {{ super() }}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+{% endblock %}
+
 {% block body %}
   {{ super() }}
-  <p>Welcome to Kifutalk!</p>
-  <a href="{{ url_for('upload_get') }}">Upload a kifu</a>
-  <a href="">Browse Kifus</a>
+  <main>
+    <a href="{{ url_for('upload_get') }}" id="upload"><span>Upload Kifu</span></a>
+    <a href="{{ url_for('new') }}" id="new"><span>Create New Kifu</span></a>
+    <a href="#" id="browse"><span>Browse Kifus</span></a>
+  </main>
 {% endblock %}

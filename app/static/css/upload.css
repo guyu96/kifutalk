@@ -1,0 +1,40 @@
+#upload {
+  position: absolute;
+  height: 600px;
+  width: 550px;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+}
+
+#upload h2 {
+  color: #e8e8e8;
+  font-size: 20px;
+  margin: 10px;
+  font-weight: bold;
+}
+
+#upload input {
+  margin: 10px;
+  color: #e8e8e8;
+}
+
+#upload textarea {
+  margin: 10px;
+  width: 500px;
+  height: 400px;
+}
+
+#text-submit {
+  display: block;
+}
+
+#upload button {
+  margin: 10px;
+}
+
+#upload div {
+  margin: 10px;
+}

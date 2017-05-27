@@ -2,9 +2,13 @@
 {% from 'macros.html' import render_field %}
 
 {% block title %}Log In - Kifutalk{% endblock %}
+{% block css %}
+  {{ super() }}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/sign-up-login.css') }}">
+{% endblock %}
 {% block body %}
   {{ super() }}
-  <form method="post">
+  <form id="login" method="post">
     {{ render_field(form.email) }}
     {{ render_field(form.password) }}
     {{ render_field(form.remember_me) }}

@@ -55,3 +55,11 @@ footer p {
   text-align: center;
   color: #97afcf;
 }
+
+.flashes li {
+  text-align: center;
+  background: #635aa7;
+  padding: 20px;
+  color: #e8e8e8;
+  border: 1px solid #57527d;
+}
