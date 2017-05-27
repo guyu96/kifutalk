@@ -23,11 +23,14 @@ var Controller = function(kifu, kifuComments, boardCanvas) {
     'prev': document.getElementById('prev'),
     'next': document.getElementById('next'),
     'end': document.getElementById('end'),
+    // edit
+    'deleteNode': document.getElementById('delete-node'),
     // control
     'editMode': document.getElementsByClassName('edit-mode'),
     'navAssist': document.getElementsByClassName('nav-assist'),
     // action bar
-    'delete': document.getElementById('delete')
+    'deleteKifu': document.getElementById('delete-kifu'),
+    'forkKifu': document.getElementById('fork')
   };
   this.initEditToggle();
 
@@ -38,6 +41,7 @@ var Controller = function(kifu, kifuComments, boardCanvas) {
   // application state variable
   this.autoPlayIntervalID = null; // to control auto play
   this.isEditting = false;
+  this.nodesDeletedDuringEdit = []; // keep track of which nodes are deleted during editting
   this.boardCanvasBackup = null;
 
   // update navigation, edit, and comment interface
@@ -193,11 +197,17 @@ Controller.prototype.pass = function() {
 };
 
 Controller.prototype.delete = function() {
+  var node = this.boardCanvas.driver.gameTree.currentNode;
   if (this.boardCanvas.delete()) {
     this.updateCommentList();
     this.updateNavEdit();
+    // delete success, add the IDs of node and its descendants
+    node.getChildren().forEach(function(child) {
+      this.nodesDeletedDuringEdit.push(child.id);
+    }, this);
     return true;
   }
+  // delete failed, do nothing
   return false;
 };
 
@@ -274,8 +284,13 @@ Controller.prototype.addActionEventListeners = function() {
   var self = this;
 
   // delete kifu
-  this.html.delete.addEventListener('click', function(e) {
+  this.html.deleteKifu.addEventListener('click', function(e) {
     self.deleteKifu(self.kifu.id);
+  });
+
+  // fork kifu
+  this.html.forkKifu.addEventListener('click', function(e) {
+    self.forkKifu(self.kifu.id);
   });
 };
 
@@ -337,6 +352,7 @@ Controller.prototype.addEditEventListeners = function() {
   // toggle edit
   this.html.toggleEdit.addEventListener('click', function(e) {
     self.isEditting = true;
+    self.nodesDeletedDuringEdit = []; // reset deleted nodes
     self.updateNavEdit();
     // backup controller state
     self.backupBoardCanvas();
@@ -349,7 +365,8 @@ Controller.prototype.addEditEventListeners = function() {
   this.html.save.addEventListener('click', function(e) {
     self.updateKifu(
       self.kifu.id,
-      SGF.print(self.boardCanvas.driver.gameTree.root)
+      SGF.print(self.boardCanvas.driver.gameTree.root),
+      self.nodesDeletedDuringEdit
     )
   });
 
@@ -362,6 +379,11 @@ Controller.prototype.addEditEventListeners = function() {
     // enable comments
     self.html.commentInput.disabled = false;
     self.html.commentSubmit.disabled = false;
+  });
+
+  // delete node
+  this.html.deleteNode.addEventListener('click', function(e) {
+    self.delete();
   });
 };
 
@@ -435,7 +457,7 @@ Controller.prototype.createCommentElement = function(comment) {
   return c;
 };
 
-Controller.prototype.updateKifu = function(kifuID, newSGF) {
+Controller.prototype.updateKifu = function(kifuID, newSGF, deletedNodes) {
   var self = this;
   var xhr = new XMLHttpRequest();
   xhr.addEventListener('readystatechange', function() {
@@ -458,6 +480,9 @@ Controller.prototype.updateKifu = function(kifuID, newSGF) {
       // update view
       self.updateNavEdit();
       self.updateCommentList();
+      // re-enable save and cancel button
+      self.html.save.disabled = false;
+      self.html.cancel.disabled = false;
     // post failed
     } else if (xhr.readyState === 4 && xhr.status !== 200) {
       // re-enable save and cancel button
@@ -469,7 +494,10 @@ Controller.prototype.updateKifu = function(kifuID, newSGF) {
 
   // send post request to server
   var url = '/kifu/' + kifuID;
-  var data = JSON.stringify(newSGF);
+  var data = JSON.stringify({
+    'newSGF': newSGF,
+    'deletedNodes': deletedNodes
+  });
   xhr.open('UPDATE', url);
   xhr.setRequestHeader('Content-type', 'application/json');
   xhr.send(data);
@@ -482,14 +510,14 @@ Controller.prototype.deleteKifu = function(kifuID) {
     // post initiated
     if (xhr.readyState === 1) {
       // disable delete button
-      self.html.delete.disabled = true;
+      self.html.deleteKifu.disabled = true;
     // post successful
     } else if (xhr.readyState === 4 && xhr.status === 200) {
       window.location.replace(JSON.parse(xhr.responseText).redirect);
     // post failed
     } else if (xhr.readyState === 4 && xhr.status !== 200) {
       // re-enable delete button
-      self.html.delete.disabled = false;
+      self.html.deleteKifu.disabled = false;
       throw new exceptions.NetworkError(2, "Kifu Deletion Failed");
     }
   });
@@ -497,6 +525,33 @@ Controller.prototype.deleteKifu = function(kifuID) {
   // send post request to server
   var url = '/kifu/' + kifuID;
   xhr.open('DELETE', url);
+  xhr.setRequestHeader('Content-type', 'application/json');
+  xhr.send();
+}
+
+Controller.prototype.forkKifu = function(kifuID) {
+  var self = this;
+  var xhr = new XMLHttpRequest();
+  xhr.addEventListener('readystatechange', function() {
+    // post initiated
+    if (xhr.readyState === 1) {
+      // disable fork button
+      self.html.forkKifu.disabled = true;
+    // post successful
+    } else if (xhr.readyState === 4 && xhr.status === 200) {
+      console.log(xhr.responseText);
+      window.location.replace(JSON.parse(xhr.responseText).redirect);
+    // post failed
+    } else if (xhr.readyState === 4 && xhr.status !== 200) {
+      // re-enable delete button
+      self.html.forkKifu.disabled = false;
+      throw new exceptions.NetworkError(3, "Kifu Fork Failed");
+    }
+  });
+
+  // send post request to server
+  var url = '/fork/' + kifuID;
+  xhr.open('POST', url);
   xhr.setRequestHeader('Content-type', 'application/json');
   xhr.send();
 }
@@ -514,7 +569,6 @@ Controller.prototype.restoreBoardCanvas = function() {
     return false;
   }
 
-  console.log('here');
   // restore boardCanvas
   this.boardCanvas = this.boardCanvasBackup;
 
