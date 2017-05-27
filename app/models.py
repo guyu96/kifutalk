@@ -60,7 +60,7 @@ class Kifu(db.Model):
   uploaded_on = db.Column(db.DateTime)
   # modified_on = db.Column(db.DateTime)
   owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-  # for root kifus, the two foreign keys below are the same as the primary key
+  # for root kifus, the two foreign keys below are null
   forked_from_kifu_id = db.Column(db.Integer, db.ForeignKey('kifus.id'))
   original_kifu_id = db.Column(db.Integer, db.ForeignKey('kifus.id'))
   upvotes = db.Column(db.Integer, default=0)

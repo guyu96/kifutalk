@@ -1,6 +1,7 @@
 var Controller = function(kifu, kifuComments, boardCanvas) {
   // retrieve data from server
   this.kifu = kifu;
+  console.log(kifu);
   this.kifuComments = kifuComments;
   this.authStatus = authStatus;
 
@@ -30,7 +31,8 @@ var Controller = function(kifu, kifuComments, boardCanvas) {
     'navAssist': document.getElementsByClassName('nav-assist'),
     // action bar
     'deleteKifu': document.getElementById('delete-kifu'),
-    'forkKifu': document.getElementById('fork')
+    'forkKifu': document.getElementById('fork'),
+    'downloadKifu': document.getElementById('download')
   };
   this.initEditToggle();
 
@@ -292,6 +294,11 @@ Controller.prototype.addActionEventListeners = function() {
   this.html.forkKifu.addEventListener('click', function(e) {
     self.forkKifu(self.kifu.id);
   });
+
+  // download kifu
+  this.html.downloadKifu.addEventListener('click', function(e) {
+    window.location.replace('/download/' + self.kifu.id);
+  });
 };
 
 // add event listeners to navigation
@@ -539,11 +546,10 @@ Controller.prototype.forkKifu = function(kifuID) {
       self.html.forkKifu.disabled = true;
     // post successful
     } else if (xhr.readyState === 4 && xhr.status === 200) {
-      console.log(xhr.responseText);
       window.location.replace(JSON.parse(xhr.responseText).redirect);
     // post failed
     } else if (xhr.readyState === 4 && xhr.status !== 200) {
-      // re-enable delete button
+      // re-enable fork button
       self.html.forkKifu.disabled = false;
       throw new exceptions.NetworkError(3, "Kifu Fork Failed");
     }

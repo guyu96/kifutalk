@@ -1,4 +1,4 @@
-from flask import render_template, redirect, url_for, flash, request, abort, jsonify, current_app
+from flask import render_template, redirect, url_for, flash, request, abort, jsonify, current_app, send_file
 from flask_login import login_user, logout_user, login_required, current_user
 import datetime, os
 
@@ -237,3 +237,14 @@ def fork(kifu_id):
   return jsonify({
     'redirect': url_for('kifu_get', kifu_id=kifu_clone.id, _external=True)
   })
+
+# download a kifu
+@app.route('/download/<int:kifu_id>', methods=['GET'])
+def download(kifu_id):
+  kifu = Kifu.query.filter_by(id=kifu_id).first_or_404()
+  return send_file(
+    kifu.filepath,
+    mimetype='text/sgf',
+    attachment_filename=str(kifu.id)+'.sgf',
+    as_attachment=True
+  )
