@@ -106,17 +106,21 @@ def kifu_get(kifu_id):
     auth_status=auth_status
   )
 
-# create a new, empty kifu
-@app.route('/kifu/<int:kifu_id>', methods=['POST'])
-def kifu_post():
-  pass
-
 @app.route('/kifu/<int:kifu_id>', methods=['UPDATE'])
 def kifu_update(kifu_id):
   kifu = Kifu.query.filter_by(id=kifu_id).first_or_404()
   if (kifu.owner_id != current_user.id):
     abort(401)
-  kifu.update_sgf(request.get_json())
+  data = request.get_json()
+
+  # update SGF
+  kifu.update_sgf(data['newSGF'])
+  # delete comments on deleted nodes
+  for node_id in data['deletedNodes']:
+    comments = Comment.query.filter_by(node_id=node_id).all()
+    for c in comments:
+      db.session.delete(c)
+
   db.session.add(kifu)
   db.session.commit()
   return jsonify(kifu.serialize)
@@ -154,9 +158,11 @@ def kifu_delete(kifu_id):
   })
 
 @app.route('/upload', methods=['GET'])
-@login_required
 def upload_get():
-  return render_template('upload.html')
+  if current_user.is_authenticated:
+    return render_template('upload.html')
+  flash('You must log in first to upload kifus')
+  return redirect(url_for('login'))
 
 @app.route('/upload', methods=['POST'])
 @login_required
@@ -169,17 +175,65 @@ def upload_post():
     uploaded_on=datetime.datetime.now(),
     owner_id=current_user.id
   )
-
-  kifu.forked_from_kifu_id = kifu.id
-  kifu.original_kifu_id = kifu.id
   db.session.add(kifu)
   db.session.commit()
 
   # write SGF to file
-  sgf_path = os.path.join(current_app.config['SGF_FOLDER'], str(kifu.id) + '.sgf')
-  with open(sgf_path, 'w') as f:
+  with open(kifu.filepath, 'w') as f:
     f.write(kifu_json['sgf'])
 
   return jsonify({
     'redirect': url_for('kifu_get', kifu_id=kifu.id, _external=True)
+  })
+
+# create a new, empty kifu
+@app.route('/new', methods=['GET'])
+def new():
+  # must be logged in
+  if not current_user.is_authenticated:
+    flash('You must log in to create a new kifu')
+    return redirect(url_for('login'))
+
+  # add new kifu to database
+  kifu = Kifu(
+    title='',
+    uploaded_on=datetime.datetime.now(),
+    owner_id=current_user.id
+  )
+  db.session.add(kifu)
+  db.session.commit()
+
+  # write SGF to file
+  with open(kifu.filepath, 'w') as f:
+    f.write('()')
+
+  return redirect(url_for('kifu_get', kifu_id=kifu.id))
+
+# fork an existing kifu
+@app.route('/fork/<int:kifu_id>', methods=['POST'])
+@login_required
+def fork(kifu_id):
+  kifu = Kifu.query.filter_by(id=kifu_id).first_or_404()
+
+  # create a clone of kifu
+  original_id = kifu.original_kifu_id if kifu.original_kifu_id else kifu.id
+  kifu_clone = Kifu(
+    title=kifu.title,
+    uploaded_on=datetime.datetime.now(),
+    owner_id=current_user.id,
+    original_kifu_id = original_id,
+    forked_from_kifu_id = kifu.id
+  )
+
+  # add kifu to database
+  db.session.add(kifu_clone)
+  db.session.commit()
+
+  # write SGF to file
+  with open(kifu_clone.filepath, 'w') as clone_file:
+    with open(kifu.filepath, 'r') as original_file:
+      clone_file.write(original_file.read())
+
+  return jsonify({
+    'redirect': url_for('kifu_get', kifu_id=kifu_clone.id, _external=True)
   })
