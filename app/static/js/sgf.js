@@ -55,6 +55,7 @@ var SGF = (function() {
             // add id to node
             node.id = id;
             // update maxNodeID
+            console.log(node.id);
             maxNodeID = node.id > maxNodeID? node.id: maxNodeID;
             // remove id from node.actions
             node.actions.splice(j, 1);
@@ -207,8 +208,9 @@ var SGF = (function() {
     }
     // parsing kifu retrieved from database
     // reset maxNodeID
+    var maxNodeIDCopy = maxNodeID;
     maxNodeID = -1;
-    return new GameTree(root, maxNodeID+1);
+    return new GameTree(root, maxNodeIDCopy+1);
   }
 
   // convert a game tree into a SGF string
