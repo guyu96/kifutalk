@@ -259,11 +259,37 @@ def browse_kifu(page=1):
     per_page=current_app.config['PERPAGE'],
     error_out=True
   )
-  print(kifu_pagination.pages)
   return render_template(
     'kifulist.html',
     kifus=kifu_pagination.items,
     page_num=kifu_pagination.page,
     has_next=kifu_pagination.has_next,
     has_prev=kifu_pagination.has_prev
+  )
+
+@app.route('/user/<int:user_id>', methods=['GET'])
+@app.route('/user/<int:user_id>/<int:page>', methods=['GET'])
+def profile(user_id, page=1):
+  user = User.query.filter_by(id=user_id).first_or_404()
+  user_kifu = Kifu.query.filter_by(owner_id=user_id).join(User).add_columns(
+    User.username, Kifu.id, Kifu.title, Kifu.uploaded_on
+  ).order_by(Kifu.uploaded_on.desc()).paginate(
+    page=page,
+    per_page=current_app.config['PERPAGE'],
+    error_out=True
+  )
+
+  print(Kifu.query.join(User).filter(
+    Kifu.owner_id==user_id
+  ).add_columns(
+    User.username, Kifu.id, Kifu.title, Kifu.uploaded_on
+  ).order_by(Kifu.uploaded_on.desc()))
+  return render_template(
+    'user-kifulist.html',
+    user_id=user.id,
+    username=user.username,
+    kifus=user_kifu.items,
+    page_num=user_kifu.page,
+    has_next=user_kifu.has_next,
+    has_prev=user_kifu.has_prev
   )

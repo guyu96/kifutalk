@@ -56,6 +56,13 @@ footer p {
   color: #97afcf;
 }
 
+footer p a {
+  color: #97afcf;
+}
+footer p a:visited {
+  color: #97afcf;
+}
+
 .flashes li {
   text-align: center;
   background: #635aa7;

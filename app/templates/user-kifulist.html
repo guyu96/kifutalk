@@ -1,0 +1,19 @@
+{% extends 'kifulist.html' %}
+
+{% block css %}
+  {{ super() }}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/user-kifulist.css') }}">
+{% endblock %}
+
+{% block header %}
+  {{ super() }}
+  <h2 id="user-title">{{ username }}'s Kifus</h2>
+{% endblock %}
+
+{% block prev_link %}
+  <a href="{{ url_for('profile', user_id=user_id, page=(page_num-1)) }}" id="prev"><</a>
+{% endblock %}
+
+{% block next_link %}
+  <a href="{{ url_for('profile', user_id=user_id, page=(page_num+1)) }}" id="prev">></a>
+{% endblock %}

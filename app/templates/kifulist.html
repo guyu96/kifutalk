@@ -11,6 +11,8 @@
 {% block body %}
   {{ super() }}
   <main>
+    {% block header %}
+    {% endblock %}
     <div class="kifu-list">
       {% for kifu in kifus %}
         {{ render_kifu_entry(kifu) }}
@@ -19,11 +21,15 @@
     <div class="page-nav">
     {% if kifus %}
       {% if has_prev %}
-        <a href="{{ url_for('browse_kifu', page=(page_num-1)) }}" id="prev"><</a>
+        {% block prev_link %}
+          <a href="{{ url_for('browse_kifu', page=(page_num-1)) }}" id="prev"><</a>
+        {% endblock %}
       {% endif %}
-      <span id="page-num">{{ page_num }}</span>
+      <span id="page-num">Page {{ page_num }}</span>
       {% if has_next %}
-        <a href="{{ url_for('browse_kifu', page=(page_num+1)) }}" id="next">></a>
+        {% block next_link %}
+          <a href="{{ url_for('browse_kifu', page=(page_num+1)) }}" id="next">></a>
+        {% endblock %}
       {% endif %}
     {% else %}
       <p id="no-kifu">No Kifus Available</p>

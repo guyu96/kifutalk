@@ -1,0 +1,14 @@
+main {
+  height: 605px;
+}
+
+main h2 {
+  width: 580px;
+  height: 25px;
+  margin-bottom: 20px;
+  color: #e8e8e8;
+  font-size: 20px;
+  line-height: 25px;
+  text-align: center;
+  letter-spacing: 2px;
+}
