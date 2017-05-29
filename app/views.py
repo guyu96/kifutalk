@@ -196,7 +196,7 @@ def new():
 
   # add new kifu to database
   kifu = Kifu(
-    title='',
+    title='New Kifu',
     uploaded_on=datetime.datetime.now(),
     owner_id=current_user.id
   )
@@ -247,4 +247,23 @@ def download(kifu_id):
     mimetype='text/sgf',
     attachment_filename=str(kifu.id)+'.sgf',
     as_attachment=True
+  )
+
+@app.route('/browse', methods=['GET'])
+@app.route('/browse/<int:page>', methods=['GET'])
+def browse_kifu(page=1):
+  kifu_pagination = Kifu.query.join(User).add_columns(
+    User.username, Kifu.id, Kifu.title, Kifu.uploaded_on
+  ).order_by(Kifu.uploaded_on.desc()).paginate(
+    page=page,
+    per_page=current_app.config['PERPAGE'],
+    error_out=True
+  )
+  print(kifu_pagination.pages)
+  return render_template(
+    'kifulist.html',
+    kifus=kifu_pagination.items,
+    page_num=kifu_pagination.page,
+    has_next=kifu_pagination.has_next,
+    has_prev=kifu_pagination.has_prev
   )

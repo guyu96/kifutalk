@@ -10,3 +10,12 @@
     </ul>
   {% endif %}
 {% endmacro %}
+
+{% macro render_kifu_entry(kifu) %}
+  <a href="{{ url_for('kifu_get', kifu_id=kifu.id) }}">
+    <div class="kifu-entry">
+      <p class="kifu-title">{{ kifu.title }}</p>
+      <p class="kifu-upload">Uploaded on {{ kifu.uploaded_on.strftime('%Y-%m-%d') }} by {{ kifu.username }}</p>
+    </div>
+  </a>
+{% endmacro %}

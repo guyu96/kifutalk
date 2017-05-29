@@ -11,6 +11,6 @@
   <main>
     <a href="{{ url_for('upload_get') }}" id="upload"><span>Upload Kifu</span></a>
     <a href="{{ url_for('new') }}" id="new"><span>Create New Kifu</span></a>
-    <a href="#" id="browse"><span>Browse Kifus</span></a>
+    <a href="{{ url_for('browse_kifu') }}" id="browse"><span>Browse Kifus</span></a>
   </main>
 {% endblock %}

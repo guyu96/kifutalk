@@ -1,0 +1,69 @@
+main {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  height: 560px;
+  width: 580px;
+}
+
+.kifu-list a {
+  text-decoration: none;
+}
+
+.kifu-entry {
+  margin: 5px;
+  width: 500px;
+  padding: 15px 35px;
+  background: #499c88;
+  color: #e8e8e8;
+}
+.kifu-entry:hover {
+  background: #186652;
+}
+
+.kifu-entry .kifu-title {
+  font-size: 18px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  width: 500px;
+  height: 25px;
+  line-height: 25px;
+  margin-bottom: 5px;
+}
+
+.kifu-entry .kifu-upload {
+  color: #d8d8d8;
+  font-size: 15px;
+  width: 500px;
+  height: 18px;
+  line-height: 18px;
+  text-align: right;
+}
+
+.page-nav {
+  text-align: center;
+  height: 30px;
+  color: #e8e8e8;
+  margin-top: 20px;
+}
+
+.page-nav a {
+  font-family: monospace;
+  font-size: 20px;
+  font-weight: bold;
+  margin: 0 10px;
+  line-height: 30px;
+  text-decoration: none;
+}
+.page-nav a:visited {
+  color: #e8e8e8;
+}
+
+.page-nav #page-num {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 17px;
+  line-height: 30px;
+}

@@ -1,0 +1,29 @@
+{% extends 'layout.html' %}
+{% from 'macros.html' import render_kifu_entry %}
+
+
+{% block title %}Browse Kifus{% endblock %}
+{% block css %}
+  {{ super() }}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/kifulist.css') }}">
+{% endblock %}
+
+{% block body %}
+  {{ super() }}
+  <main>
+    <div class="kifu-list">
+      {% for kifu in kifus %}
+        {{ render_kifu_entry(kifu) }}
+      {% endfor %}
+    </div>
+    <div class="page-nav">
+      {% if has_prev %}
+        <a href="{{ url_for('browse_kifu', page=(page_num-1)) }}" id="prev"><</a>
+      {% endif %}
+      <span id="page-num">{{ page_num }}</span>
+      {% if has_next %}
+        <a href="{{ url_for('browse_kifu', page=(page_num+1)) }}" id="next">></a>
+      {% endif %}
+    </div>
+  </main>
+{% endblock %}
