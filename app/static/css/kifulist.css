@@ -67,3 +67,10 @@ main {
   font-size: 17px;
   line-height: 30px;
 }
+
+.page-nav #no-kifu {
+  font-family: 'Open Sans', sans-serif;
+  letter-spacing: 1px;
+  font-size: 20px;
+  line-height: 30px;
+}

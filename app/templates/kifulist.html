@@ -17,6 +17,7 @@
       {% endfor %}
     </div>
     <div class="page-nav">
+    {% if kifus %}
       {% if has_prev %}
         <a href="{{ url_for('browse_kifu', page=(page_num-1)) }}" id="prev"><</a>
       {% endif %}
@@ -24,6 +25,9 @@
       {% if has_next %}
         <a href="{{ url_for('browse_kifu', page=(page_num+1)) }}" id="next">></a>
       {% endif %}
+    {% else %}
+      <p id="no-kifu">No Kifus Available</p>
+    {% endif %}
     </div>
   </main>
 {% endblock %}
