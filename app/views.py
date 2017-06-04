@@ -215,6 +215,10 @@ def new():
 def fork(kifu_id):
   kifu = Kifu.query.filter_by(id=kifu_id).first_or_404()
 
+  # owner is not allowed to fork his/her own kifu
+  if kifu.owner_id == current_user.id:
+    abort(401)
+
   # create a clone of kifu
   original_id = kifu.original_kifu_id if kifu.original_kifu_id else kifu.id
   kifu_clone = Kifu(

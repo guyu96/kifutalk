@@ -1,7 +1,6 @@
 var Controller = function(kifu, kifuComments, boardCanvas) {
   // retrieve data from server
   this.kifu = kifu;
-  console.log(kifu);
   this.kifuComments = kifuComments;
   this.authStatus = authStatus;
 
@@ -46,9 +45,10 @@ var Controller = function(kifu, kifuComments, boardCanvas) {
   this.nodesDeletedDuringEdit = []; // keep track of which nodes are deleted during editting
   this.boardCanvasBackup = null;
 
-  // update navigation, edit, and comment interface
+  // update navigation, edit, comment, and action-bar interface
   this.updateNavEdit();
   this.updateCommentList();
+  this.setActionBar();
 
   // attach event listeners
   this.addActionEventListeners();
@@ -156,6 +156,18 @@ Controller.prototype.updateCommentList = function() {
     noComment.classList.add('no-comment');
     noComment.textContent = 'No comments';
     this.html.commentList.appendChild(noComment);
+  }
+}
+
+Controller.prototype.setActionBar = function() {
+  switch(this.authStatus) {
+    // hide delete button if user is not owner
+    case 1:
+      this.html.deleteKifu.style.display = 'none';
+      break;
+    // hide fork button if user is owner
+    case 2:
+      this.html.forkKifu.style.display = 'none';
   }
 }
 
