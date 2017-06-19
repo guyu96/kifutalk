@@ -29,6 +29,10 @@ var GameTree = function(root, nextNodeID) {
   for (var prop in this.gameInfo) {
     this.gameInfo[prop] = this.findValueByProp(prop);
   }
+
+  // set to true when adding stones
+  // group all stones added in one session into one node
+  this.addStoneActive = false;
 };
 
 // update the next valid variations
@@ -49,7 +53,7 @@ GameTree.prototype.updateNextVariations = function() {
       var prop = child.actions[j].prop;
       var val = child.actions[j].value;
       if (prop === 'B' || prop === 'W') {
-        // a pass variation
+        // a pass variation, anything other than -1 indicates that there is a pass
         if (val === '' || val === 'tt') {
           this.nextVar.pass = i;
         // a play variation contains play location and index in children[]
@@ -137,9 +141,16 @@ GameTree.prototype.next = function(childIndex) {
     console.error('The end has been reached');
     return false;
   }
+
   childIndex = childIndex === undefined ? 0: childIndex;
+  if (childIndex && childIndex >= this.currentNode.children.length) {
+    console.error('Variation does not exist');
+    return false;
+  }
+
   this.currentNode = this.currentNode.children[childIndex];
   this.updateNextVariations();
+  this.addStoneActive = false;
   return true;
 };
 
@@ -151,7 +162,8 @@ GameTree.prototype.prev = function() {
   }
   this.currentNode = this.currentNode.parent;
   this.updateNextVariations();
-  return true;
+  this.addStoneActive = false;
+  return true;  
 };
 
 // add a play node to game tree and advance to it
@@ -169,6 +181,7 @@ GameTree.prototype.play = function(player, row, col) {
   this.currentNode.addChild(playNode);
   this.currentNode = playNode;
   this.updateNextVariations();
+  this.addStoneActive = false;
   return true;
 };
 
@@ -194,9 +207,11 @@ GameTree.prototype.delete = function() {
   children.splice(i, 1);
 
   this.updateNextVariations();
+  this.addStoneActive = false;
   return true;
 };
 
+// pass (skip a turn)
 GameTree.prototype.pass = function(player) {
   if (this.nextVar.pass !== -1) {
     this.next(this.nextVar.pass);
@@ -215,8 +230,60 @@ GameTree.prototype.pass = function(player) {
     this.currentNode = passNode;
     this.updateNextVariations();
   }
+  this.addStoneActive = false;
   // return a boolean to futureproof possible pass failures
   // current all passes should succeed
+  return true;
+};
+
+// add black and white stones
+GameTree.prototype.addStone = function(row, col, stone) {
+  // check for unknown stone types
+  if (constants.st.indexOf(stone) === -1) {
+    console.log('unknown stone: ' + stone);
+    return false;
+  }
+
+  // continue adding stones
+  if (this.addStoneActive) {
+    this.currentNode.addAction(
+      'A' + stone.toUpperCase(),
+      utils.n2l(col) + utils.n2l(row)
+    );
+  // start new stone-adding session
+  } else {
+    this.addStoneActive = true;
+    // create new node
+    var addNode = new Node(this.currentNode);
+    addNode.addAction(
+      'A' + stone.toUpperCase(),
+      utils.n2l(col) + utils.n2l(row)
+    );
+    addNode.id = this.nextNodeID;
+    this.nextNodeID++;
+    // attach add node
+    this.currentNode.addChild(addNode);
+    this.currentNode = addNode;
+    this.updateNextVariations();
+  }
+
+  return true;
+};
+
+// add markers
+GameTree.prototype.addMarker = function(row, col, marker) {
+  // check for unknown marker types
+  if (!constants.mk.hasOwnProperty(marker)) {
+    return false;
+  }
+  markerSGF = constants.mk[marker];
+
+  // markers are always added to the current node
+  this.currentNode.addAction(
+    markerSGF,
+    utils.n2l(col) + utils.n2l(row)
+  );
+
   return true;
 };
 

@@ -17,38 +17,54 @@ var Controller = function(kifu, kifuComments, boardCanvas) {
     'komi': document.getElementById('komi'),
     'result': document.getElementById('result'),
     // navigation
-    'navigation': document.getElementById('navigation'),
     'play': document.getElementById('play'),
+    'pause': document.getElementById('pause'),
     'beginning': document.getElementById('beginning'),
     'prev': document.getElementById('prev'),
     'next': document.getElementById('next'),
     'end': document.getElementById('end'),
+    'toggleEdit': document.getElementById('toggle-edit'),
+    'save': document.getElementById('save'),
+    'cancel': document.getElementById('cancel'),
     // edit
+    'edit': document.getElementById('edit'),
     'deleteNode': document.getElementById('delete-node'),
-    // control
+    'pass': document.getElementById('pass'),
     'editMode': document.getElementsByClassName('edit-mode'),
-    'navAssist': document.getElementsByClassName('nav-assist'),
+    'addBlack': document.getElementById('add-black'),
+    'addWhite': document.getElementById('add-white'),
+    'addStone': document.getElementById('add-stone'),
+    'triangle': document.getElementById('triangle'),
+    'square': document.getElementById('square'),
     // action bar
     'deleteKifu': document.getElementById('delete-kifu'),
     'forkKifu': document.getElementById('fork'),
     'downloadKifu': document.getElementById('download')
   };
-  this.initEditToggle();
+
+  // cursor modes mapped to buttons
+  this.cursorButtonMap = {};
+  this.cursorButtonMap[constants.cursor.ADD_BLACK] = this.html.addBlack;
+  this.cursorButtonMap[constants.cursor.ADD_WHITE] = this.html.addWhite;
+  this.cursorButtonMap[constants.cursor.MARK_TRIANGLE] = this.html.triangle;
+  this.cursorButtonMap[constants.cursor.MARK_SQUARE] = this.html.square;
 
   // initialize game
   this.boardCanvas = boardCanvas;
   this.setGameInfo();
+  this.initAuth();
 
   // application state variable
   this.autoPlayIntervalID = null; // to control auto play
-  this.isEditting = false;
+  this.isAutoPlaying = false;
+  this.isEditing = false;
   this.nodesDeletedDuringEdit = []; // keep track of which nodes are deleted during editting
   this.boardCanvasBackup = null;
+  this.cursorMode = constants.cursor.PLAY_AND_SELECT;
 
-  // update navigation, edit, comment, and action-bar interface
+  // update navigation, edit, and comment interface
   this.updateNavEdit();
   this.updateCommentList();
-  this.setActionBar();
 
   // attach event listeners
   this.addActionEventListeners();
@@ -57,27 +73,6 @@ var Controller = function(kifu, kifuComments, boardCanvas) {
   this.addNavigationEventListeners();
   this.addCommentEventListeners();
   this.addEditEventListeners();
-}
-
-// initialize edit, save, and cancel buttons
-Controller.prototype.initEditToggle = function() {
-  var toggleEdit = document.createElement('button');
-  toggleEdit.id = 'toggle-edit';
-  toggleEdit.classList.add('edit');
-  toggleEdit.innerHTML = '<span>Edit</span>'
-  this.html['toggleEdit'] = toggleEdit;
-
-  var save = document.createElement('button');
-  save.id = 'save';
-  save.classList.add('edit');
-  save.innerHTML = '<span>Save</span>'
-  this.html['save'] = save;
-
-  var cancel = document.createElement('button');
-  cancel.id = 'cancel';
-  cancel.classList.add('edit');
-  cancel.innerHTML = '<span>Cancel</span>'
-  this.html['cancel'] = cancel;
 };
 
 // set game information
@@ -90,8 +85,9 @@ Controller.prototype.setGameInfo = function() {
 };
 
 Controller.prototype.updateNavEdit = function() {
-  // check for beginning/end
   var gameTree = this.boardCanvas.driver.gameTree;
+  
+  // check for beginning/end
   if (gameTree.atFirstNode()) {
     this.html.beginning.disabled = true;
     this.html.prev.disabled = true;
@@ -102,43 +98,146 @@ Controller.prototype.updateNavEdit = function() {
   if (gameTree.atEnd()) {
     this.html.end.disabled = true;
     this.html.next.disabled = true;
+    this.html.play.disabled = true;
   } else {
     this.html.end.disabled = false;
     this.html.next.disabled = false;
+    this.html.play.disabled = false;
+  }
+
+  // check if game is autoplaying
+  if (this.isAutoPlaying) {
+    // switch buttons
+    this.html.play.style.display = 'none';
+    this.html.pause.style.display = 'inline-block';
+    // disable beginning, prev, next, end, and toggleEdit
+    this.html.beginning.disabled = true;
+    this.html.prev.disabled = true;
+    this.html.next.disabled = true;
+    this.html.end.disabled = true;
+    this.html.toggleEdit.disabled = true;
+  } else {
+    // switch buttons
+    this.html.pause.style.display = 'none';
+    this.html.play.style.display = 'inline-block';
+    // enable beginning, prev if not at first node
+    if (!gameTree.atFirstNode()) {
+      this.html.beginning.disabled = false;
+      this.html.prev.disabled = false;
+    }
+    // enable next, end if not at end
+    if (!gameTree.atEnd()) {
+      this.html.next.disabled = false;
+      this.html.end.disabled = false;
+    }
+    // enable toggleEdit if user owns kifu
+    if (this.authStatus === 2) {
+      this.html.toggleEdit.disabled = false;
+    }
   }
 
   // check if in edit mode
-  if (this.isEditting) {
+  if (this.isEditing) {
     // change buttons
-    this.html.toggleEdit.remove();
-    this.html.navigation.appendChild(this.html.save);
-    this.html.navigation.appendChild(this.html.cancel);
+    this.html.toggleEdit.style.display = 'none';
+    this.html.save.style.display = 'inline-block';
+    this.html.cancel.style.display = 'inline-block';
     // enable buttons
     for (var i = 0; i < this.html.editMode.length; i++) {
       this.html.editMode[i].disabled = false;
     }
+    // disable play button
+    this.html.play.disabled = true;
+    // disable comments
+    this.html.commentInput.disabled = true;
+    this.html.commentSubmit.disabled = true;
   } else {
     // change buttons
-    this.html.save.remove();
-    this.html.cancel.remove();
-    this.html.navigation.appendChild(this.html.toggleEdit);
+    this.html.save.style.display = 'none';
+    this.html.cancel.style.display = 'none';
+    this.html.toggleEdit.style.display = 'inline-block';
     // disable buttons
     for (var i = 0; i < this.html.editMode.length; i++) {
       this.html.editMode[i].disabled = true;
     }
+    // enable play button if not at end
+    if (!gameTree.atEnd()) {
+      this.html.play.disabled = false;
+    }
+    // enable comments
+    this.html.commentInput.disabled = false;
+    this.html.commentSubmit.disabled = false;
   }
 
-  // authentication status (the code above assumes authStatus === 2)
-  if (authStatus === 0) {
-    // not logged in, disable comments and edit button
-    this.html.commentInput.disabled = true;
-    this.html.commentSubmit.disabled = true;
-    this.html.toggleEdit.disabled = true;
-  } else if (authStatus === 1) {
-    // logged in, but not owner, disable edit button
-    this.html.toggleEdit.disabled = true;
+  // check if next variation involves adding stone
+  // addStone would only display when not in edit mode
+  if (gameTree.nextVar.add.length !== 0 && !this.isEditing) {
+    // remove addBlack and addWhite
+    this.html.addBlack.style.display = 'none';
+    this.html.addWhite.style.display = 'none';
+    // add addStone
+    this.html.addStone.style.display = 'inline-block';
+    this.html.addStone.disabled = false;
+  } else {
+    // add addBlack and addWhite
+    this.html.addBlack.style.display = 'inline-block';
+    this.html.addWhite.style.display = 'inline-block';
+    // remove addStone
+    this.html.addStone.style.display = 'none';
   }
-}
+
+  // check if next variation involves pass
+  // again, disable pass only when not editting
+  if (gameTree.nextVar.pass === -1 && !this.isEditing) {
+    // disable pass
+    this.html.pass.disabled = true;
+  } else {
+    // enable pass
+    this.html.pass.disabled = false;
+  }
+
+  // check cursor mode
+  switch (this.cursorMode) {
+    // play and select, remove active from all cursor buttons
+    case constants.cursor.PLAY_AND_SELECT:
+      for (var cur in this.cursorButtonMap) {
+        this.cursorButtonMap[cur].classList.remove('active');
+      }
+      break;
+    // all other cases
+    default:
+      // disable all edit buttons but the current cursor button
+      for (var i = 0; i < this.html.editMode.length; i++) {
+        this.html.editMode[i].disabled = true;
+      }
+      this.cursorButtonMap[this.cursorMode].disabled = false;
+      // mark the enabled button as active
+      this.cursorButtonMap[this.cursorMode].classList.add('active');
+      break;
+  }
+};
+
+Controller.prototype.createCommentElement = function(comment) {
+  var c = document.createElement('li');
+  var author = document.createElement('span');
+  var timestamp = document.createElement('span');
+  var text = document.createElement('p');
+
+  author.textContent = comment.author_username;
+  timestamp.textContent = comment.timestamp;
+  text.textContent = comment.content;
+
+  c.classList.add('comment');
+  author.classList.add('user');
+  timestamp.classList.add('time');
+  text.classList.add('text');
+
+  c.appendChild(author);
+  c.appendChild(timestamp);
+  c.appendChild(text);
+
+  return c;
+};
 
 Controller.prototype.updateCommentList = function() {
   this.html.commentList.innerHTML = '';
@@ -157,19 +256,27 @@ Controller.prototype.updateCommentList = function() {
     noComment.textContent = 'No comments';
     this.html.commentList.appendChild(noComment);
   }
-}
+};
 
-Controller.prototype.setActionBar = function() {
+Controller.prototype.initAuth = function() {
   switch(this.authStatus) {
-    // hide delete button if user is not owner
-    case 1:
-      this.html.deleteKifu.style.display = 'none';
+    case 0:
+      // not logged in, disable comments and edit button
+      this.html.commentInput.disabled = true;
+      this.html.commentSubmit.disabled = true;
+      this.html.toggleEdit.disabled = true;
       break;
-    // hide fork button if user is owner
+    case 1:
+      // not owner, remove delete button and disable edit
+      this.html.deleteKifu.remove();
+      this.html.toggleEdit.disabled = true;
+      break;
     case 2:
-      this.html.forkKifu.style.display = 'none';
+      // is owner, remove fork button
+      this.html.forkKifu.remove();
+      break;
   }
-}
+};
 
 Controller.prototype.next = function(childIndex) {
   if (this.boardCanvas.next(childIndex)) {
@@ -225,6 +332,24 @@ Controller.prototype.delete = function() {
   return false;
 };
 
+Controller.prototype.addStone = function(row, col, stone) {
+  if (this.boardCanvas.addStone(row, col, stone)) {
+    this.updateCommentList();
+    this.updateNavEdit();
+    return true;
+  }
+  return false;
+};
+
+Controller.prototype.addMarker = function(row, col, marker) {
+  if (this.boardCanvas.addMarker(row, col, marker)) {
+    this.updateCommentList();
+    this.updateNavEdit();
+    return true;
+  }
+  return false;
+};
+
 // add event listeners to canvas
 Controller.prototype.addCanvasEventListeners = function() {
   var bc = this.boardCanvas;
@@ -241,35 +366,55 @@ Controller.prototype.addCanvasEventListeners = function() {
     if (bx == -1 || by == -1) {
       return;
     }
-
-    // check if clicking on an existing variation
-    var playVars = bc.driver.gameTree.nextVar.play;
-    var index = -1;
-    for (var i = 0; i < playVars.length; i++) {
-      if (playVars[i].row === by && playVars[i].col === bx) {
-        index = playVars[i].index;
+    
+    // different cursor modes
+    switch(self.cursorMode) {
+      case constants.cursor.PLAY_AND_SELECT:
+        // check if clicking on an existing variation
+        var playVars = bc.driver.gameTree.nextVar.play;
+        var index = -1;
+        for (var i = 0; i < playVars.length; i++) {
+          if (playVars[i].row === by && playVars[i].col === bx) {
+            index = playVars[i].index;
+            break;
+          }
+        }
+        // plays a new move (requires edit mode)
+        if (index === -1) {
+          if (self.isEditing) {
+            self.play(by, bx);
+          }
+        // chooses a variation
+        } else {
+          self.next(index);
+        }
         break;
-      }
-    }
-
-    // plays a new move (requires edit mode)
-    if (index === -1) {
-      if (self.isEditting) {
-        self.play(by, bx);
-      }
-    // chooses a variation
-    } else {
-      self.next(index);
+      case constants.cursor.ADD_BLACK:
+        self.addStone(by, bx, 'b');
+        break;
+      case constants.cursor.ADD_WHITE:
+        self.addStone(by, bx, 'w');
+        break;
+      case constants.cursor.MARK_TRIANGLE:
+        self.addMarker(by, bx, 't');
+        break;
+      case constants.cursor.MARK_SQUARE:
+        self.addMarker(by, bx, 's');
+        break;
+      default:
+        console.error('Unknown cursor mode: ' + self.cursorMode);
     }
   });
 
-  // right click deletes the current node (requires edit mode)
+  /* 
+  right click deletes the current node (requires edit mode) - currently disabled
   this.boardCanvas.canvas.addEventListener('contextmenu', function(e) {
     e.preventDefault();
-    if (self.isEditting) {
+    if (self.isEditing) {
       self.delete();
     }
-  });
+  }); 
+  */
 };
 
 // enable keyboard navigation and control
@@ -310,7 +455,7 @@ Controller.prototype.addActionEventListeners = function() {
   // download kifu
   this.html.downloadKifu.addEventListener('click', function(e) {
     window.location.replace('/download/' + self.kifu.id);
-  });
+});
 };
 
 // add event listeners to navigation
@@ -331,23 +476,29 @@ Controller.prototype.addNavigationEventListeners = function() {
   });
 
   this.html.play.addEventListener('click', function(e) {
-    if (!self.autoPlayIntervalID) {
-      // begin auto-play immediately
+    self.isAutoPlaying = true;
+    // begin auto-play immediately
+    if (!self.boardCanvas.driver.gameTree.atEnd()) {
+      self.next();
+    }
+    self.autoPlayIntervalID = setInterval(function() {
       if (!self.boardCanvas.driver.gameTree.atEnd()) {
         self.next();
-        self.html.play.classList.add('playing');
+      } else {
+        // as if pressing pause (see below)
+        clearInterval(self.autoPlayIntervalID);
+        self.isAutoPlaying = false;
+        self.autoPlayIntervalID = null;
+        self.updateNavEdit();
       }
-      self.autoPlayIntervalID = setInterval(function() {
-        if (!self.boardCanvas.driver.gameTree.atEnd()) {
-          self.next();
-          self.html.play.classList.add('playing');
-        }
-      }, 500);
-    } else {
-      clearInterval(self.autoPlayIntervalID);
-      self.autoPlayIntervalID = null;
-      self.html.play.classList.remove('playing');
-    }
+    }, 500);
+  });
+
+  this.html.pause.addEventListener('click', function(e) {
+    clearInterval(self.autoPlayIntervalID);
+    self.isAutoPlaying = false;
+    self.autoPlayIntervalID = null;
+    self.updateNavEdit();
   });
 
   this.html.next.addEventListener('click', function(e) {
@@ -362,6 +513,11 @@ Controller.prototype.addNavigationEventListeners = function() {
     self.updateCommentList();
     self.updateNavEdit();
   });
+
+  // pass is in edit section, but could also be used in navigation
+  this.html.pass.addEventListener('click', function(e) {
+    self.pass();
+  });
 };
 
 // add event listeners to editting section
@@ -370,39 +526,53 @@ Controller.prototype.addEditEventListeners = function() {
 
   // toggle edit
   this.html.toggleEdit.addEventListener('click', function(e) {
-    self.isEditting = true;
+    self.isEditing = true;
     self.nodesDeletedDuringEdit = []; // reset deleted nodes
     self.updateNavEdit();
     // backup controller state
     self.backupBoardCanvas();
-    // disable comments
-    self.html.commentInput.disabled = true;
-    self.html.commentSubmit.disabled = true;
   });
 
   // save all the changes
   this.html.save.addEventListener('click', function(e) {
+    // restore cursorMode to PLAY_AND_SELECT
+    if (self.cursorMode !== constants.cursor.PLAY_AND_SELECT) {
+      self.cursorMode = constants.cursor.PLAY_AND_SELECT;
+    }
+    // update kifu
     self.updateKifu(
       self.kifu.id,
       SGF.print(self.boardCanvas.driver.gameTree.root),
       self.nodesDeletedDuringEdit
-    )
+    );
   });
 
   // cancel changes
   this.html.cancel.addEventListener('click', function(e) {
-    self.isEditting = false;
+    // restore cursorMode to PLAY_AND_SELECT
+    if (self.cursorMode !== constants.cursor.PLAY_AND_SELECT) {
+      self.cursorMode = constants.cursor.PLAY_AND_SELECT;
+    }
+    self.isEditing = false;
     self.updateNavEdit();
     // restore backup
     self.restoreBoardCanvas();
-    // enable comments
-    self.html.commentInput.disabled = false;
-    self.html.commentSubmit.disabled = false;
   });
 
   // delete node
   this.html.deleteNode.addEventListener('click', function(e) {
     self.delete();
+  });
+
+  // switch cursor modes
+  cursors = Object.keys(this.cursorButtonMap).map(function(cur) {
+    return parseInt(cur);
+  });
+  cursors.forEach(function(cur) {
+    self.cursorButtonMap[cur].addEventListener('click', function(e) {
+      self.cursorMode = self.cursorMode === cur? constants.cursor.PLAY_AND_SELECT: cur;
+      self.updateNavEdit();
+    });
   });
 };
 
@@ -454,32 +624,11 @@ Controller.prototype.postComment = function(comment) {
   xhr.send(data);
 };
 
-Controller.prototype.createCommentElement = function(comment) {
-  var c = document.createElement('li');
-  var author = document.createElement('span');
-  var timestamp = document.createElement('span');
-  var text = document.createElement('p');
-
-  author.textContent = comment.author_username;
-  timestamp.textContent = comment.timestamp;
-  text.textContent = comment.content;
-
-  c.classList.add('comment');
-  author.classList.add('user');
-  timestamp.classList.add('time');
-  text.classList.add('text');
-
-  c.appendChild(author);
-  c.appendChild(timestamp);
-  c.appendChild(text);
-
-  return c;
-};
-
 Controller.prototype.updateKifu = function(kifuID, newSGF, deletedNodes) {
   var self = this;
   var xhr = new XMLHttpRequest();
   xhr.addEventListener('readystatechange', function() {
+    console.log('here');
     // post initiated
     if (xhr.readyState === 1) {
       // disable save and cancel button
@@ -491,22 +640,21 @@ Controller.prototype.updateKifu = function(kifuID, newSGF, deletedNodes) {
       self.kifu = JSON.parse(xhr.responseText);
       // delete backup
       self.boardCanvasBackup = null;
-      // enable comments
-      self.html.commentInput.disabled = false;
-      self.html.commentSubmit.disabled = false;
       // exit edit mode
-      self.isEditting = false;
+      self.isEditing = false;
       // update view
       self.updateNavEdit();
       self.updateCommentList();
-      // re-enable save and cancel button
+      // re-enable save and cancel
       self.html.save.disabled = false;
       self.html.cancel.disabled = false;
     // post failed
     } else if (xhr.readyState === 4 && xhr.status !== 200) {
-      // re-enable save and cancel button
+      // re-enable save and cancel
       self.html.save.disabled = false;
       self.html.cancel.disabled = false;
+      // alert that save failed
+      window.alert('Network Error: Save Failed');
       throw new exceptions.NetworkError(1, "Kifu SGF Update Failed");
     }
   });
@@ -520,7 +668,7 @@ Controller.prototype.updateKifu = function(kifuID, newSGF, deletedNodes) {
   xhr.open('UPDATE', url);
   xhr.setRequestHeader('Content-type', 'application/json');
   xhr.send(data);
-}
+};
 
 Controller.prototype.deleteKifu = function(kifuID) {
   var self = this;
@@ -546,7 +694,7 @@ Controller.prototype.deleteKifu = function(kifuID) {
   xhr.open('DELETE', url);
   xhr.setRequestHeader('Content-type', 'application/json');
   xhr.send();
-}
+};
 
 Controller.prototype.forkKifu = function(kifuID) {
   var self = this;
@@ -572,7 +720,7 @@ Controller.prototype.forkKifu = function(kifuID) {
   xhr.open('POST', url);
   xhr.setRequestHeader('Content-type', 'application/json');
   xhr.send();
-}
+};
 
 Controller.prototype.backupBoardCanvas = function() {
   this.boardCanvasBackup = new BoardCanvas(
@@ -580,7 +728,7 @@ Controller.prototype.backupBoardCanvas = function() {
     this.boardCanvas.ctx,
     this.boardCanvas.driver.clone()
   );
-}
+};
 
 Controller.prototype.restoreBoardCanvas = function() {
   if (!this.boardCanvasBackup) {
@@ -592,11 +740,11 @@ Controller.prototype.restoreBoardCanvas = function() {
 
   // update state
   this.autoPlayIntervalID = null;
-  this.isEditting = false;
+  this.isEditing = false;
   this.boardCanvasBackup = null; // backup is deleted
 
   // update view
   this.updateNavEdit();
   this.updateCommentList();
   this.boardCanvas.render();
-}
+};

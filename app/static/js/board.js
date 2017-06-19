@@ -7,7 +7,8 @@ var Board = function (size, stars, toPlay) {
   for (var i = 0; i < size; i++) {
     var row = [];
     for (var j = 0; j < size; j++) {
-      row.push('.'); // empty location on board
+      // empty location on board represented as '.'
+      row.push('.');
     }
     this.grid.push(row);
   }
@@ -30,16 +31,25 @@ Board.prototype.removeMarkers = function() {
   }
 }
 
-// add stone or marker to board
+// add stone to board
 Board.prototype.add = function(row, col, type) {
-  // row and col are 0-indexed
   if (!this.isValidLocation(row, col)) {
     console.log('Invalid location');
-  } else if (constants.stmk.indexOf(type) === -1) {
-    console.log('Invalid type');
-  } else {
-    this.grid[row][col] = type;
+    return false
   }
+
+  if (constants.st.indexOf(type) === -1) {
+    console.log('Invalid stone');
+    return false;
+  }
+
+  if (this.grid[row][col] !== '.') {
+    console.log("Can't add stone at occupied spot");
+    return false;
+  }
+  
+  this.grid[row][col] = type;
+  return true;
 };
 
 // remove a stone or marker from board

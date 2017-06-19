@@ -9,7 +9,12 @@ var config = (function() {
     'star': '#623F16',
     'b': '#464646',
     'w': '#F8F8F8',
-    'n': '#C22326'
+    'n': '#D44942',
+    'mk': {
+      '.': '#464646',
+      'b': '#F8F8F8',
+      'w': '#464646'
+    }
   };
 
   // canvas appearance configuration
@@ -17,12 +22,12 @@ var config = (function() {
     'lw': 1, // line width
     'sp': 60, // spacing relative to line width
     'px': 600, // scale to how many pixels
-    'er': 0.4, // click error range (see utils.c2b)
+    'er': 0.45, // click error range (see utils.c2b)
     'st': 0.5, // stone radius relative to spacing
     'mk': 0.3, // stone marker radius relative to spacing
     'mw': 2.5, // stone marker width relative to line width
     'sr': 0.1, // star point radius relative to spacing
-    'nx': 0.2 // next move marker radius relative to spacing
+    'nx': 0.32 // next move marker radius relative to spacing
   };
 
   return {
