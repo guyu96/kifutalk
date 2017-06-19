@@ -29,6 +29,10 @@ main {
   margin: 0 10px;
 }
 
+#board:hover {
+  cursor: pointer;
+}
+
 #control {
   position: absolute;
   width: 400px;

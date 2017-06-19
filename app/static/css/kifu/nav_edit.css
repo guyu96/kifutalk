@@ -26,17 +26,58 @@
   width: 50px;
 }
 
-.navigation .span, .edit .span{
+.navigation svg,
+.edit svg,
+.navigation svg polygon,
+.edit svg polygon,
+.navigation svg line,
+.edit svg line
+{
+  height: 20px;
+  width: 20px;
+  stroke: #363636;
   display: block;
   margin: auto;
   vertical-align: middle;
+}
+
+button:disabled svg,
+button:disabled svg polygon,
+button:disabled svg line
+{
+  stroke: #a8a8a8;
+}
+
+#add-black svg {
+  stroke-width: 1px;
+  stroke: #a8a8a8;
+  fill: #464646;
+}
+
+#add-white svg {
+  stroke-width: 1px;
+  stroke: #c8c8c8;
+  fill: #f8f8f8;
+}
+
+#add-black:disabled svg {
+  fill: #666666;
+}
+
+#add-white:disabled svg {
+  fill: #f0f0f0;
 }
 
 .edit {
   width: 50px;
 }
 
-#toggle-edit, #save, #cancel, #delete-node, #pass {
+#add-stone {
+  width: 100px;
+}
+
+/* buttons with words */
+#toggle-edit, #save, #cancel, #delete-node, #pass, #add-stone {
   font-family: 'Open Sans', sans-serif;
   font-size: 16px;
 }
@@ -73,14 +114,14 @@
   width: 130px;
 }
 
-#play.playing {
-  background: #a8a8a8;
-}
-
 button:disabled {
   color: #a8a8a8;
 }
 
 button:disabled:hover {
+  background: #d8d8d8;
+}
+
+.active {
   background: #d8d8d8;
 }

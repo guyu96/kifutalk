@@ -70,3 +70,7 @@ footer p a:visited {
   color: #e8e8e8;
   border: 1px solid #57527d;
 }
+
+button:hover {
+  cursor: pointer;
+}

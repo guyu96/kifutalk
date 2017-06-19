@@ -1,11 +1,44 @@
-<button class="navigation" id="beginning"><span><<</span></button>
-<button class="navigation" id="prev"><span><</span></button>
-<button class="navigation" id="play"><span>&#9654</span></button>
-<button class="navigation" id="next"><span>></span></button>
-<button class="navigation" id="end"><span>>></span></button>
-{# edit placed here for layout reason #}
-{#
+<button class="navigation" id="beginning">
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <polygon points="19 20 9 12 19 4 19 20" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+    <line x1="5" y1="19" x2="5" y2="5" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+  </svg>
+</button>
+
+<button class="navigation" id="prev">
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="20" y1="12" x2="4" y2="12"/>
+    <polyline points="10 18 4 12 10 6"/>
+  </svg>
+</button>
+
+<button class="navigation" id="play">
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polygon points="5 3 19 12 5 21 5 3"/>
+  </svg>
+</button>
+
+<button class="navigation" id="pause">
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <rect x="6" y="4" width="4" height="16" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+    <rect x="14" y="4" width="4" height="16" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+  </svg>
+</button>
+
+<button class="navigation" id="next">
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="4" y1="12" x2="20" y2="12"/>
+    <polyline points="14 6 20 12 14 18"/>
+  </svg>
+</button>
+
+<button class="navigation" id="end">
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <polygon points="5 4 15 12 5 20 5 4" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+    <line x1="19" y1="5" x2="19" y2="19" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+  </svg>
+</button>
+
 <button class="edit" id="toggle-edit"><span>Edit</span></button>
 <button class="edit" id="save"><span>Save</span></button>
 <button class="edit" id="cancel"><span>Cancel</span></button>
-#}
