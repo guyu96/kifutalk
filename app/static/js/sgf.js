@@ -55,7 +55,6 @@ var SGF = (function() {
             // add id to node
             node.id = id;
             // update maxNodeID
-            console.log(node.id);
             maxNodeID = node.id > maxNodeID? node.id: maxNodeID;
             // remove id from node.actions
             node.actions.splice(j, 1);
