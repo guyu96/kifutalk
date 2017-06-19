@@ -482,10 +482,7 @@ Controller.prototype.addNavigationEventListeners = function() {
       self.next();
     }
     self.autoPlayIntervalID = setInterval(function() {
-      if (!self.boardCanvas.driver.gameTree.atEnd()) {
-        self.next();
-      } else {
-        // as if pressing pause (see below)
+      if (self.boardCanvas.driver.gameTree.atEnd() || !self.next()) {
         clearInterval(self.autoPlayIntervalID);
         self.isAutoPlaying = false;
         self.autoPlayIntervalID = null;
@@ -507,7 +504,9 @@ Controller.prototype.addNavigationEventListeners = function() {
 
   this.html.end.addEventListener('click', function(e) {
     while (!self.boardCanvas.driver.gameTree.atEnd()) {
-      self.boardCanvas.driver.next();
+      if (!self.boardCanvas.driver.next()) {
+        break;
+      }
     }
     self.boardCanvas.render();
     self.updateCommentList();
