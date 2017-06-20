@@ -34,6 +34,7 @@ var Controller = function(kifu, kifuComments, boardCanvas) {
     'addBlack': document.getElementById('add-black'),
     'addWhite': document.getElementById('add-white'),
     'addStone': document.getElementById('add-stone'),
+    'addStoneMenu': document.getElementById('add-stone-menu'),
     'triangle': document.getElementById('triangle'),
     'square': document.getElementById('square'),
     // action bar
@@ -58,6 +59,7 @@ var Controller = function(kifu, kifuComments, boardCanvas) {
   this.autoPlayIntervalID = null; // to control auto play
   this.isAutoPlaying = false;
   this.isEditing = false;
+  this.isSelectingAdd = false; // if the user is selecting an AB/AW variation
   this.nodesDeletedDuringEdit = []; // keep track of which nodes are deleted during editting
   this.boardCanvasBackup = null;
   this.cursorMode = constants.cursor.PLAY_AND_SELECT;
@@ -83,6 +85,18 @@ Controller.prototype.setGameInfo = function() {
   this.html.komi.textContent = 'Komi: ' + info.komi;
   this.html.result.textContent = 'Result: ' + info.result;
 };
+
+Controller.prototype.createAddVarElement = function(childIndex) {
+  var self = this;
+  console.log(childIndex);
+  var addVarLi = document.createElement('li');
+  addVarLi.textContent = 'Variation ' + (childIndex+1);
+  addVarLi.addEventListener('click', function(e) {
+    self.next(childIndex);
+  });
+
+  return addVarLi;
+}
 
 Controller.prototype.updateNavEdit = function() {
   var gameTree = this.boardCanvas.driver.gameTree;
@@ -187,13 +201,13 @@ Controller.prototype.updateNavEdit = function() {
   }
 
   // check if next variation involves pass
-  // again, disable pass only when not editting
-  if (gameTree.nextVar.pass === -1 && !this.isEditing) {
-    // disable pass
-    this.html.pass.disabled = true;
-  } else {
+  // enable pass only when editting or when pass move is availabe and not autoplaying
+  if (this.isEditing || gameTree.nextVar.pass !== -1) {
     // enable pass
     this.html.pass.disabled = false;
+  } else {
+    // disable pass
+    this.html.pass.disabled = true;
   }
 
   // check cursor mode
@@ -214,6 +228,27 @@ Controller.prototype.updateNavEdit = function() {
       // mark the enabled button as active
       this.cursorButtonMap[this.cursorMode].classList.add('active');
       break;
+  }
+
+  // check if addStone is active
+  // note: pressing any other button would set isSelectingAdd to false
+  if (this.isSelectingAdd) {
+    // clear and populate addStoneMenu
+    this.html.addStoneMenu.innerHTML = '';
+    gameTree.nextVar.add.forEach(function(addVar) {
+      this.html.addStoneMenu.appendChild(
+        this.createAddVarElement(addVar.index)
+      );
+    }, this);
+    // display addStoneMenu
+    this.html.addStoneMenu.style.display = 'inline-block';
+    // mark addStone as active
+    this.html.addStone.classList.add('active');
+  } else {
+    // hide addStoneMenu
+    this.html.addStoneMenu.style.display = 'none';
+    // mark addStone as inactive
+    this.html.addStone.classList.remove('active');
   }
 };
 
@@ -280,6 +315,7 @@ Controller.prototype.initAuth = function() {
 
 Controller.prototype.next = function(childIndex) {
   if (this.boardCanvas.next(childIndex)) {
+    this.isSelectingAdd = false;
     this.updateCommentList();
     this.updateNavEdit();
     return true;
@@ -288,10 +324,8 @@ Controller.prototype.next = function(childIndex) {
 };
 
 Controller.prototype.prev = function() {
-  if (this.boardCanvas.driver.gameTree.atFirstNode()) {
-    return false;
-  }
   if (this.boardCanvas.prev()) {
+    this.isSelectingAdd = false;
     this.updateCommentList();
     this.updateNavEdit();
     return true;
@@ -301,6 +335,7 @@ Controller.prototype.prev = function() {
 
 Controller.prototype.play = function(row, col) {
   if (this.boardCanvas.play(row, col)) {
+    this.isSelectingAdd = false;
     this.updateCommentList();
     this.updateNavEdit();
     return true;
@@ -310,6 +345,7 @@ Controller.prototype.play = function(row, col) {
 
 Controller.prototype.pass = function() {
   if (this.boardCanvas.pass()) {
+    this.isSelectingAdd = false;
     this.updateCommentList();
     this.updateNavEdit();
     return true;
@@ -320,6 +356,7 @@ Controller.prototype.pass = function() {
 Controller.prototype.delete = function() {
   var node = this.boardCanvas.driver.gameTree.currentNode;
   if (this.boardCanvas.delete()) {
+    this.isSelectingAdd = false;
     this.updateCommentList();
     this.updateNavEdit();
     // delete success, add the IDs of node and its descendants
@@ -467,6 +504,7 @@ Controller.prototype.addNavigationEventListeners = function() {
       self.boardCanvas.driver.prev();
     }
     self.boardCanvas.render();
+    self.isSelectingAdd = false;
     self.updateCommentList();
     self.updateNavEdit();
   });
@@ -509,6 +547,7 @@ Controller.prototype.addNavigationEventListeners = function() {
       }
     }
     self.boardCanvas.render();
+    self.isSelectingAdd = false;
     self.updateCommentList();
     self.updateNavEdit();
   });
@@ -516,6 +555,12 @@ Controller.prototype.addNavigationEventListeners = function() {
   // pass is in edit section, but could also be used in navigation
   this.html.pass.addEventListener('click', function(e) {
     self.pass();
+  });
+
+  // addStone also in edit section, but it is used for navigation
+  this.html.addStone.addEventListener('click', function(e) {
+    self.isSelectingAdd = self.isSelectingAdd ? false: true;
+    self.updateNavEdit();
   });
 };
 
@@ -527,6 +572,7 @@ Controller.prototype.addEditEventListeners = function() {
   this.html.toggleEdit.addEventListener('click', function(e) {
     self.isEditing = true;
     self.nodesDeletedDuringEdit = []; // reset deleted nodes
+    self.isSelectingAdd = false;
     self.updateNavEdit();
     // backup controller state
     self.backupBoardCanvas();

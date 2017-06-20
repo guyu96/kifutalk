@@ -10,12 +10,12 @@
   font-size: 24px;
   color: #363636;
   vertical-align: middle;
+  outline: none;
 }
 
 #navigation, #edit {
   /* remove space between inline buttons */
   font-size: 0;
-  border-bottom: 1px solid #a3a3a3;
 }
 
 .navigation:hover, .edit:hover {
@@ -124,4 +124,30 @@ button:disabled:hover {
 
 .active {
   background: #d8d8d8;
+}
+
+#add-stone-menu {
+  display: inline-block;
+  position: absolute;
+  width: 100px;
+  top: 80px;
+  max-height: 240px;
+  overflow: auto;
+  color: black;
+}
+
+#add-stone-menu li {
+  background: #d8d8d8;
+  color: #464646;
+  display: block;
+  text-align: center;
+  height: 30px;
+  font-size: 14px;
+  line-height: 30px;
+  padding: 10px;
+}
+
+#add-stone-menu li:hover {
+  cursor: pointer;
+  background: #c8c8c8;
 }
