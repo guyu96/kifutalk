@@ -85,17 +85,26 @@ Driver.prototype.updateMarkerLayer = function() {
 // helper function that executes an action
 Driver.prototype.execAction = function(action) {
   switch(action.prop) {
-    // add black stone
+    // add black and white stones
     case 'AB':
-      var row = utils.l2n(action.value[1]);
-      var col = utils.l2n(action.value[0]);
-      this.board.add(row, col, 'b');
-      break;
-    // add white stone
     case 'AW':
-      var row = utils.l2n(action.value[1]);
-      var col = utils.l2n(action.value[0]);
-      this.board.add(row, col, 'w');
+      var stone = action.prop === 'AB' ? 'b': 'w';
+      // add multiple stones
+      if (action.value.indexOf(':') !== -1) {
+        var pos = action.value.split(':');
+        var row1 = utils.l2n(pos[0][1]), col1 = utils.l2n(pos[0][0]);
+        var row2 = utils.l2n(pos[1][1]), col2 = utils.l2n(pos[1][0]);
+        for (var i = row1; i <= row2; i++) {
+          for (var j = col1; j <= col2; j++) {
+            this.board.add(i, j, stone);
+          }
+        }
+      // add single stone
+      } else {
+        var row = utils.l2n(action.value[1]);
+        var col = utils.l2n(action.value[0]);
+        this.board.add(row, col, stone);
+      }
       break;
     // black or white plays
     case 'B':
@@ -127,9 +136,22 @@ Driver.prototype.undoAction = function(action) {
     // remove a stone
     case 'AB':
     case 'AW':
-      var row = utils.l2n(action.value[1]);
-      var col = utils.l2n(action.value[0]);
-      this.board.remove(row, col);
+      // remove multiple stones
+      if (action.value.indexOf(':') !== -1) {
+        var pos = action.value.split(':');
+        var row1 = utils.l2n(pos[0][1]), col1 = utils.l2n(pos[0][0]);
+        var row2 = utils.l2n(pos[1][1]), col2 = utils.l2n(pos[1][0]);
+        for (var i = row1; i <= row2; i++) {
+          for (var j = col1; j <= col2; j++) {
+            this.board.remove(i, j);
+          }
+        }
+      // remove single stone
+      } else {
+        var row = utils.l2n(action.value[1]);
+        var col = utils.l2n(action.value[0]);
+        this.board.remove(row, col);
+      }
       break;
     // undo a move
     case 'B':
