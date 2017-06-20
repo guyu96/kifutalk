@@ -75,9 +75,22 @@ Driver.prototype.updateMarkerLayer = function() {
   this.clearLayer(this.markerLayer);
   this.gameTree.currentNode.actions.forEach(function(action) {
     if (Object.keys(constants.mkSGF).indexOf(action.prop) !== -1) {
-      var row = utils.l2n(action.value[1]);
-      var col = utils.l2n(action.value[0]);
-      this.markerLayer[row][col] = constants.mkSGF[action.prop];
+      // add multiple markers
+      if (action.value.indexOf(':') !== -1) {
+        var pos = action.value.split(':');
+        var row1 = utils.l2n(pos[0][1]), col1 = utils.l2n(pos[0][0]);
+        var row2 = utils.l2n(pos[1][1]), col2 = utils.l2n(pos[1][0]);
+        for (var i = row1; i <= row2; i++) {
+          for (var j = col1; j <= col2; j++) {
+            this.markerLayer[i][j] = constants.mkSGF[action.prop];
+          }
+        }
+      // add single marker
+      } else {
+        var row = utils.l2n(action.value[1]);
+        var col = utils.l2n(action.value[0]);
+        this.markerLayer[row][col] = constants.mkSGF[action.prop];
+      }
     }
   }, this);
 };
