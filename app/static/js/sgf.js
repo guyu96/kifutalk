@@ -14,8 +14,8 @@ var SGF = (function() {
 
     while (bracketIndex !== -1) {
       var i = actionsStr.indexOf('[', start);
-      var prop = actionsStr.substring(start, i).toUpperCase();
-      var value = actionsStr.substring(i+1, bracketIndex);
+      var prop = actionsStr.substring(start, i).trim().toUpperCase();
+      var value = actionsStr.substring(i+1, bracketIndex).trim();
 
       actions.push(
         {
