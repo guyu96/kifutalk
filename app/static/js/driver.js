@@ -70,6 +70,18 @@ Driver.prototype.updateIndicatorLayer = function() {
   }
 };
 
+// update marker layer
+Driver.prototype.updateMarkerLayer = function() {
+  this.clearLayer(this.markerLayer);
+  this.gameTree.currentNode.actions.forEach(function(action) {
+    if (Object.keys(constants.mkSGF).indexOf(action.prop) !== -1) {
+      var row = utils.l2n(action.value[1]);
+      var col = utils.l2n(action.value[0]);
+      this.markerLayer[row][col] = constants.mkSGF[action.prop];
+    }
+  }, this);
+};
+
 // helper function that executes an action
 Driver.prototype.execAction = function(action) {
   switch(action.prop) {
@@ -90,6 +102,7 @@ Driver.prototype.execAction = function(action) {
     case 'W':
       if (this.board.toPlay.toUpperCase() !== action.prop) {
         console.error('SGF error: wrong player');
+        return false;
       } else if (action.value === '' || action.value === 'tt') {
         this.board.pass();
       } else {
@@ -100,27 +113,6 @@ Driver.prototype.execAction = function(action) {
           return false;
         }
       }
-      break;
-    // add markers
-    case 'TR':
-      var row = utils.l2n(action.value[1]);
-      var col = utils.l2n(action.value[0]);
-      this.markerLayer[row][col] = 't';
-      break;
-    case 'CR':
-      var row = utils.l2n(action.value[1]);
-      var col = utils.l2n(action.value[0]);
-      this.markerLayer[row][col] = 'c';
-      break;
-    case 'SQ':
-      var row = utils.l2n(action.value[1]);
-      var col = utils.l2n(action.value[0]);
-      this.markerLayer[row][col] = 's';
-      break;
-    case 'MA':
-      var row = utils.l2n(action.value[1]);
-      var col = utils.l2n(action.value[0]);
-      this.markerLayer[row][col] = 'x';
       break;
     default:
       console.log('unknown sgf tag: ' + action.prop);
@@ -163,9 +155,6 @@ Driver.prototype.undoAction = function(action) {
 
 // advance to the next node in game tree
 Driver.prototype.next = function(childIndex) {
-  // backup and clear markerLayer
-  var markerBackup = this.clearLayer(this.markerLayer);
-
   if (this.gameTree.next(childIndex)) {
     var node = this.gameTree.currentNode;
     // execute actions
@@ -178,93 +167,67 @@ Driver.prototype.next = function(childIndex) {
         }
         console.error('Action invalid: ', node.actions[i]);
         this.gameTree.prev();
-
-        // restore marker layer in case of failure
-        this.markerLayer = markerBackup;
         return false;
       }
     }
-
+    this.updateMarkerLayer();
     this.updateIndicatorLayer();
     return true;
   }
-
-  // restore marker layer in case of failure
-  this.markerLayer = markerBackup;
   return false;
 };
 
 // move to the previous node in game tree
 Driver.prototype.prev = function() {
-  // backup and clear markerLayer
-  var markerBackup = this.clearLayer(this.markerLayer);
-
   var node = this.gameTree.currentNode;
   if (this.gameTree.prev()) {
     // undo actions
     node.actions.forEach(function(action) {
       this.undoAction(action);
     }, this);
-
+    this.updateMarkerLayer();
     this.updateIndicatorLayer();
     return true;
   }
-
-  // restore marker layer in case of failure
-  this.markerLayer = markerBackup;
   return false;
 };
 
 // play a move on board
 // add corresponding node to game tree
 Driver.prototype.play = function(row, col) {
-  // backup and clear markerLayer
-  var markerBackup = this.clearLayer(this.markerLayer);
-
   var player = this.board.toPlay.toUpperCase();
   if (!this.board.play(row, col)) {
-    // restore marker layer in case of failure
-    this.markerLayer = markerBackup;
     return false
   }
   this.gameTree.play(player, row, col);
+  this.updateMarkerLayer();
   this.updateIndicatorLayer();
   return true;
 };
 
 // pass
 Driver.prototype.pass = function() {
-  // backup and clear markerLayer
-  var markerBackup = this.clearLayer(this.markerLayer);
-
   var player = this.board.toPlay.toUpperCase();
   if (this.gameTree.pass(player)) {
     this.board.pass();
+    this.updateMarkerLayer();
     this.updateIndicatorLayer();
     return true;
   }
-
-  // restore marker layer in case of failure
-  this.markerLayer = markerBackup;
   return false;
 };
 
 // delete the current node
 Driver.prototype.delete = function() {
-  // backup and clear markerLayer
-  var markerBackup = this.clearLayer(this.markerLayer);
-
   var node = this.gameTree.currentNode;
   if (this.gameTree.delete()) {
     node.actions.forEach(function(action) {
       this.undoAction(action);
     }, this);
+    this.updateMarkerLayer();
     this.updateIndicatorLayer();
     return true;
   }
-
-  // restore marker layer in case of failure
-  this.markerLayer = markerBackup;
   return false;
 };
 

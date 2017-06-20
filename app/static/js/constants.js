@@ -35,6 +35,14 @@ var constants = (function() {
     'x': 'MA' // X <-> MA
   };
 
+  // like validMarkers, but with keys and values reversed
+  var validMarkerSGF = {
+    'TR': 't',
+    'CR': 'c',
+    'SQ': 's',
+    'MA': 'x'
+  };
+
   // cursor modes that determine what clicking on the board does
   var cursor = {
     'PLAY_AND_SELECT': 1, // play a move or select a variation
@@ -50,6 +58,7 @@ var constants = (function() {
     st: validStones,
     idct: validIndicators,
     mk: validMarkers,
+    mkSGF: validMarkerSGF,
     cursor: cursor
   };
 })();
