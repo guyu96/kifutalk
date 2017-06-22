@@ -56,14 +56,25 @@ class Kifu(db.Model):
   __tablename__ = 'kifus'
   # id also used as file paths, e.g. /kifus/1.sgf for kifu with id 1
   id = db.Column(db.Integer, primary_key=True)
-  title = db.Column(db.String(512))
   uploaded_on = db.Column(db.DateTime)
-  # modified_on = db.Column(db.DateTime)
+  modified_on = db.Column(db.DateTime)
   owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+  # kifu info
+  black_player = db.Column(db.String(128))
+  white_player = db.Column(db.String(128))
+  black_rank = db.Column(db.String(16))
+  white_rank = db.Column(db.String(16))
+  komi = db.Column(db.String(8))
+  result = db.Column(db.String(16))
+
   # for root kifus, the two foreign keys below are null
   forked_from_kifu_id = db.Column(db.Integer, db.ForeignKey('kifus.id'))
   original_kifu_id = db.Column(db.Integer, db.ForeignKey('kifus.id'))
-  upvotes = db.Column(db.Integer, default=0)
+  
+  @property
+  def title(self):
+    return '%s(%s) vs. %s(%s)' % (self.black_player, self.black_rank, self.white_player, self.white_rank)
 
   @property
   def filepath(self):
@@ -80,7 +91,12 @@ class Kifu(db.Model):
     return {
       'id': self.id,
       'owner': User.query.get(self.owner_id).username,
-      'title': self.title,
+      'black_player': self.black_player,
+      'white_player': self.white_player,
+      'black_rank': self.black_rank,
+      'white_rank': self.white_rank,
+      'komi': self.komi,
+      'result': self.result,
       'uploaded_on': uploaded_on,
       'forked_from': self.forked_from_kifu_id,
       'original': self.original_kifu_id,
@@ -97,11 +113,8 @@ class Comment(db.Model):
   content = db.Column(db.Text, nullable=False)
   timestamp = db.Column(db.DateTime, nullable=False)
   author = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-  in_reply_to = db.Column(db.Integer, db.ForeignKey('users.id')) # comment is reply to another user
-  read = db.Column(db.Boolean, default=False) # if reply read by the in_reply_to user
   kifu_id = db.Column(db.Integer, db.ForeignKey('kifus.id'), nullable=False)
   node_id = db.Column(db.Integer, nullable=False)
-  upvotes = db.Column(db.Integer, default=0)
 
   @property
   def serialize(self):
@@ -110,10 +123,15 @@ class Comment(db.Model):
       'timestamp': self.timestamp.strftime('%Y-%m-%d %H:%M:%S'),
       'author_id': self.author,
       'author_username': User.query.get(self.author).username,
-      'in_reply_to': self.in_reply_to,
       'kifu_id': self.kifu_id,
       'node_id': self.node_id
     }
+
+class KifuStar(db.Model):
+  __tablename__='kifustars'
+  id = db.Column(db.Integer, primary_key=True)
+  user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+  kifu_id = db.Column(db.Integer, db.ForeignKey('kifus.id'), nullable=False)
 
 class Country(db.Model):
   __tablename__ = 'countries'

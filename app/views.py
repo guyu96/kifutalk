@@ -107,19 +107,37 @@ def kifu_get(kifu_id):
   )
 
 @app.route('/kifu/<int:kifu_id>', methods=['UPDATE'])
+@login_required
 def kifu_update(kifu_id):
   kifu = Kifu.query.filter_by(id=kifu_id).first_or_404()
   if (kifu.owner_id != current_user.id):
     abort(401)
+
   data = request.get_json()
+  kifu.modified_on = datetime.datetime.now()
 
   # update SGF
-  kifu.update_sgf(data['newSGF'])
-  # delete comments on deleted nodes
-  for node_id in data['deletedNodes']:
-    comments = Comment.query.filter_by(node_id=node_id).all()
-    for c in comments:
-      db.session.delete(c)
+  if 'sgf' in data and 'deletedNodes' in data:
+    kifu.update_sgf(data['newSGF'])
+    # delete comments on deleted nodes
+    for node_id in data['deletedNodes']:
+      comments = Comment.query.filter_by(node_id=node_id).all()
+      for c in comments:
+        db.session.delete(c)
+
+  # update other data
+  if 'blackPlayer' in data:
+    kifu.black_player = data['blackPlayer']
+  if 'whitePlayer' in data:
+    kifu.white_player = data['whitePlayer']
+  if 'blackRank' in data:
+    kifu.black_rank = data['blackRank']
+  if 'whiteRank' in data:
+    kifu.white_rank = data['whiteRank']
+  if 'komi' in data:
+    kifu.komi = data['komi']
+  if 'result' in data:
+    kifu.result = data['result']
 
   db.session.add(kifu)
   db.session.commit()
@@ -168,10 +186,16 @@ def upload_get():
 @login_required
 def upload_post():
   kifu_json = request.get_json()
+  print(kifu_json )
 
   # insert kifu into database
   kifu = Kifu(
-    title=kifu_json['title'],
+    black_player=kifu_json['blackPlayer'],
+    white_player=kifu_json['whitePlayer'],
+    black_rank=kifu_json['blackRank'],
+    white_rank=kifu_json['whiteRank'],
+    komi=kifu_json['komi'],
+    result=kifu_json['result'],
     uploaded_on=datetime.datetime.now(),
     owner_id=current_user.id
   )
@@ -257,7 +281,7 @@ def download(kifu_id):
 @app.route('/browse/<int:page>', methods=['GET'])
 def browse_kifu(page=1):
   kifu_pagination = Kifu.query.join(User).add_columns(
-    User.username, Kifu.id, Kifu.title, Kifu.uploaded_on
+    User.username, Kifu.id, Kifu.black_player, Kifu.white_player, Kifu.black_rank, Kifu.white_rank, Kifu.uploaded_on
   ).order_by(Kifu.uploaded_on.desc()).paginate(
     page=page,
     per_page=current_app.config['PERPAGE'],
@@ -276,18 +300,13 @@ def browse_kifu(page=1):
 def profile(user_id, page=1):
   user = User.query.filter_by(id=user_id).first_or_404()
   user_kifu = Kifu.query.filter_by(owner_id=user_id).join(User).add_columns(
-    User.username, Kifu.id, Kifu.title, Kifu.uploaded_on
+    User.username, Kifu.id, Kifu.black_player, Kifu.white_player, Kifu.black_rank, Kifu.white_rank, Kifu.uploaded_on
   ).order_by(Kifu.uploaded_on.desc()).paginate(
     page=page,
     per_page=current_app.config['PERPAGE'],
     error_out=True
   )
 
-  print(Kifu.query.join(User).filter(
-    Kifu.owner_id==user_id
-  ).add_columns(
-    User.username, Kifu.id, Kifu.title, Kifu.uploaded_on
-  ).order_by(Kifu.uploaded_on.desc()))
   return render_template(
     'user-kifulist.html',
     user_id=user.id,

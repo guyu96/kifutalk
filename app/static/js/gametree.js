@@ -289,10 +289,10 @@ GameTree.prototype.addMarker = function(row, col, marker) {
 
 GameTree.prototype.infoString = function() {
   return {
-    'blackPlayer': this.gameInfo.PB? this.gameInfo.PB: 'Unknown',
-    'whitePlayer': this.gameInfo.PW? this.gameInfo.PW: 'Unknown',
-    'blackRank': '(' + (this.gameInfo.BR? this.gameInfo.BR: '?') + ')',
-    'whiteRank': '(' + (this.gameInfo.WR? this.gameInfo.WR: '?') + ')',
+    'blackPlayer': this.gameInfo.PB? this.gameInfo.PB: 'Anonymous',
+    'whitePlayer': this.gameInfo.PW? this.gameInfo.PW: 'Anonymous',
+    'blackRank': this.gameInfo.BR? this.gameInfo.BR: '?',
+    'whiteRank': this.gameInfo.WR? this.gameInfo.WR: '?',
     'komi': this.gameInfo.KM? this.gameInfo.KM: '?',
     'result': this.gameInfo.RE? this.gameInfo.RE: '?'
   };

@@ -3,18 +3,20 @@
     <svg class="black" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
      <circle cx="100" cy="100" r="100"/>
     </svg>
-    <span>black</span>
+    <span id="black-player" contentEditable="true">{{ kifu.black_player }}</span>
+    (<span id="black-rank" contentEditable="true">{{ kifu.black_rank }}</span>)
   </div>
   <div id="white">
-    <span>white</span>
+    <span id="white-player" contentEditable="true">{{ kifu.white_player }}</span>
+    (<span id="white-rank" contentEditable="true">{{ kifu.white_rank }}</span>)
     <svg class="white" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
      <circle cx="100" cy="100" r="100"/>
     </svg>
   </div>
 </div>
 <div id="meta">
-  <span id="komi"></span>
-  <span id="result"></span>
+  <p id="komi">Komi: <span contentEditable="true">{{ kifu.komi }}</span></p>
+  <p id="result">Result: <span contentEditable="true">{{ kifu.result }}</span></p>
   <span id="upload-info">
     {{ kifu.uploaded_on.split(' ')[0] }} by {{ kifu.owner }}
   </span>

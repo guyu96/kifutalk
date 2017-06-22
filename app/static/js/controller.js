@@ -12,10 +12,12 @@ var Controller = function(kifu, kifuComments, boardCanvas) {
     'commentInput': document.getElementById('comment-input'),
     'commentSubmit': document.getElementById('comment-submit'),
     // info
-    'blackInfo': document.getElementById('black').getElementsByTagName('span')[0],
-    'whiteInfo': document.getElementById('white').getElementsByTagName('span')[0],
-    'komi': document.getElementById('komi'),
-    'result': document.getElementById('result'),
+    'blackPlayer': document.getElementById('black-player'),
+    'blackRank': document.getElementById('black-rank'),
+    'whitePlayer': document.getElementById('white-player'),
+    'whiteRank': document.getElementById('white-rank'),
+    'komi': document.getElementById('komi').children[0],
+    'result': document.getElementById('result').children[0],
     // navigation
     'play': document.getElementById('play'),
     'pause': document.getElementById('pause'),
@@ -52,7 +54,6 @@ var Controller = function(kifu, kifuComments, boardCanvas) {
 
   // initialize game
   this.boardCanvas = boardCanvas;
-  this.setGameInfo();
   this.initAuth();
 
   // application state variable
@@ -62,6 +63,7 @@ var Controller = function(kifu, kifuComments, boardCanvas) {
   this.isSelectingAdd = false; // if the user is selecting an AB/AW variation
   this.nodesDeletedDuringEdit = []; // keep track of which nodes are deleted during editting
   this.driverBackup = null;
+  this.textBackup = ''; // info updating failsafe
   this.cursorMode = constants.cursor.PLAY_AND_SELECT;
 
   // update navigation, edit, and comment interface
@@ -75,15 +77,7 @@ var Controller = function(kifu, kifuComments, boardCanvas) {
   this.addNavigationEventListeners();
   this.addCommentEventListeners();
   this.addEditEventListeners();
-};
-
-// set game information
-Controller.prototype.setGameInfo = function() {
-  var info = this.boardCanvas.driver.gameTree.infoString();
-  this.html.blackInfo.textContent = info.blackPlayer + ' ' + info.blackRank;
-  this.html.whiteInfo.textContent = info.whitePlayer + ' ' + info.whiteRank;
-  this.html.komi.textContent = 'Komi: ' + info.komi;
-  this.html.result.textContent = 'Result: ' + info.result;
+  this.addInfoEventListeners();
 };
 
 Controller.prototype.createAddVarElement = function(childIndex) {
@@ -491,7 +485,7 @@ Controller.prototype.addActionEventListeners = function() {
   // download kifu
   this.html.downloadKifu.addEventListener('click', function(e) {
     window.location.replace('/download/' + self.kifu.id);
-});
+  });
 };
 
 // add event listeners to navigation
@@ -618,6 +612,57 @@ Controller.prototype.addEditEventListeners = function() {
       self.updateNavEdit();
     });
   });
+};
+
+// add event listeners for updating game information (through contentEditable)
+Controller.prototype.addInfoEventListeners = function() {
+  var self = this;
+  var addListener = function(contentElement, dataKey) {
+    // clicking on editable info backs the info up
+    contentElement.addEventListener('focus', function() {
+      self.textBackup = contentElement.textContent;
+    });
+
+    var update = function() {
+      var xhr = new XMLHttpRequest();
+      // revert to backup if change failed
+      xhr.addEventListener('readystatechange', function() {
+        if (xhr.readyState === 4 && xhr.status !== 200) {
+          contentElement.textContent = self.textBackup;
+        }
+      });
+      // construct url and data
+      var url = '/kifu/' + self.kifu.id;
+      var data = {};
+      data[dataKey] = contentElement.textContent;
+      data = JSON.stringify(data);
+      // if content has been changed to empty
+      if (contentElement.textContent === '') {
+        contentElement.textContent = self.textBackup;
+      // if content has actually been changed
+      } else if (self.textBackup !== contentElement.textContent) {
+        xhr.open('UPDATE', url);
+        xhr.setRequestHeader('Content-type', 'application/json');
+        xhr.send(data);
+      }
+    };
+    // after user finishes changing the info, send change to server
+    contentElement.addEventListener('blur', update);
+    contentElement.addEventListener('keydown', function(e) {
+      if (e.keyCode === 13) { // enter key
+        e.preventDefault();
+        contentElement.blur();
+        update();
+      }
+    });
+  };
+
+  addListener(this.html.blackPlayer, 'blackPlayer');
+  addListener(this.html.whitePlayer, 'whitePlayer');
+  addListener(this.html.blackRank, 'blackRank');
+  addListener(this.html.whiteRank, 'whiteRank');
+  addListener(this.html.komi, 'komi');
+  addListener(this.html.result, 'result');
 };
 
 // add event listeners to comment-list and comment-form

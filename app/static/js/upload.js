@@ -5,15 +5,6 @@ var textForm = document.getElementById('upload-text-form')
 var textInput = document.getElementById('text-input');
 var textSubmit = document.getElementById('text-submit');
 
-var generateTitle = function(gameTree) {
-  var black = gameTree.gameInfo['PB']? gameTree.gameInfo['PB']: 'Unknown';
-  var white = gameTree.gameInfo['PW']? gameTree.gameInfo['PW']: 'Unknown';
-  var black_rank = gameTree.gameInfo['BR']? gameTree.gameInfo['BR']: '?';
-  var white_rank = gameTree.gameInfo['WR']? gameTree.gameInfo['WR']: '?';
-
-  return black + ' (' + black_rank + ') vs. ' + white + ' (' + white_rank + ')';
-};
-
 var validateAndSubmit = function(sgfStr) {
   // validate
   if (!/\S/.test(sgfStr)) {
@@ -24,6 +15,7 @@ var validateAndSubmit = function(sgfStr) {
   } catch(e) {
     throw e;
   }
+  var info = gameTree.gameInfo;
 
   // construct xhr
   var xhr = new XMLHttpRequest();
@@ -48,8 +40,13 @@ var validateAndSubmit = function(sgfStr) {
   // submit
   var url = '/upload';
   var data = JSON.stringify({
-    sgf: SGF.print(gameTree.root),
-    title: generateTitle(gameTree)
+    'sgf': SGF.print(gameTree.root),
+    'blackPlayer': info.PB !== '' ? info.PB : 'Anonymous',
+    'whitePlayer': info.PW !== '' ? info.PW : 'Anonymous',
+    'blackRank': info.BR !== '' ? info.BR : '?',
+    'whiteRank': info.WR !== '' ? info.WR : '?',
+    'komi': info.KM !== '' ? info.KM : '?',
+    'result': info.RE !== '' ? info.RE : '?'
   });
   xhr.open('POST', url);
   xhr.setRequestHeader('Content-type', 'application/json');
