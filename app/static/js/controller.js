@@ -61,7 +61,7 @@ var Controller = function(kifu, kifuComments, boardCanvas) {
   this.isEditing = false;
   this.isSelectingAdd = false; // if the user is selecting an AB/AW variation
   this.nodesDeletedDuringEdit = []; // keep track of which nodes are deleted during editting
-  this.boardCanvasBackup = null;
+  this.driverBackup = null;
   this.cursorMode = constants.cursor.PLAY_AND_SELECT;
 
   // update navigation, edit, and comment interface
@@ -88,7 +88,6 @@ Controller.prototype.setGameInfo = function() {
 
 Controller.prototype.createAddVarElement = function(childIndex) {
   var self = this;
-  console.log(childIndex);
   var addVarLi = document.createElement('li');
   addVarLi.textContent = 'Variation ' + (childIndex+1);
   addVarLi.addEventListener('click', function(e) {
@@ -684,7 +683,7 @@ Controller.prototype.updateKifu = function(kifuID, newSGF, deletedNodes) {
       // parse new kifu
       self.kifu = JSON.parse(xhr.responseText);
       // delete backup
-      self.boardCanvasBackup = null;
+      self.driverBackup = null;
       // exit edit mode
       self.isEditing = false;
       // update view
@@ -768,25 +767,21 @@ Controller.prototype.forkKifu = function(kifuID) {
 };
 
 Controller.prototype.backupBoardCanvas = function() {
-  this.boardCanvasBackup = new BoardCanvas(
-    this.boardCanvas.canvas,
-    this.boardCanvas.ctx,
-    this.boardCanvas.driver.clone()
-  );
+  this.driverBackup = this.boardCanvas.driver.clone();
 };
 
 Controller.prototype.restoreBoardCanvas = function() {
-  if (!this.boardCanvasBackup) {
+  if (!this.driverBackup) {
     return false;
   }
 
   // restore boardCanvas
-  this.boardCanvas = this.boardCanvasBackup;
+  this.boardCanvas.driver = this.driverBackup;
 
   // update state
   this.autoPlayIntervalID = null;
   this.isEditing = false;
-  this.boardCanvasBackup = null; // backup is deleted
+  this.driverBackup = null; // backup is deleted
 
   // update view
   this.updateNavEdit();
