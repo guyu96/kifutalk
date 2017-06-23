@@ -3,7 +3,7 @@ from flask_login import login_user, logout_user, login_required, current_user
 import datetime, os
 
 from . import app, db
-from .models import User, Kifu, Comment
+from .models import User, Kifu, Comment, KifuStar
 from .forms import SignUpForm, LoginForm
 
 # home page
@@ -99,13 +99,25 @@ def kifu_get(kifu_id):
   else:
     auth_status = 2
 
+  # check if kifu starred by user
+  if not current_user.is_authenticated:
+    starred = False
+  else:
+    kifustar = KifuStar.query.filter_by(
+      user_id=current_user.id,
+      kifu_id=kifu_id
+    ).first()
+    starred = False if kifustar is None else True
+
   return render_template(
     'kifu/kifu.html',
     kifu=kifu.serialize,
     kifu_comments=comments_dict,
-    auth_status=auth_status
+    auth_status=auth_status,
+    starred=starred
   )
 
+# update kifu
 @app.route('/kifu/<int:kifu_id>', methods=['UPDATE'])
 @login_required
 def kifu_update(kifu_id):
@@ -143,7 +155,9 @@ def kifu_update(kifu_id):
   db.session.commit()
   return jsonify(kifu.serialize)
 
+# delete kifu
 @app.route('/kifu/<int:kifu_id>', methods=['DELETE'])
+@login_required
 def kifu_delete(kifu_id):
   kifu = Kifu.query.filter_by(id=kifu_id).first_or_404()
   if (kifu.owner_id != current_user.id):
@@ -175,6 +189,7 @@ def kifu_delete(kifu_id):
     'redirect': url_for('index', _external=True)
   })
 
+# upload page
 @app.route('/upload', methods=['GET'])
 def upload_get():
   if current_user.is_authenticated:
@@ -182,6 +197,7 @@ def upload_get():
   flash('You must log in first to upload kifus')
   return redirect(url_for('login'))
 
+# upload kifu
 @app.route('/upload', methods=['POST'])
 @login_required
 def upload_post():
@@ -220,7 +236,6 @@ def new():
 
   # add new kifu to database
   kifu = Kifu(
-    title='New Kifu',
     uploaded_on=datetime.datetime.now(),
     owner_id=current_user.id
   )
@@ -232,6 +247,50 @@ def new():
     f.write('()')
 
   return redirect(url_for('kifu_get', kifu_id=kifu.id))
+
+# star a kifu
+@app.route('/star/kifu/<int:kifu_id>', methods=['POST'])
+@login_required
+def star_kifu(kifu_id):
+  # check if kifu exists
+  kifu = Kifu.query.filter_by(id=kifu_id).first_or_404()
+  # check if user has already starred this kifu
+  starred = KifuStar.query.filter_by(
+    user_id=current_user.id,
+    kifu_id=kifu_id
+  ).first();
+  if starred is not None:
+    abort(400)
+
+  # star kifu
+  kifustar = KifuStar(
+    user_id=current_user.id,
+    kifu_id=kifu_id
+  )
+  db.session.add(kifustar)
+  db.session.commit()
+
+  return jsonify({'success': True})
+
+# unstar a kifu
+@app.route('/unstar/kifu/<int:kifu_id>', methods=['POST'])
+@login_required
+def unstar_kifu(kifu_id):
+  # check if kifu exists
+  kifu = Kifu.query.filter_by(id=kifu_id).first_or_404()
+  # check if user has already starred this kifu
+  starred = KifuStar.query.filter_by(
+    user_id=current_user.id,
+    kifu_id=kifu_id
+  ).first();
+  if starred is None:
+    abort(400)
+
+  # unstar kifu
+  db.session.delete(starred)
+  db.session.commit()
+
+  return jsonify({'success': True})
 
 # fork an existing kifu
 @app.route('/fork/<int:kifu_id>', methods=['POST'])
@@ -277,6 +336,7 @@ def download(kifu_id):
     as_attachment=True
   )
 
+# browse kifu
 @app.route('/browse', methods=['GET'])
 @app.route('/browse/<int:page>', methods=['GET'])
 def browse_kifu(page=1):
@@ -295,6 +355,7 @@ def browse_kifu(page=1):
     has_prev=kifu_pagination.has_prev
   )
 
+# user profile page
 @app.route('/user/<int:user_id>', methods=['GET'])
 @app.route('/user/<int:user_id>/<int:page>', methods=['GET'])
 def profile(user_id, page=1):

@@ -25,3 +25,8 @@
   position: absolute;
   bottom: 0;
 }
+
+#unstar svg path {
+  stroke: #F4B812;
+  stroke-width: 0.5px;
+}

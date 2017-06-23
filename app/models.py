@@ -61,12 +61,12 @@ class Kifu(db.Model):
   owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
   # kifu info
-  black_player = db.Column(db.String(128))
-  white_player = db.Column(db.String(128))
-  black_rank = db.Column(db.String(16))
-  white_rank = db.Column(db.String(16))
-  komi = db.Column(db.String(8))
-  result = db.Column(db.String(16))
+  black_player = db.Column(db.String(128), default='Anonymous')
+  white_player = db.Column(db.String(128), default='Anonymous')
+  black_rank = db.Column(db.String(16), default='?')
+  white_rank = db.Column(db.String(16), default='?')
+  komi = db.Column(db.String(8), default='?')
+  result = db.Column(db.String(16), default='?')
 
   # for root kifus, the two foreign keys below are null
   forked_from_kifu_id = db.Column(db.Integer, db.ForeignKey('kifus.id'))

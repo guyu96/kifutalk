@@ -3,6 +3,7 @@ var Controller = function(kifu, kifuComments, boardCanvas) {
   this.kifu = kifu;
   this.kifuComments = kifuComments;
   this.authStatus = authStatus;
+  this.starred = starred;
 
   // HTML elements that controller needs
   this.html = {
@@ -40,6 +41,8 @@ var Controller = function(kifu, kifuComments, boardCanvas) {
     'triangle': document.getElementById('triangle'),
     'square': document.getElementById('square'),
     // action bar
+    'starKifu': document.getElementById('star'),
+    'unstarKifu': document.getElementById('unstar'),
     'deleteKifu': document.getElementById('delete-kifu'),
     'forkKifu': document.getElementById('fork'),
     'downloadKifu': document.getElementById('download')
@@ -54,7 +57,7 @@ var Controller = function(kifu, kifuComments, boardCanvas) {
 
   // initialize game
   this.boardCanvas = boardCanvas;
-  this.initAuth();
+  this.initStarAuth();
 
   // application state variable
   this.autoPlayIntervalID = null; // to control auto play
@@ -286,13 +289,25 @@ Controller.prototype.updateCommentList = function() {
   }
 };
 
-Controller.prototype.initAuth = function() {
+Controller.prototype.initStarAuth = function() {
+  // display star/unstar button
+  if (this.starred) {
+    this.html.unstarKifu.display = 'block';
+    this.html.starKifu.style.display = 'none';
+  } else {
+    this.html.starKifu.display = 'block';
+    this.html.unstarKifu.style.display = 'none';
+  }
+
   switch(this.authStatus) {
     case 0:
       // not logged in, disable comments and edit button
       this.html.commentInput.disabled = true;
       this.html.commentSubmit.disabled = true;
       this.html.toggleEdit.disabled = true;
+      // also hide star buttons
+      this.html.starKifu.style.display = 'none';
+      this.html.unstarKifu.style.display = 'none';
       break;
     case 1:
       // not owner, remove delete button and disable edit
@@ -471,6 +486,18 @@ Controller.prototype.addKeyboardEventListeners = function() {
 // add event listeners to action bar
 Controller.prototype.addActionEventListeners = function() {
   var self = this;
+
+  // star and unstar kifu
+  this.html.starKifu.addEventListener('click', function(e) {
+    if (!self.starred) {
+      self.starKifu(self.kifu.id);
+    }
+  });
+  this.html.unstarKifu.addEventListener('click', function(e) {
+    if (self.starred) {
+      self.unstarKifu(self.kifu.id);
+    }
+  });
 
   // delete kifu
   this.html.deleteKifu.addEventListener('click', function(e) {
@@ -824,6 +851,50 @@ Controller.prototype.forkKifu = function(kifuID) {
   xhr.setRequestHeader('Content-type', 'application/json');
   xhr.send();
 };
+
+Controller.prototype.starKifu = function(kifuID) {
+  var self = this;
+  var xhr = new XMLHttpRequest();
+  xhr.addEventListener('readystatechange', function() {
+    // if post successful
+    if (xhr.readyState === 4 && xhr.status === 200) {
+      self.starred = true;
+      self.html.starKifu.style.display = 'none';
+      self.html.unstarKifu.style.display = 'block';
+    // post failed
+    } else if (xhr.readyState === 4 && xhr.status !== 200) {
+      throw new exceptions.NetworkError(4, "Kifu Star/Unstar Failed");
+    }
+  });
+
+  // send post request to server
+  var url = '/star/kifu/' + kifuID;
+  xhr.open('POST', url);
+  xhr.setRequestHeader('Content-type', 'application/json');
+  xhr.send();
+}
+
+Controller.prototype.unstarKifu = function(kifuID) {
+  var self = this;
+  var xhr = new XMLHttpRequest();
+  xhr.addEventListener('readystatechange', function() {
+    // if post successful
+    if (xhr.readyState === 4 && xhr.status === 200) {
+      self.starred = false;
+      self.html.starKifu.style.display = 'block';
+      self.html.unstarKifu.style.display = 'none';
+    // post failed
+    } else if (xhr.readyState === 4 && xhr.status !== 200) {
+      throw new exceptions.NetworkError(4, "Kifu Star/Unstar Failed");
+    }
+  });
+
+  // send post request to server
+  var url = '/unstar/kifu/' + kifuID;
+  xhr.open('POST', url);
+  xhr.setRequestHeader('Content-type', 'application/json');
+  xhr.send();
+}
 
 Controller.prototype.backupBoardCanvas = function() {
   this.driverBackup = this.boardCanvas.driver.clone();
