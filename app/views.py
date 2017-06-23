@@ -118,7 +118,7 @@ def kifu_update(kifu_id):
 
   # update SGF
   if 'sgf' in data and 'deletedNodes' in data:
-    kifu.update_sgf(data['newSGF'])
+    kifu.update_sgf(data['sgf'])
     # delete comments on deleted nodes
     for node_id in data['deletedNodes']:
       comments = Comment.query.filter_by(node_id=node_id).all()

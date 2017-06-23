@@ -717,7 +717,6 @@ Controller.prototype.updateKifu = function(kifuID, newSGF, deletedNodes) {
   var self = this;
   var xhr = new XMLHttpRequest();
   xhr.addEventListener('readystatechange', function() {
-    console.log('here');
     // post initiated
     if (xhr.readyState === 1) {
       // disable save and cancel button
@@ -751,7 +750,7 @@ Controller.prototype.updateKifu = function(kifuID, newSGF, deletedNodes) {
   // send post request to server
   var url = '/kifu/' + kifuID;
   var data = JSON.stringify({
-    'newSGF': newSGF,
+    'sgf': newSGF,
     'deletedNodes': deletedNodes
   });
   xhr.open('UPDATE', url);
