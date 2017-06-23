@@ -668,11 +668,26 @@ Controller.prototype.addInfoEventListeners = function() {
 // add event listeners to comment-list and comment-form
 Controller.prototype.addCommentEventListeners = function() {
   var self = this;
-  // submit comment
+  var submit = function() {
+    var comment = (new FormData(self.html.commentForm)).get('comment-input');
+    // only post non-empty comments
+    if (comment.trim() !== '') {
+      self.postComment(comment);
+    }
+  }
+
+  // submit by clicking
   this.html.commentForm.addEventListener('submit', function(e) {
     e.preventDefault();
-    var formData = new FormData(self.html.commentForm);
-    self.postComment(formData.get('comment-input'));
+    submit();
+  });
+
+  // submit by hitting ENTER
+  this.html.commentForm.addEventListener('keydown', function(e) {
+    if (e.keyCode === 13) {
+      e.preventDefault();
+      submit();
+    }
   });
 };
 
