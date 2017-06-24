@@ -1,12 +1,8 @@
 main {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  margin: auto;
-  height: 560px;
-  width: 580px;
+  border-top: 1px solid #254977;
+  margin: 20px auto;
+  height: 750px;
+  width: 620px;
 }
 
 .kifu-list a {
@@ -14,33 +10,56 @@ main {
 }
 
 .kifu-entry {
-  margin: 5px;
-  width: 500px;
-  padding: 15px 35px;
-  background: #499c88;
+  position: relative;
+  width: 550px;
+  height: 100px;
+  padding: 10px 35px;
+  border-bottom: 1px solid #254977;
+  background: #355987;
   color: #e8e8e8;
 }
 .kifu-entry:hover {
-  background: #186652;
+  background: #254977;
 }
 
-.kifu-entry .kifu-title {
+.kifu-thumbnail {
+  display: inline-block;
+  height: 100px;
+  width: 100px;
+}
+
+.kifu-info {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 130px;
+  right: 0px;
+  margin: auto;
+  display: inline-block;
+  height: 100px;
+  width: 400px;
+}
+
+.kifu-title {
+  display: block;
   font-size: 18px;
   font-weight: bold;
   letter-spacing: 1px;
-  width: 500px;
-  height: 25px;
-  line-height: 25px;
+  height: 70px;
+  line-height: 70px;
   margin-bottom: 5px;
+  text-align: left;
+  overflow: hidden;
 }
 
-.kifu-entry .kifu-upload {
+.kifu-upload {
+  display: block;
   color: #d8d8d8;
   font-size: 15px;
-  width: 500px;
-  height: 18px;
+  height: 30px;
   line-height: 18px;
   text-align: right;
+  overflow: hidden;
 }
 
 .page-nav {
