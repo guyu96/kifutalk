@@ -793,7 +793,8 @@ Controller.prototype.updateKifu = function(kifuID, newSGF, deletedNodes) {
   var url = '/kifu/' + kifuID;
   var data = JSON.stringify({
     'sgf': newSGF,
-    'deletedNodes': deletedNodes
+    'deletedNodes': deletedNodes,
+    'img': createThumbnail(newSGF, config.tq)
   });
   xhr.open('UPDATE', url);
   xhr.setRequestHeader('Content-type', 'application/json');

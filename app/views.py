@@ -7,6 +7,24 @@ from . import app, db
 from .models import User, Kifu, Comment, KifuStar
 from .forms import SignUpForm, LoginForm
 
+# helper functions to save and retrieve kifu thumbnails
+def save_thumbnail(kifu, base64_str):
+  # first write image to temperory file
+  temp_img = current_app.config['SGF_FOLDER'] + '/.temp' + str(kifu.id)
+  with open(temp_img, 'wb') as f:
+    f.write(base64.decodebytes(bytes(base64_str, 'utf-8')))
+  # write scaled image
+  img = Image.open(temp_img)
+  img.thumbnail(current_app.config['THUMBNAIL_SIZE'])
+  img.save(kifu.imagepath, 'JPEG')
+  # remove temporary file
+  os.remove(temp_img)
+
+def thumbnail_dataurl(kifu):
+  with open(kifu.imagepath, 'r') as f:
+    # append dataurl prefix
+    return 'data:image/jpeg;base64,' + f.read()
+
 # home page
 @app.route('/')
 def index():
@@ -130,14 +148,17 @@ def kifu_update(kifu_id):
   kifu.modified_on = datetime.datetime.now()
 
   # update SGF
-  if 'sgf' in data and 'deletedNodes' in data:
+  if 'sgf' in data: # deletedNodes and img should also be present
+    # update SGF
     kifu.update_sgf(data['sgf'])
     # delete comments on deleted nodes
     for node_id in data['deletedNodes']:
       comments = Comment.query.filter_by(node_id=node_id).all()
       for c in comments:
         db.session.delete(c)
-
+    # update kifu thumbnail
+    save_thumbnail(kifu, data['img'])
+  
   # update other data
   if 'blackPlayer' in data:
     kifu.black_player = data['blackPlayer']
@@ -228,14 +249,8 @@ def upload_post():
   with open(kifu.filepath, 'w') as f:
     f.write(kifu_json['sgf'])
 
-  # write image to temporary file
-  temp_img = current_app.config['SGF_FOLDER'] + '/temp'
-  with open(temp_img, 'wb') as f:
-    f.write(base64.decodebytes(bytes(kifu_json['img'], 'utf-8')))
-  # write scaled image
-  img = Image.open(temp_img)
-  img.thumbnail(current_app.config['THUMBNAIL_SIZE'])
-  img.save(kifu.imagepath, 'JPEG')
+  # save kifu thumbnail
+  save_thumbnail(kifu, kifu_json['img'])
 
   return jsonify({
     'redirect': url_for('kifu_get', kifu_id=kifu.id, _external=True)
@@ -263,14 +278,8 @@ def new():
   with open(kifu.filepath, 'w') as f:
     f.write('()')
 
-  # write image to temporary file
-  temp_img = current_app.config['SGF_FOLDER'] + '/temp'
-  with open(temp_img, 'wb') as f:
-    f.write(base64.decodebytes(bytes(kifu_json['img'], 'utf-8')))
-  # write scaled image
-  img = Image.open(temp_img)
-  img.thumbnail(current_app.config['THUMBNAIL_SIZE'])
-  img.save(kifu.imagepath, 'JPEG')
+  # save kifu thumbnail
+  save_thumbnail(kifu, kifu_json['img'])
 
   return jsonify({
     'redirect': url_for('kifu_get', kifu_id=kifu.id, _external=True)

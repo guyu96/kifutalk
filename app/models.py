@@ -73,16 +73,18 @@ class Kifu(db.Model):
   original_kifu_id = db.Column(db.Integer, db.ForeignKey('kifus.id'))
   
   @property
-  def title(self):
-    return '%s(%s) vs. %s(%s)' % (self.black_player, self.black_rank, self.white_player, self.white_rank)
-
-  @property
   def filepath(self):
-    return os.path.join(current_app.config['SGF_FOLDER'], str(self.id) + '.sgf')
+    return os.path.join(
+      current_app.config['SGF_FOLDER'],
+      str(self.id) + '.sgf'
+    )
 
   @property
   def imagepath(self):
-    return os.path.join(current_app.config['SGF_FOLDER'], str(self.id) + '.jpg')
+    return os.path.join(
+      current_app.config['THUMBNAIL_FOLDER'],
+      str(self.id) + '.jpg'
+    )
 
   @property
   def sgf(self):
