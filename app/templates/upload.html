@@ -25,10 +25,17 @@
     </div>
   </div>
   
+  <script src="{{ url_for('static', filename='js/config.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/constants.js') }}"></script>
   <script src="{{ url_for('static', filename='js/exceptions.js') }}"></script>
   <script src="{{ url_for('static', filename='js/utils.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/sgf.js') }}"></script>
+
   <script src="{{ url_for('static', filename='js/node.js') }}"></script>
   <script src="{{ url_for('static', filename='js/gametree.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/sgf.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/board.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/driver.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/board_canvas.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/thumbnail.js') }}"></script>
   <script src="{{ url_for('static', filename='js/upload.js') }}"></script>
 {% endblock %}

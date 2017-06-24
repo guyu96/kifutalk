@@ -30,9 +30,13 @@ var config = (function() {
     'nx': 0.32 // next move marker radius relative to spacing
   };
 
+  // thumbnail quality
+  var thumbnail_quality = 0.8;
+
   return {
     sz: board_size,
     colors: colors,
-    canvas: canvas
+    canvas: canvas,
+    tq: thumbnail_quality
   };
 })();

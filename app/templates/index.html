@@ -10,7 +10,21 @@
   {{ super() }}
   <main>
     <a href="{{ url_for('upload_get') }}" id="upload"><span>Upload Kifu</span></a>
-    <a href="{{ url_for('new') }}" id="new"><span>Create New Kifu</span></a>
+    <a href="#" id="new"><span>Create New Kifu</span></a>
     <a href="{{ url_for('browse_kifu') }}" id="browse"><span>Browse Kifus</span></a>
   </main>
+  
+  <script src="{{ url_for('static', filename='js/config.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/constants.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/exceptions.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/utils.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/sgf.js') }}"></script>
+
+  <script src="{{ url_for('static', filename='js/node.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/gametree.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/board.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/driver.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/board_canvas.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/thumbnail.js') }}"></script>  
+  <script src="{{ url_for('static', filename='js/new.js') }}"></script>
 {% endblock %}

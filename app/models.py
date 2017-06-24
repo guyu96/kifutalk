@@ -78,7 +78,11 @@ class Kifu(db.Model):
 
   @property
   def filepath(self):
-    return os.path.join(current_app.config['SGF_FOLDER'], str(self.id) + '.sgf');
+    return os.path.join(current_app.config['SGF_FOLDER'], str(self.id) + '.sgf')
+
+  @property
+  def imagepath(self):
+    return os.path.join(current_app.config['SGF_FOLDER'], str(self.id) + '.jpg')
 
   @property
   def sgf(self):

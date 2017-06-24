@@ -209,6 +209,14 @@ BoardCanvas.prototype.render = function() {
   this.drawMarkers();
 };
 
+// render without markers/indicators
+BoardCanvas.prototype.simpleRender = function() {
+  this.drawBackground();
+  this.drawGrid();
+  this.drawStarPoints();
+  this.drawStones();
+}
+
 // control functions (see gametree.js and driver.js)
 // sync canvas with driver
 BoardCanvas.prototype.next = function(childIndex) {

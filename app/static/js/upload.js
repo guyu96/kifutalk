@@ -15,7 +15,6 @@ var validateAndSubmit = function(sgfStr) {
   } catch(e) {
     throw e;
   }
-  var info = gameTree.gameInfo;
 
   // construct xhr
   var xhr = new XMLHttpRequest();
@@ -39,6 +38,7 @@ var validateAndSubmit = function(sgfStr) {
 
   // submit
   var url = '/upload';
+  var info = gameTree.gameInfo;
   var data = JSON.stringify({
     'sgf': SGF.print(gameTree.root),
     'blackPlayer': info.PB !== '' ? info.PB : 'Anonymous',
@@ -46,7 +46,8 @@ var validateAndSubmit = function(sgfStr) {
     'blackRank': info.BR !== '' ? info.BR : '?',
     'whiteRank': info.WR !== '' ? info.WR : '?',
     'komi': info.KM !== '' ? info.KM : '?',
-    'result': info.RE !== '' ? info.RE : '?'
+    'result': info.RE !== '' ? info.RE : '?',
+    'img': createThumbnail(sgfStr, config.tq)
   });
   xhr.open('POST', url);
   xhr.setRequestHeader('Content-type', 'application/json');

@@ -1,6 +1,7 @@
 from flask import render_template, redirect, url_for, flash, request, abort, jsonify, current_app, send_file
 from flask_login import login_user, logout_user, login_required, current_user
-import datetime, os
+import datetime, os, base64
+from PIL import Image
 
 from . import app, db
 from .models import User, Kifu, Comment, KifuStar
@@ -178,12 +179,18 @@ def kifu_delete(kifu_id):
     f.forked_from_kifu_id = None
     db.session.add(f)
 
-  # delete and commit
+  # delete all kifustars entries of this kifu
+  stars = KifuStar.query.filter_by(kifu_id=kifu_id)
+  for s in stars:
+    db.session.delete(s)
+
+  # delete kifu and commit
   db.session.delete(kifu)
   db.session.commit()
 
   # remove local file
   os.remove(kifu.filepath)
+  os.remove(kifu.imagepath)
 
   return jsonify({
     'redirect': url_for('index', _external=True)
@@ -202,7 +209,6 @@ def upload_get():
 @login_required
 def upload_post():
   kifu_json = request.get_json()
-  print(kifu_json )
 
   # insert kifu into database
   kifu = Kifu(
@@ -222,19 +228,30 @@ def upload_post():
   with open(kifu.filepath, 'w') as f:
     f.write(kifu_json['sgf'])
 
+  # write image to temporary file
+  temp_img = current_app.config['SGF_FOLDER'] + '/temp'
+  with open(temp_img, 'wb') as f:
+    f.write(base64.decodebytes(bytes(kifu_json['img'], 'utf-8')))
+  # write scaled image
+  img = Image.open(temp_img)
+  img.thumbnail(current_app.config['THUMBNAIL_SIZE'])
+  img.save(kifu.imagepath, 'JPEG')
+
   return jsonify({
     'redirect': url_for('kifu_get', kifu_id=kifu.id, _external=True)
   })
 
 # create a new, empty kifu
-@app.route('/new', methods=['GET'])
+@app.route('/new', methods=['POST'])
 def new():
   # must be logged in
   if not current_user.is_authenticated:
     flash('You must log in to create a new kifu')
-    return redirect(url_for('login'))
+    return jsonify({'redirect': url_for('login')})
 
-  # add new kifu to database
+  kifu_json = request.get_json()
+
+  # insert kifu into database
   kifu = Kifu(
     uploaded_on=datetime.datetime.now(),
     owner_id=current_user.id
@@ -242,11 +259,22 @@ def new():
   db.session.add(kifu)
   db.session.commit()
 
-  # write SGF to file
+  # write empty SGF to file
   with open(kifu.filepath, 'w') as f:
     f.write('()')
 
-  return redirect(url_for('kifu_get', kifu_id=kifu.id))
+  # write image to temporary file
+  temp_img = current_app.config['SGF_FOLDER'] + '/temp'
+  with open(temp_img, 'wb') as f:
+    f.write(base64.decodebytes(bytes(kifu_json['img'], 'utf-8')))
+  # write scaled image
+  img = Image.open(temp_img)
+  img.thumbnail(current_app.config['THUMBNAIL_SIZE'])
+  img.save(kifu.imagepath, 'JPEG')
+
+  return jsonify({
+    'redirect': url_for('kifu_get', kifu_id=kifu.id, _external=True)
+  })
 
 # star a kifu
 @app.route('/star/kifu/<int:kifu_id>', methods=['POST'])
