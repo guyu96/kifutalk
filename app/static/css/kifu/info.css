@@ -18,13 +18,13 @@
 }
 
 #black-player, #white-player {
-  max-width: 180px;
+  max-width: 105px;
   max-height: 30px;
   overflow: hidden;
 }
 
 #black-rank, #white-rank {
-  max-width: 80px;
+  max-width: 45px;
   max-height: 30px;
   overflow: hidden;
 }
@@ -71,6 +71,7 @@ svg.white circle {
 
 #komi, #result, #upload-info {
   display: block;
+  height: 16px;
   line-height: 16px;
   margin: 0;
   padding: 0;
@@ -79,8 +80,14 @@ svg.white circle {
 }
 
 #komi span, #result span {
-  max-width: 75px;
+  display: inline-block;
+  line-height: 16px;
+  margin: 1px;
+  padding: 0;
+  height: 16px;
+  max-width: 80px;
   max-height: 16px;
+  overflow: hidden;
 }
 
 span[contentEditable="true"] {

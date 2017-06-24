@@ -17,8 +17,8 @@ var Controller = function(kifu, kifuComments, boardCanvas) {
     'blackRank': document.getElementById('black-rank'),
     'whitePlayer': document.getElementById('white-player'),
     'whiteRank': document.getElementById('white-rank'),
-    'komi': document.getElementById('komi').children[0],
-    'result': document.getElementById('result').children[0],
+    'komi': document.getElementById('komi').children[1],
+    'result': document.getElementById('result').children[1],
     // navigation
     'play': document.getElementById('play'),
     'pause': document.getElementById('pause'),
