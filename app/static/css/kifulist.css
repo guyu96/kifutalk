@@ -1,11 +1,7 @@
 main {
   margin: 20px auto;
-  height: 758px;
+  height: 756px;
   width: 620px;
-}
-
-.kifu-list {
-  border-top: 1px solid #254977;
 }
 
 .kifu-list a {
@@ -70,7 +66,6 @@ main {
   height: 30px;
   font-size: 0;
   width: 620px;
-  border-bottom: 1px solid #254977;
 }
 
 .page-nav a {
