@@ -1,7 +1,7 @@
 main {
   border-top: 1px solid #254977;
   margin: 20px auto;
-  height: 750px;
+  height: 756px;
   width: 620px;
 }
 
@@ -63,28 +63,46 @@ main {
 }
 
 .page-nav {
-  text-align: center;
+  background: #355987;
   height: 30px;
-  color: #e8e8e8;
-  margin-top: 20px;
+  font-size: 0;
+  width: 620px;
 }
 
 .page-nav a {
-  font-family: monospace;
-  font-size: 20px;
-  font-weight: bold;
-  margin: 0 10px;
-  line-height: 30px;
-  text-decoration: none;
+  display: inline-block;
+  width: 290px;
+  height: 30px;
+  margin: 0;
+  padding: 0;
 }
-.page-nav a:visited {
-  color: #e8e8e8;
+
+.page-nav a:hover {
+  background: #254977;
+}
+
+.page-nav svg {
+  height: 20px;
+  width: 20px;
+  margin: 5px 135px;
+}
+
+.page-nav svg line,
+.page-nav svg polyline {
+  stroke: #d8d8d8;
 }
 
 .page-nav #page-num {
-  font-family: 'Open Sans', sans-serif;
-  font-size: 17px;
+  text-align: center;
+  color: #e8e8e8;
   line-height: 30px;
+  font-size: 15px;
+  vertical-align: top;
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+  width: 40px;
+  height: 30px;
 }
 
 .page-nav #no-kifu {
