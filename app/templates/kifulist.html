@@ -10,15 +10,15 @@
 
 {% block body %}
   {{ super() }}
+  {% block header %}
+  {% endblock %}
   <main>
-    {% block header %}
-    {% endblock %}
+    {% if kifus %}
     <div class="kifu-list">
       {% for kifu in kifus %}
         {{ render_kifu_entry(kifu) }}
       {% endfor %}
       <div class="page-nav">
-        {% if kifus %}
           {% block prev_link %}
             <a
               id="prev"
@@ -50,10 +50,10 @@
               </svg>
             </a>
           {% endblock %}
-        {% else %}
-          <p id="no-kifu">No Kifus Available</p>
-        {% endif %}
       </div>
     </div>
+    {% else %}
+      <p id="no-kifu">No Kifus Available</p>
+    {% endif %}
   </main>
 {% endblock %}

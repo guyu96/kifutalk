@@ -7,13 +7,37 @@
 
 {% block header %}
   {{ super() }}
-  <h2 id="user-title">{{ username }}'s Kifus</h2>
+  <h2 id="user-title">Kifus of {{ username }}</h2>
 {% endblock %}
 
 {% block prev_link %}
-  <a href="{{ url_for('profile', user_id=user_id, page=(page_num-1)) }}" id="prev"><</a>
+  <a
+    id="prev"
+    {% if has_prev %}
+      href="{{ url_for('profile', user_id=user_id, page=(page_num-1)) }}"
+    {% else %}
+      href="#"
+    {% endif %}
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="20" y1="12" x2="4" y2="12"/>
+      <polyline points="10 18 4 12 10 6"/>
+    </svg>
+  </a>
 {% endblock %}
 
 {% block next_link %}
-  <a href="{{ url_for('profile', user_id=user_id, page=(page_num+1)) }}" id="prev">></a>
+  <a
+    id="next"
+    {% if has_next %}
+      href="{{ url_for('profile', user_id=user_id, page=(page_num+1)) }}"
+    {% else %}
+      href="#"
+    {% endif %}
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="4" y1="12" x2="20" y2="12"/>
+      <polyline points="14 6 20 12 14 18"/>
+    </svg>
+  </a>
 {% endblock %}

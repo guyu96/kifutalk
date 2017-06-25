@@ -1,8 +1,11 @@
 main {
-  border-top: 1px solid #254977;
   margin: 20px auto;
-  height: 756px;
+  height: 758px;
   width: 620px;
+}
+
+.kifu-list {
+  border-top: 1px solid #254977;
 }
 
 .kifu-list a {
@@ -67,6 +70,7 @@ main {
   height: 30px;
   font-size: 0;
   width: 620px;
+  border-bottom: 1px solid #254977;
 }
 
 .page-nav a {
@@ -105,9 +109,11 @@ main {
   height: 30px;
 }
 
-.page-nav #no-kifu {
+#no-kifu {
   font-family: 'Open Sans', sans-serif;
-  letter-spacing: 1px;
-  font-size: 20px;
-  line-height: 30px;
+  letter-spacing: 0.5px;
+  font-size: 15px;
+  color: #d8d8d8;
+  text-align: center;
+  margin-top: 50px;
 }
