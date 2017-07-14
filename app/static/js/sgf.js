@@ -36,7 +36,7 @@ var SGF = (function() {
   // Square brackets escaping is not enabled
   var parseVar = function(root, sgfStr) {
     var parent = root;
-    nodeStrList = sgfStr.split(';');
+    var nodeStrList = sgfStr.split(';');
     // i starts at 1 because the split list starts
     // with the empty string
     for (var i = 1; i < nodeStrList.length; i++) {
@@ -169,6 +169,9 @@ var SGF = (function() {
       } else if (sgfStr[i] === '(') {
         // find the matching close parenthesis
         var end = findValidPrtsMatch(sgfStr, i);
+        if (end === -1) {
+          throw new exceptions.ParsingError(1, 'Invalid SGF String');
+        }
         // recursively parse the subvariation
         // delete the open parenthesis but keep the close one
         parseHelper(sgfStr.substring(i+1, end+1), parent, 0);

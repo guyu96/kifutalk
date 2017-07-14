@@ -126,6 +126,8 @@ class SGF:
         i = next
       elif sgf_str[i] == '(':
         end = self.__find_valid_prts_match(sgf_str, i)
+        if end == -1:
+          raise ValueError('Invalid SGF String')
         self.__parse_helper(sgf_str[i+1:end+1], parent, 0)
         i = end + 1
       else:
