@@ -1,3 +1,4 @@
+# the Node and SGF classes are just a re-write of sgf.js
 class Node:
   def __init__(self, parent):
     self.id = -1
@@ -140,3 +141,64 @@ class SGF:
     self.__parse_helper(sgf_str, root, 0)
     self.max_node_id = -1
     return root
+
+# check if the sgf_str is syntactically valid
+def validate_sgf(sgf_str):
+  sgf = SGF()
+  try:
+    root = sgf.parse(sgf_str)
+    return True
+  except Exception as e:
+    print(e)
+    return False
+
+# helper function to verify that one node is a "sub_node" of another node
+def validate_sub_node(node, sub_node):
+  # must have the same ID
+  if node.id != sub_node.id:
+    return False
+  # node must contain all of sub_node's actions
+  if len(node.actions) < len(sub_node.actions):
+    return False
+  for sub_action in sub_node.actions:
+    found = False
+    for action in node.actions:
+      if action['prop'] == sub_action['prop'] and action['value'] == sub_action['value']:
+        found = True
+        break
+    if not found:
+      return False
+  # validation success
+  return True
+
+# sgf_str should contain the entire sub_sgf_str
+# with only leaf nodes or leaf subtrees added
+def validate_sub_sgf(sgf_str, sub_sgf_str):
+  # helper dfs routine
+  def dfs(root, sub_root):
+    # check if root contains all of sub_root's children
+    for sub_child in sub_root.children:
+      found = False
+      for child in root.children:
+        if validate_sub_node(child, sub_child):
+          found = True
+          # recursively validate the child, subchild pair
+          if not dfs(child, sub_child):
+            return False
+          break
+      if not found:
+        return False
+    # validation success
+    return True
+
+  # parse both sgf strings
+  # if error during parsing, just return false
+  sgf = SGF()
+  try:
+    root = sgf.parse(sgf_str)
+    sub_root = sgf.parse(sub_sgf_str)
+  except Exception as e:
+    print(e)
+    return False
+
+  return dfs(root, sub_root)
