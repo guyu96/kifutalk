@@ -1,42 +1,92 @@
 main {
+  width: 1100px;
+  height: 797px;
   position: absolute;
-  top: 0;
-  bottom: 0;
+  top: 60px;
+  bottom: 22px;
   left: 0;
   right: 0;
-  padding: 0;
-  width: 720px;
-  height: 180px;
   margin: auto;
-  font-size: 0;
 }
 
-main a {
+#left {
+  float: left;
+  height: 797px;
+  width: 400px;
+  background: #355987;
+}
+
+#right {
+  float: right;
+  width: 620px;
+}
+
+#greeting {
+  color: #f8f8f8;
   font-family: 'Open Sans', sans-serif;
-  text-decoration: none;
-  display: inline-block;
-  width: 160px;
-  padding: 40px 20px;
-  margin: 20px;
-  border: 0;
-  background: #499c88;
-  color: #d8d8d8;
-  text-align: center;
+  line-height: 70px;
+  height: 185px;
+  width: 350px;
+  padding: 30px 25px;
+  border-bottom: 1px solid #254977;
 }
 
-main a:hover {
-  width: 158px;
-  height: 18px;
-  border: 1px solid #51739e;
-  background: #186652;
-  cursor: pointer;
+#greeting .main {
+  font-size: 50px;
+  font-weight: bold;
+  line-height: 70px;
+  letter-spacing: 2px;
+  height: 140px;
 }
 
-main a span {
+#greeting .sub {
+  margin-top: 20px;
   font-size: 18px;
-  height: 20px;
-  text-align: center;
-  vertical-align: center;
+  line-height: 25px;
+  letter-spacing: 1px;
+  height: 25px;
+  text-align: left;
+}
+
+#upload, #new {
+  background: #254977;
+  color: #e8e8e8;
+  margin: 77px auto;
+  width: 300px;
+  height: 160px;
+  line-height: 160px;
+  text-decoration: none;
   display: block;
-  margin: auto;
+}
+
+svg {
+  display: inline-block;
+  height: 160px;
+  width: 30px;
+  margin-right: 25px;
+  margin-left: 25px;
+  float: left;
+}
+
+svg path, svg polyline, svg line, svg polygon {
+  stroke: #e8e8e8;
+}
+
+#upload p, #new p {
+  width: 200px;
+  height: 105px;
+  display: inline-block;
+  vertical-align: middle;
+  line-height: 35px;
+  font-size: 18px;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+#upload:hover, #new:hover {
+  background: #153967;
+}
+
+#upload:visited, #new:visited {
+  color: #e8e8e8;
 }

@@ -1,6 +1,11 @@
 main {
   margin: auto;
-  position: relative;
+  position: absolute;
+  top: 60px;
+  bottom: 22px;
+  left: 0;
+  right: 0;
+  margin: auto;
   width: 1100px;
   height: 680px;
 }

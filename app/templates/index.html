@@ -3,15 +3,45 @@
 {% block title %}Kifutalk{% endblock %}
 {% block css %}
   {{ super() }}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/kifulist.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
 {% endblock %}
 
 {% block body %}
   {{ super() }}
   <main>
-    <a href="{{ url_for('upload_get') }}" id="upload"><span>Upload Kifu</span></a>
-    <a href="#" id="new"><span>Create New Kifu</span></a>
-    <a href="{{ url_for('browse_kifu') }}" id="browse"><span>Browse Kifus</span></a>
+  <div id="left">
+    <div id="greeting">
+      <p class="main">Welcome to Kifutalk</p>
+      <p class="sub">conversations about Go made easy</p>
+    </div>
+    <div id="action">
+      <a href="{{ url_for('upload_get') }}" id="upload">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 17v3a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-3"/>
+          <polyline points="16 6 12 2 8 6"/>
+          <line x1="12" y1="2" x2="12" y2="16"/>
+        </svg>
+        <p>Upload an existing Go game in the SGF file format</p>
+      </a>
+      <a href="#" id="new">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 14.66V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5.34"/>
+          <polygon points="18 2 22 6 12 16 8 16 8 12 18 2"/>
+        </svg>
+        <p>Create an empty Go board and edit it from scratch</p>
+      </a>
+    </div>
+  </div>
+  <div id="right">
+    {% with
+      prev_url=url_for('index', page=page_num-1),
+      next_url=url_for('index', page=page_num+1),
+      list_title='Newest Uploads'
+    %} 
+      {% include('kifulist.html') %}
+    {% endwith %}
+  </div>
   </main>
   
   <script src="{{ url_for('static', filename='js/config.js') }}"></script>

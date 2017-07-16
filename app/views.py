@@ -25,10 +25,24 @@ def thumbnail_dataurl(kifu):
     # append dataurl prefix
     return 'data:image/jpeg;base64,' + f.read()
 
-# home page
-@app.route('/')
+# home page (also browse kifu)
+@app.route('/', methods=['GET'])
 def index():
-  return(render_template('index.html'))
+  page = int(request.args.get('page', 1))
+  kifu_pagination = Kifu.query.join(User).add_columns(
+    User.username, Kifu.id, Kifu.black_player, Kifu.white_player, Kifu.black_rank, Kifu.white_rank, Kifu.uploaded_on
+  ).order_by(Kifu.uploaded_on.desc()).paginate(
+    page=page,
+    per_page=current_app.config['PERPAGE'],
+    error_out=True
+  )
+  return render_template(
+    'index.html',
+    kifus=kifu_pagination.items,
+    page_num=kifu_pagination.page,
+    has_next=kifu_pagination.has_next,
+    has_prev=kifu_pagination.has_prev
+  )
 
 # sign up page
 @app.route('/signup', methods=['GET', 'POST'])
@@ -404,7 +418,7 @@ def profile(user_id, page=1):
     per_page=current_app.config['PERPAGE'],
     error_out=True
   )
-
+  print(user.username)
   return render_template(
     'user-kifulist.html',
     user_id=user.id,

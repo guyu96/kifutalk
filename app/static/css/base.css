@@ -4,6 +4,11 @@ body {
 }
 
 header {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  z-index: 10;
   height: 40px;
   padding: 10px 20px;
   color: #97afcf;
@@ -41,6 +46,7 @@ header nav a:hover {
 }
 
 footer {
+  height: 12px;
   position: fixed;
   left: 0;
   right: 0;
@@ -52,6 +58,7 @@ footer {
 
 footer p {
   font-size: 12px;
+  line-height: 12px;
   text-align: center;
   color: #97afcf;
 }
