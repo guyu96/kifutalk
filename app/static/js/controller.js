@@ -44,7 +44,6 @@ var Controller = function(kifu, kifuComments, boardCanvas) {
     'starKifu': document.getElementById('star'),
     'unstarKifu': document.getElementById('unstar'),
     'deleteKifu': document.getElementById('delete-kifu'),
-    'forkKifu': document.getElementById('fork'),
     'downloadKifu': document.getElementById('download')
   };
 
@@ -140,8 +139,8 @@ Controller.prototype.updateNavEdit = function() {
       this.html.next.disabled = false;
       this.html.end.disabled = false;
     }
-    // enable toggleEdit if user owns kifu
-    if (this.authStatus === 2) {
+    // enable toggleEdit if user is logged in
+    if (this.authStatus > 0) {
       this.html.toggleEdit.disabled = false;
     }
   }
@@ -155,6 +154,13 @@ Controller.prototype.updateNavEdit = function() {
     // enable buttons
     for (var i = 0; i < this.html.editMode.length; i++) {
       this.html.editMode[i].disabled = false;
+    }
+    // disable deleteNode if user is not owner and if the game
+    // is at a node that already existed before the edit session
+    if (this.authStatus !== 2) {
+      if (gameTree.currentNode.id < this.driverBackup.gameTree.nextNodeID) {
+        this.html.deleteNode.disabled = true;
+      }
     }
     // disable play button
     this.html.play.disabled = true;
@@ -310,13 +316,11 @@ Controller.prototype.initStarAuth = function() {
       this.html.unstarKifu.style.display = 'none';
       break;
     case 1:
-      // not owner, remove delete button and disable edit
+      // not owner, remove delete button
       this.html.deleteKifu.remove();
-      this.html.toggleEdit.disabled = true;
       break;
     case 2:
-      // is owner, remove fork button
-      this.html.forkKifu.remove();
+      // is owner, no action required (as of now)
       break;
   }
 };
@@ -504,11 +508,6 @@ Controller.prototype.addActionEventListeners = function() {
     self.deleteKifu(self.kifu.id);
   });
 
-  // fork kifu
-  this.html.forkKifu.addEventListener('click', function(e) {
-    self.forkKifu(self.kifu.id);
-  });
-
   // download kifu
   this.html.downloadKifu.addEventListener('click', function(e) {
     window.location.replace('/download/' + self.kifu.id);
@@ -593,9 +592,9 @@ Controller.prototype.addEditEventListeners = function() {
     self.isEditing = true;
     self.nodesDeletedDuringEdit = []; // reset deleted nodes
     self.isSelectingAdd = false;
-    self.updateNavEdit();
     // backup controller state
     self.backupBoardCanvas();
+    self.updateNavEdit();
   });
 
   // save all the changes
@@ -823,32 +822,6 @@ Controller.prototype.deleteKifu = function(kifuID) {
   // send post request to server
   var url = '/kifu/' + kifuID;
   xhr.open('DELETE', url);
-  xhr.setRequestHeader('Content-type', 'application/json');
-  xhr.send();
-};
-
-Controller.prototype.forkKifu = function(kifuID) {
-  var self = this;
-  var xhr = new XMLHttpRequest();
-  xhr.addEventListener('readystatechange', function() {
-    // post initiated
-    if (xhr.readyState === 1) {
-      // disable fork button
-      self.html.forkKifu.disabled = true;
-    // post successful
-    } else if (xhr.readyState === 4 && xhr.status === 200) {
-      window.location.replace(JSON.parse(xhr.responseText).redirect);
-    // post failed
-    } else if (xhr.readyState === 4 && xhr.status !== 200) {
-      // re-enable fork button
-      self.html.forkKifu.disabled = false;
-      throw new exceptions.NetworkError(3, "Kifu Fork Failed");
-    }
-  });
-
-  // send post request to server
-  var url = '/fork/' + kifuID;
-  xhr.open('POST', url);
   xhr.setRequestHeader('Content-type', 'application/json');
   xhr.send();
 };

@@ -67,10 +67,6 @@ class Kifu(db.Model):
   white_rank = db.Column(db.String(16), default='?')
   komi = db.Column(db.String(8), default='?')
   result = db.Column(db.String(16), default='?')
-
-  # for root kifus, the two foreign keys below are null
-  forked_from_kifu_id = db.Column(db.Integer, db.ForeignKey('kifus.id'))
-  original_kifu_id = db.Column(db.Integer, db.ForeignKey('kifus.id'))
   
   @property
   def filepath(self):
@@ -104,8 +100,6 @@ class Kifu(db.Model):
       'komi': self.komi,
       'result': self.result,
       'uploaded_on': uploaded_on,
-      'forked_from': self.forked_from_kifu_id,
-      'original': self.original_kifu_id,
       'sgf': self.sgf
     }
 

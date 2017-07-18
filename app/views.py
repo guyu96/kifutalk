@@ -6,6 +6,7 @@ from PIL import Image
 from . import app, db
 from .models import User, Kifu, Comment, KifuStar
 from .forms import SignUpForm, LoginForm
+from .sgf import validate_sgf, validate_sub_sgf
 
 # helper functions to save and retrieve kifu thumbnails
 def save_thumbnail(kifu, base64_str):
@@ -155,14 +156,15 @@ def kifu_get(kifu_id):
 @login_required
 def kifu_update(kifu_id):
   kifu = Kifu.query.filter_by(id=kifu_id).first_or_404()
-  if (kifu.owner_id != current_user.id):
-    abort(401)
 
   data = request.get_json()
   kifu.modified_on = datetime.datetime.now()
 
   # update SGF
   if 'sgf' in data: # deletedNodes and img should also be present
+    # first ensure that new SGF contains all nodes present in the old SGF
+    if not validate_sub_sgf(data['sgf'], kifu.sgf):
+      abort(401)
     # update SGF
     kifu.update_sgf(data['sgf'])
     # delete comments on deleted nodes
@@ -203,16 +205,6 @@ def kifu_delete(kifu_id):
   kifu_comments = Comment.query.filter_by(kifu_id=kifu_id).all()
   for kc in kifu_comments:
     db.session.delete(kc)
-
-  # set child kifu's original/fork_from pointer to null
-  originial = Kifu.query.filter_by(original_kifu_id=kifu_id)
-  fork = Kifu.query.filter_by(forked_from_kifu_id=kifu_id)
-  for o in originial:
-    o.original_kifu_id = None
-    db.session.add(o)
-  for f in fork:
-    f.forked_from_kifu_id = None
-    db.session.add(f)
 
   # delete all kifustars entries of this kifu
   stars = KifuStar.query.filter_by(kifu_id=kifu_id)
@@ -342,39 +334,6 @@ def unstar_kifu(kifu_id):
   db.session.commit()
 
   return jsonify({'success': True})
-
-# fork an existing kifu
-@app.route('/fork/<int:kifu_id>', methods=['POST'])
-@login_required
-def fork(kifu_id):
-  kifu = Kifu.query.filter_by(id=kifu_id).first_or_404()
-
-  # owner is not allowed to fork his/her own kifu
-  if kifu.owner_id == current_user.id:
-    abort(401)
-
-  # create a clone of kifu
-  original_id = kifu.original_kifu_id if kifu.original_kifu_id else kifu.id
-  kifu_clone = Kifu(
-    title=kifu.title,
-    uploaded_on=datetime.datetime.now(),
-    owner_id=current_user.id,
-    original_kifu_id = original_id,
-    forked_from_kifu_id = kifu.id
-  )
-
-  # add kifu to database
-  db.session.add(kifu_clone)
-  db.session.commit()
-
-  # write SGF to file
-  with open(kifu_clone.filepath, 'w') as clone_file:
-    with open(kifu.filepath, 'r') as original_file:
-      clone_file.write(original_file.read())
-
-  return jsonify({
-    'redirect': url_for('kifu_get', kifu_id=kifu_clone.id, _external=True)
-  })
 
 # download a kifu
 @app.route('/download/<int:kifu_id>', methods=['GET'])
