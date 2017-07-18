@@ -70,6 +70,13 @@ footer p a:visited {
   color: #97afcf;
 }
 
+.flashes {
+  position: fixed;
+  top: 60px;
+  left: 0;
+  right: 0;
+}
+
 .flashes li {
   text-align: center;
   background: #635aa7;
