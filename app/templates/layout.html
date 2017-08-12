@@ -30,7 +30,7 @@
   {% if messages %}
     <ul class=flashes>
     {% for message in messages %}
-      <li>{{ message }}</li>
+      <li>{{ message }} <span>Dismiss</span> </li>
     {% endfor %}
     </ul>
   {% endif %}
@@ -40,5 +40,13 @@
   <footer>
     <p>Guyu Fan 2017 <a href="https://github.com/guyu96/kifutalk">GitHub</a></p>
   </footer>
+  <script>
+    // for flash messages
+    document.querySelectorAll('.flashes li span').forEach(function(dismiss){
+      dismiss.addEventListener('click', function(e) {
+        this.parentNode.parentNode.removeChild(this.parentNode);
+      });
+    });
+  </script>
 </body>
 </html>

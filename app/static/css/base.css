@@ -75,6 +75,7 @@ footer p a:visited {
   top: 60px;
   left: 0;
   right: 0;
+  z-index: 1;
 }
 
 .flashes li {
@@ -83,6 +84,13 @@ footer p a:visited {
   padding: 20px;
   color: #e8e8e8;
   border: 1px solid #57527d;
+}
+
+.flashes li span {
+  display: inline-block;
+  margin: 0 20px;
+  text-decoration: underline;
+  cursor: pointer;
 }
 
 button:hover {
