@@ -1,0 +1,48 @@
+{# needs render_field #}
+<div class="login-signup">
+  <div class="switch">
+    <button class="active" id="login-button">Log In</button>
+    <button id="sign-up-button">Sign Up</button>
+  </div>
+  <form id="login-form" method="post">
+    {{ render_field(login_form.login_email) }}
+    {{ render_field(login_form.login_password) }}
+    {{ login_form.login_submit }}
+    {{ login_form.csrf_token }}
+  </form>
+  <form id="sign-up-form" method="post" style="display: none;">
+    {{ render_field(sign_up_form.sign_up_email) }}
+    {{ render_field(sign_up_form.sign_up_username) }}
+    {{ render_field(sign_up_form.sign_up_password) }}
+    {{ render_field(sign_up_form.sign_up_confirm) }}
+    {{ render_field(sign_up_form.sign_up_rank) }}
+    {{ sign_up_form.sign_up_submit }}
+    {{ sign_up_form.csrf_token }}
+  </form>
+</div>
+<script type="text/javascript">
+  var loginButton = document.getElementById('login-button');
+  var signUpButton = document.getElementById('sign-up-button');
+  var loginForm = document.getElementById('login-form');
+  var signUpForm = document.getElementById('sign-up-form');
+
+  loginButton.addEventListener('click', function(e) {
+    loginButton.classList.add('active');
+    signUpButton.classList.remove('active');
+    loginForm.style.display = 'block';
+    signUpForm.style.display = 'none';
+  });
+
+  signUpButton.addEventListener('click', function(e) {
+    signUpButton.classList.add('active');
+    loginButton.classList.remove('active');
+    signUpForm.style.display = 'block';
+    loginForm.style.display = 'none';
+  });
+
+  // make sign-up active if it contains error messages
+  if (signUpForm.querySelector('.errors')) {
+    console.log('lol')
+    signUpButton.click();
+  }
+</script>

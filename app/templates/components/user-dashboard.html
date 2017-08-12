@@ -1,0 +1,11 @@
+<div class="user-dashboard">
+  <div class="greeting">
+    <p>Hello, <span>{{ current_user.username }}</span> (<span>{{ current_user.rank }}</span>)</p>
+    <a href="{{ url_for('logout') }}">Log out</a>
+  </div>
+  <div class="actions">
+    <a href="#" id="view-uploads" class="action">View My Uploads</a>
+    <a href="#" id="view-saved" class="action">View Saved Kifus</a>
+    <a href="#" id="view-comments" class="action">View My Comments</a>
+  </div>
+</div>

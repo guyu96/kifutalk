@@ -1,0 +1,59 @@
+.user-dashboard {
+  width: 400px;
+  color: #f8f8f8;
+  font-family: 'Open Sans', sans-serif;
+}
+
+.greeting {
+  background: #355987;
+  text-align: center;
+}
+
+.greeting p {
+  padding: 60px;
+  height: 40px;
+  line-height: 40px;
+  font-size: 25px;
+  letter-spacing: 0.5px;
+  font-weight: bold;
+}
+
+.greeting a {
+  display: block;
+  color: #e8e8e8;
+  font-size: 20px;
+  line-height: 23px;
+  height: 23px;
+  text-decoration: none;
+  border-top: 1px solid #254977;
+  padding: 20px;
+}
+
+.greeting a:hover {
+  background: #253977;
+}
+
+.action {
+  width: 400px;
+  text-align: center;
+  padding: 40px 0;
+  height: 53px;
+  line-height: 53px;
+  display: block;
+  font-size: 25px;
+  font-weight: bold;
+  letter-spacing: 0.8px;
+  color: #f8f8f8;
+  background: #254977;
+  text-decoration: none;
+}
+
+#view-saved {
+  border-top: 1px solid #153967;
+  border-bottom: 1px solid #153967;
+  height: 48px;
+}
+
+.action:hover {
+  background: #153967;
+}

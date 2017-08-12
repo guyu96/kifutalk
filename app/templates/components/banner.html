@@ -1,0 +1,20 @@
+<div class="banner">
+  <div class="poster">
+    <h2>Welcome to Kifutalk</h2>
+    <h3>conversations about Go made easy</h3>
+  </div>
+  <div class="features">
+    <a href="{{ url_for('new') }}" id="create" class="feature">
+      <h4>Create</h4>
+      <p>a new board and start from scratch. Add as many moves and variations as you'd like, marking the board and adding commentary along the way.</p>
+    </a>
+    <a href="{{ url_for('upload_get') }}" id="upload" class="feature">
+      <h4>Upload</h4>
+      <p>and share an SGF file containing a game you recently played, a difficult tsumego problem, or a professional game you don't quite understand.</p>
+    </a>
+    <a href="{{ url_for('browse_kifu') }}" id="comment" class="feature">
+      <h4>Browse</h4>
+      <p>and discover the kifus other people have uploaded. Contribute to the community by finding a game that interests you and adding a comment or variation.</p>
+    </a>
+  </div>
+</div>
