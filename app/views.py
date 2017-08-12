@@ -27,23 +27,33 @@ def thumbnail_dataurl(kifu):
     return 'data:image/jpeg;base64,' + f.read()
 
 # home page (also browse kifu)
-@app.route('/', methods=['GET'])
+@app.route('/', methods=['GET', 'POST'])
 def index():
-  page = int(request.args.get('page', 1))
-  kifu_pagination = Kifu.query.join(User).add_columns(
-    User.username, Kifu.id, Kifu.black_player, Kifu.white_player, Kifu.black_rank, Kifu.white_rank, Kifu.uploaded_on
-  ).order_by(Kifu.uploaded_on.desc()).paginate(
-    page=page,
-    per_page=current_app.config['PERPAGE'],
-    error_out=True
-  )
-  return render_template(
-    'index.html',
-    kifus=kifu_pagination.items,
-    page_num=kifu_pagination.page,
-    has_next=kifu_pagination.has_next,
-    has_prev=kifu_pagination.has_prev
-  )
+  login_form = LoginForm()
+  sign_up_form = SignUpForm()
+
+  if login_form.login_submit.data and login_form.validate_on_submit():
+    user = User.query.filter_by(email=login_form.login_email.data).first()
+    if user is not None and user.verify_password(login_form.login_password.data):
+      login_user(user, True)
+      return redirect(request.args.get('next') or url_for('index'))
+    flash('Invalid email address or password.')
+
+  if sign_up_form.sign_up_submit.data and sign_up_form.validate_on_submit():
+    user = User(
+      email=sign_up_form.sign_up_email.data,
+      username=sign_up_form.sign_up_username.data,
+      password=sign_up_form.sign_up_password.data,
+      rank_id=sign_up_form.sign_up_rank.data,
+      signed_up_on=datetime.datetime.now()
+    )
+    db.session.add(user)
+    db.session.commit()
+    flash('You can now log in.')
+    return redirect(url_for('index'))
+
+
+  return render_template('index.html', login_form=login_form, sign_up_form=sign_up_form)
 
 # sign up page
 @app.route('/signup', methods=['GET', 'POST'])
