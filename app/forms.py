@@ -1,32 +1,38 @@
 from flask_wtf import FlaskForm
-from wtforms import ValidationError, StringField, PasswordField, SubmitField, BooleanField
-from wtforms.validators import DataRequired, Email, EqualTo, Length, Regexp
+from wtforms import ValidationError, StringField, PasswordField, SubmitField, BooleanField, SelectField, TextAreaField
+from wtforms.validators import DataRequired, Email, EqualTo, Length, Regexp, Optional, URL
 
-from .models import User
+from .models import User, Rank
 
 class SignUpForm(FlaskForm):
-  email = StringField('Email', validators=[
+  sign_up_email = StringField('Email', validators=[
     DataRequired(),
-    Length(1, 64),
+    Length(6, 35),
     Email()
   ])
-  username = StringField('Username', validators=[
+  sign_up_username = StringField('Username', validators=[
     DataRequired(),
-    Length(1, 64),
+    Length(4, 20),
     Regexp(
       '^[A-Za-z0-9_.]*$', 
       0,
       'Username must contain letters, dots, and underscores only'
     )
   ])
-  password = PasswordField('Password', validators=[
+  sign_up_password = PasswordField('Password', validators=[
     DataRequired(),
-    EqualTo('confirm', message='Passwords must match.')
+    Length(8, 64),
+    EqualTo('sign_up_confirm', message='Passwords must match.')
   ])
-  confirm = PasswordField('Re-enter Password', validators=[
+  sign_up_confirm = PasswordField('Re-enter Password', validators=[
     DataRequired()
   ])
-  submit = SubmitField('Sign Up') 
+  sign_up_rank = SelectField(
+    'Rank',
+    choices=[(r.id, r.rank_en) for r in Rank.query.all()],
+    coerce=int
+  )
+  sign_up_submit = SubmitField('Sign Up') 
 
   def validate_email(self, field):
     if User.query.filter_by(email=field.data).first():
@@ -37,13 +43,12 @@ class SignUpForm(FlaskForm):
       raise(ValidationError('Username already in use.'))
 
 class LoginForm(FlaskForm):
-  email = StringField('Email', validators=[
+  login_email = StringField('Email', validators=[
     DataRequired(),
     Length(1, 64),
     Email()
   ])
-  password = PasswordField('Password', validators=[
+  login_password = PasswordField('Password', validators=[
     DataRequired(),
   ])
-  remember_me = BooleanField('Stay logged in')
-  submit = SubmitField('Log In')
+  login_submit = SubmitField('Log In')
