@@ -11,9 +11,8 @@ db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
-# login_manager.login_view = 'signup'
 
-from . import models, forms, views
+from . import models
 
 @login_manager.user_loader
 def load_user(userid):

@@ -1,3 +1,3 @@
-import app
+from app import views, forms, app
 
-app.app.run()
+app.run()
