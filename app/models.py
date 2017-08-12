@@ -16,12 +16,15 @@ class User(UserMixin, db.Model):
   signed_up_on = db.Column(db.DateTime)
   confirmed_on = db.Column(db.DateTime)
   role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
-  country_id = db.Column(db.Integer, db.ForeignKey('countries.id'))
-  level_id = db.Column(db.Integer, db.ForeignKey('levels.id'))
+  rank_id = db.Column(db.Integer, db.ForeignKey('ranks.id'))
 
   @property
   def password(self):
     raise AttributeError('password is not readable')
+
+  @property
+  def rank(self):
+    return Rank.query.get(self.rank_id).rank_en;
 
   @password.setter
   def password(self, password):
@@ -61,6 +64,8 @@ class Kifu(db.Model):
   owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
   # kifu info
+  title = db.Column(db.String(512), nullable=False)
+  description = db.Column(db.Text)
   black_player = db.Column(db.String(128), default='Anonymous')
   white_player = db.Column(db.String(128), default='Anonymous')
   black_rank = db.Column(db.String(16), default='?')
@@ -133,14 +138,8 @@ class KifuStar(db.Model):
   user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
   kifu_id = db.Column(db.Integer, db.ForeignKey('kifus.id'), nullable=False)
 
-class Country(db.Model):
-  __tablename__ = 'countries'
+class Rank(db.Model):
+  __tablename__ = 'ranks'
   id = db.Column(db.Integer, primary_key=True)
-  name_en = db.Column(db.String(64))
-  name_zh = db.Column(db.String(64))
-
-class Level(db.Model):
-  __tablename__ = 'levels'
-  id = db.Column(db.Integer, primary_key=True)
-  name_en = db.Column(db.String(64))
-  name_zh = db.Column(db.String(64))
+  rank_en = db.Column(db.String(16))
+  rank_cn = db.Column(db.String(16))
