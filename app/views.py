@@ -1,12 +1,12 @@
 from flask import render_template, redirect, url_for, flash, request, abort, jsonify, current_app, send_file
 from flask_login import login_user, logout_user, login_required, current_user
-import datetime, os, base64
+import datetime, os, base64, urllib.request
 from PIL import Image
 
 from . import app, db
 from .models import User, Kifu, Comment, KifuStar
 from .forms import SignUpForm, LoginForm
-from .sgf import validate_sgf, validate_sub_sgf
+from .sgf import validate_sgf, validate_sub_sgf, get_sgf_info, standardize_sgf
 
 # helper functions to save and retrieve kifu thumbnails
 def save_thumbnail(kifu, base64_str):
@@ -43,7 +43,7 @@ def index():
     user = User(
       email=sign_up_form.sign_up_email.data,
       username=sign_up_form.sign_up_username.data,
-      password=sign_up_form.sign_up_password.data,
+      password=sign_up_oflrm.sign_up_password.data,
       rank_id=sign_up_form.sign_up_rank.data,
       signed_up_on=datetime.datetime.now()
     )
@@ -234,27 +234,33 @@ def kifu_delete(kifu_id):
   })
 
 # upload page
-@app.route('/upload', methods=['GET'])
-def upload_get():
-  if current_user.is_authenticated:
+@app.route('/upload', methods=['GET', 'POST'])
+def upload():
+  if request.method == 'GET':
+    if not current_user.is_authenticated:
+      flash('You must log in first to upload kifus')
+      return redirect(url_for('index'))
     return render_template('upload.html')
-  flash('You must log in first to upload kifus')
-  return redirect(url_for('login'))
 
-# upload kifu
-@app.route('/upload', methods=['POST'])
-@login_required
-def upload_post():
+  # request.method == 'POST'
+  # validate SGF and get SGF info
   kifu_json = request.get_json()
+  print(kifu_json)
+  if not validate_sgf(kifu_json['sgf']):
+    abort(400)
+  info = get_sgf_info(kifu_json['sgf'])
+  sgf_str = standardize_sgf(kifu_json['sgf'])
 
   # insert kifu into database
   kifu = Kifu(
-    black_player=kifu_json['blackPlayer'],
-    white_player=kifu_json['whitePlayer'],
-    black_rank=kifu_json['blackRank'],
-    white_rank=kifu_json['whiteRank'],
-    komi=kifu_json['komi'],
-    result=kifu_json['result'],
+    title=kifu_json['title'],
+    description=kifu_json['description'],
+    black_player=info['PB'],
+    white_player=info['PW'],
+    black_rank=info['BR'],
+    white_rank=info['WR'],
+    komi=info['KM'],
+    result=info['RE'],
     uploaded_on=datetime.datetime.now(),
     owner_id=current_user.id
   )
@@ -263,7 +269,7 @@ def upload_post():
 
   # write SGF to file
   with open(kifu.filepath, 'w') as f:
-    f.write(kifu_json['sgf'])
+    f.write(sgf_str)
 
   # save kifu thumbnail
   save_thumbnail(kifu, kifu_json['img'])
@@ -271,6 +277,20 @@ def upload_post():
   return jsonify({
     'redirect': url_for('kifu_get', kifu_id=kifu.id, _external=True)
   })
+
+@app.route('/get-external-sgf', methods=['POST'])
+def get_external_sgf():
+  url = request.get_json()['url']
+  # catch network/invalid url errors
+  try:
+    response = urllib.request.urlopen(url, timeout=current_app.config['URL_TIMEOUT'])
+  except Exception as e:
+    abort(404)
+  # catch invalid text file errors
+  try:
+    return jsonify({'sgf': response.read().decode('utf-8')})
+  except Exception as e:
+    abort(400)
 
 # create a new, empty kifu
 @app.route('/new', methods=['POST'])
