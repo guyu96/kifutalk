@@ -19,10 +19,22 @@ class SGF:
   def __init__(self):
     self.max_node_id = -1
 
+  def __no_escape_bracket_index(self, s, start):
+    nebi = s.find(']', start)
+    if nebi == -1:
+      return -1
+
+    while nebi != -1 and s[nebi-1] == '\\':
+      start = nebi + 1
+      nebi = s.find(']', start)
+
+    return nebi
+
   def __parse_actions(self, action_str):
     actions = []
     start = 0
-    bracket_index = action_str.find(']', start)
+    # bracket_index = action_str.find(']', start)
+    bracket_index = self.__no_escape_bracket_index(action_str, start)
     last_action_prop = ''
 
     while bracket_index != -1:
@@ -36,13 +48,14 @@ class SGF:
 
       last_action_prop = last_action_prop if prop == '' else prop
       start = bracket_index + 1
-      bracket_index = action_str.find(']', start)
+      # bracket_index = action_str.find(']', start)
+      bracket_index = self.__no_escape_bracket_index(action_str, start)
 
     return actions
 
   def __parse_var(self, root, sgf_str):
     parent = root
-    node_str_list = sgf_str.split(';')
+    node_str_list = self.__sem_valid_split(sgf_str, ';')
     for i in range(1, len(node_str_list)):
       node = Node(parent)
       node.actions = self.__parse_actions(node_str_list[i])
@@ -84,6 +97,26 @@ class SGF:
       i_right += 1
 
     return False
+
+  def __sem_valid_split(self, s, delim):
+    delim_indices = []
+    for i in range(len(s)):
+      if s[i] == delim:
+        delim_indices.append(i)
+
+    valid_delim_indices = list(filter(lambda i: self.__is_sem_valid(s, i), delim_indices))
+
+    if len(valid_delim_indices) == 0:
+      split_list = [s]
+    else:
+      split_list = []
+      start = 0
+      for vdi in valid_delim_indices:
+        split_list.append(s[start: vdi])
+        start = vdi + 1
+      split_list.append(s[start:])
+
+    return split_list
 
   def __find_valid_prts_match(self, sgf_str, i):
     if sgf_str[i] != '(':
@@ -134,13 +167,74 @@ class SGF:
       else:
         raise ValueError('Invalid SGF String')
 
-  # add_id will be implemented when needed
-  
+  def add_id(self, root):
+    id = 0
+
+    def helper(root):
+      nonlocal id
+      root.id = id
+      id += 1
+      for child in root.children:
+        helper(child)
+
+    helper(root)
+    return id
+
   def parse(self, sgf_str):
     root = Node(None)
     self.__parse_helper(sgf_str, root, 0)
+
+    # if parsing a new kifu (ID tags not added yet)
+    if (self.max_node_id == -1):
+      # reset max_node_id
+      self.max_node_id = -1
+      self.add_id(root)
+
     self.max_node_id = -1
     return root
+
+  def print(self, root):
+    sgf_str = ''
+    
+    def helper(node):
+      nonlocal sgf_str
+      # each variation starts with (
+      sgf_str += '('
+      # print actions
+      for i in range(len(node.actions)):
+        action = node.actions[i]
+        if i == 0:
+          sgf_str += ';'
+        sgf_str += action['prop'] + '[' + action['value'] + ']'
+      # print id
+      if node.id != -1:
+        # in case the node has no actions
+        if len(node.actions) == 0:
+          sgf_str += ';'
+        sgf_str += 'ID' + '[' + str(node.id) + ']'
+      # as long as there is only one variation
+      while len(node.children) == 1:
+        node = node.children[0]
+        # print actions (see above)
+        for i in range(len(node.actions)):
+          action = node.actions[i]
+          if i == 0:
+            sgf_str += ';'
+          sgf_str += action['prop'] + '[' + action['value'] + ']'
+        # print id (see above)
+        if node.id != -1:
+          # in case the node has no actions
+          if len(node.actions) == 0:
+            sgf_str += ';'
+          sgf_str += 'ID' + '[' + str(node.id) + ']'
+      # more than one branch
+      for child in node.children:
+        helper(child)
+      # close off the variation
+      sgf_str += ')'
+    
+    helper(root)
+    return sgf_str
 
 # check if the sgf_str is syntactically valid
 def validate_sgf(sgf_str):
@@ -202,3 +296,49 @@ def validate_sub_sgf(sgf_str, sub_sgf_str):
     return False
 
   return dfs(root, sub_root)
+
+# read information stored in SGF file (e.g. player, rank, result)
+# assumes that sgf_str is valid
+def get_sgf_info(sgf_str):
+
+  # helper function that finds the value of a property
+  def find_value_by_prop(root, prop):
+    value = ''
+
+    # dfs helper
+    def helper(node):
+      nonlocal value
+      for i in range(len(node.actions)):
+        if node.actions[i]['prop'] == prop:
+          value = node.actions[i]['value']
+          break
+      # if value not found, recurse
+      if value == '':
+        for child in node.children:
+          if value == '':
+            helper(child)
+
+    # start from root
+    helper(root)
+    return value
+
+  sgf_info = {
+    'PB': 'Anonymous', # black player
+    'BR': '?', # black rank
+    'PW': 'Anonymous', # white player
+    'WR': '?', # white rank
+    'KM': '?', # komi
+    'RE': '?' # game result
+  }
+  
+  root = SGF().parse(sgf_str)
+  for prop in sgf_info:
+    sgf_info[prop] = find_value_by_prop(root, prop)
+
+  return sgf_info
+
+# standardize SGF input by parsing and printing
+# assumes that sgf_str is valid
+def standardize_sgf(sgf_str):
+  sgf = SGF()
+  return sgf.print(sgf.parse(sgf_str))
