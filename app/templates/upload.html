@@ -8,23 +8,44 @@
 {% endblock %}
 {% block body %}
   {{ super() }}
-  <div id="upload">
-    <div class="upload-area">
-      <h2>Upload SGF File</h2>
-      <form id="upload-file-form" action="">
-        <input type="file" id="file-input">
-        <button id="file-submit" type="submit">Upload File</button>
-      </form>
-    </div>
-    <div class="upload-area">
-      <h2>Directly Input Raw SGF Text</h2>
-      <form id="upload-text-form" action="">
-        <textarea name="text-input" id="text-input" cols="30" rows="10"></textarea>
-        <button id="text-submit" type="submit">Upload Raw SGF</button>
-      </form>
-    </div>
+  <div class="container">
+    <form id="upload-form" method="post">
+      <section id="sgf-input">
+        <h3>Choose an SGF file</h3>
+        <div id="sgf-file-container" class="subcontainer">
+          <label for="sgf-file">
+            Pick a file from your computer
+          </label>
+          <input name="sgf-file" type="file">
+        </div>
+        <div id="sgf-text-container" class="subcontainer">
+          <label for="sgf-text">Or paste the SGF content here</label>
+          <textarea name="sgf-text"></textarea>
+        </div>
+        <div id="sgf-url-container" class="subcontainer">
+          <label for="sgf-url">Or provide a URL to an online SGF file</label>
+          <input name="sgf-url" type="text" value="http://">
+        </div>
+      </section>
+      <section id="kifu-info">
+        <h3>Tell us a bit about this kifu</h3>
+        <div id="kifu-title-container" class="subcontainer">
+          <label for="kifu-title">Kifu Title *</label>
+          <input name="kifu-title" type="text">
+        </div>
+        <div class="subcontainer">
+          <label for="kifu-description">Kifu Description</label>
+          <textarea name="kifu-description"></textarea>
+        </div>
+      </section>
+      <section id="kifu-submit">
+        <h3>Ready?</h3>
+        <div class="subcontainer">
+          <input type="submit" id="upload" value="Upload">
+        </div>
+      </section>
+    </form>
   </div>
-  
   <script src="{{ url_for('static', filename='js/config.js') }}"></script>
   <script src="{{ url_for('static', filename='js/constants.js') }}"></script>
   <script src="{{ url_for('static', filename='js/exceptions.js') }}"></script>
@@ -36,6 +57,7 @@
   <script src="{{ url_for('static', filename='js/board.js') }}"></script>
   <script src="{{ url_for('static', filename='js/driver.js') }}"></script>
   <script src="{{ url_for('static', filename='js/board_canvas.js') }}"></script>
+
   <script src="{{ url_for('static', filename='js/thumbnail.js') }}"></script>
   <script src="{{ url_for('static', filename='js/upload.js') }}"></script>
 {% endblock %}

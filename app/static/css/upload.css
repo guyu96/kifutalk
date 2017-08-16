@@ -1,40 +1,155 @@
-#upload {
+.container {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 0;
+  color: #f8f8f8;
   position: absolute;
-  height: 600px;
-  width: 550px;
-  top: 0;
-  bottom: 0;
+  width: 1250px;
+  height: 610px;
+  top: 60px;
+  bottom: 22px;
   left: 0;
   right: 0;
   margin: auto;
 }
 
-#upload h2 {
-  color: #e8e8e8;
-  font-size: 20px;
-  margin: 10px;
-  font-weight: bold;
+/* dimensions */
+section#sgf-input {
+  width: 450px;
+}
+section#kifu-info {
+  width: 400px;
+}
+section#kifu-submit {
+  width: 160px;
 }
 
-#upload input {
-  margin: 10px;
-  color: #e8e8e8;
+section {
+  vertical-align: top;
+  display: inline-block;
+  padding: 25px;
+  margin: 0 15px;
+  background: #355987;
 }
 
-#upload textarea {
-  margin: 10px;
-  width: 500px;
-  height: 400px;
+section .subcontainer {
+  margin-top: 25px;
 }
 
-#text-submit {
+label {
+  text-align: left;
+  margin: 10px 0;
   display: block;
+  font-size: 20px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
 }
 
-#upload button {
-  margin: 10px;
+h3 {
+  text-align: left;
+  font-size: 25px;
+  font-weight: bold;
+  letter-spacing: 0.8px;
+  margin-bottom: 45px;
 }
 
-#upload div {
-  margin: 10px;
+.errors {
+  background: #736ab7;
+  font-size: 15px;
+  padding: 10px;
+}
+
+input[type="text"] {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 8px;
+  font-size: 16px;
+  font-family: 'Open Sans', sans-serif;
+  letter-spacing: 1px;
+  background: #f8f8f8;
+  color: #464646;
+  border: 0;
+  outline: none;
+}
+
+#sgf-file-container {
+  font-size: 0;
+}
+
+#sgf-file-container input {
+  display: none;
+}
+
+#sgf-file-container label {
+  font-size: 20px;
+  cursor: pointer;
+  text-align: center;
+  background: #254977;
+  padding: 30px 0;
+  margin-bottom: 0;
+}
+
+#sgf-file-container label:hover {
+  background: #153967;
+}
+
+#sgf-file-container .chosen-file-name {
+  overflow: hidden;
+  cursor: initial;
+  font-weight: normal;
+  font-size: 16px;
+  padding: 10px;
+  margin-top: 0;
+  border-top: 1px solid #153967;
+}
+#sgf-file-container .chosen-file-name:hover {
+  background: #254977;
+}
+
+textarea {
+  box-sizing: border-box;
+  width: 100%;
+  resize: none;
+  padding: 8px;
+  font-size: 16px;
+  line-height: 20px;
+  font-family: 'Open Sans', sans-serif;
+  letter-spacing: 1px;
+  background: #f8f8f8;
+  color: #464646;
+  border: 0;
+  outline: none;
+}
+
+textarea[name="sgf-text"] {
+  height: 260px;
+}
+textarea[name="kifu-description"] {
+  height: 363px;
+}
+
+#upload {
+  cursor: pointer;
+  text-align: center;
+  width: 100%;
+  padding: 20px;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 21px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  background: #254977;
+  color: #f8f8f8;
+  border: 0;
+}
+
+#upload:hover {
+  background: #153967;
+}
+
+#upload:disabled {
+  color: #a8a8a8;
+}
+
+#upload:disabled:hover {
+  cursor: initial;
+  background: #254977;
 }
