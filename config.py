@@ -5,3 +5,4 @@ SGF_FOLDER = '/home/guyu/kifutalk/app/static/assets/sgf'
 THUMBNAIL_FOLDER = '/home/guyu/kifutalk/app/static/assets/thumbnail'
 PERPAGE = 6
 THUMBNAIL_SIZE = (512, 512)
+URL_TIMEOUT = 10 # seconds
