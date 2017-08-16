@@ -3,11 +3,27 @@
 var SGF = (function() {
   var maxNodeID = -1;
 
+  // a helper function that gets index of first ] that is not
+  // escaped by a \ before it
+  var noEscapeBracketIndex = function(s, start) {
+    nebi = s.indexOf(']', start);
+    if (nebi === -1) {
+      return -1;
+    }
+
+    while (nebi !== -1 && s[nebi-1] === '\\') {
+      start = nebi + 1;
+      nebi = s.indexOf(']', start);
+    }
+    return nebi;
+  };
+
   // parse a string containing actions into a list
   var parseActions = function(actionsStr) {
     var actions = [];
     var start = 0;
-    var bracketIndex = actionsStr.indexOf(']', start);
+    // var bracketIndex = actionsStr.indexOf(']', start);
+    var bracketIndex = noEscapeBracketIndex(actionsStr, start);
 
     // handle cases where one action is executed many times
     var lastActionProp = '';
@@ -26,7 +42,8 @@ var SGF = (function() {
 
       lastActionProp = prop === '' ? lastActionProp : prop;
       start = bracketIndex + 1;
-      bracketIndex = actionsStr.indexOf(']', start);
+      // bracketIndex = actionsStr.indexOf(']', start);
+      bracketIndex = noEscapeBracketIndex(actionsStr, start);
     }
 
     return actions;
@@ -36,7 +53,9 @@ var SGF = (function() {
   // Square brackets escaping is not enabled
   var parseVar = function(root, sgfStr) {
     var parent = root;
-    var nodeStrList = sgfStr.split(';');
+    // var nodeStrList = sgfStr.split(';');
+    var nodeStrList = semValidSplit(sgfStr, ';');
+    
     // i starts at 1 because the split list starts
     // with the empty string
     for (var i = 1; i < nodeStrList.length; i++) {
@@ -102,6 +121,37 @@ var SGF = (function() {
     }
 
     return false;
+  }
+
+  // split a string using only semantically valid delimiters
+  var semValidSplit = function(s, delim) {
+    // first find indices of all occurences of delim in s
+    delimIndices = [];
+    for (var i = 0; i < s.length; i++) {
+      if (s[i] === delim) {
+        delimIndices.push(i);
+      }
+    }
+
+    // remove semantically invalid delim indices
+    var validDelimIndices = delimIndices.filter(function(i) {
+      return isSemValid(s, i);
+    });
+
+    // finally, create the split list
+    if (validDelimIndices.length === 0) {
+      var splitList = [s];
+    } else {
+      var splitList = [];
+      var start = 0;
+      validDelimIndices.forEach(function(vdi) {
+        splitList.push(s.substring(start, vdi));
+        start = vdi + 1;
+      });
+      splitList.push(s.substring(start, s.length));
+    }
+
+    return splitList;
   }
 
   // return the index of matching close parenthesis
