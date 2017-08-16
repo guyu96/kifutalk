@@ -65,7 +65,7 @@ class Kifu(db.Model):
 
   # kifu info
   title = db.Column(db.String(512), nullable=False)
-  description = db.Column(db.Text)
+  description = db.Column(db.Text, default='')
   black_player = db.Column(db.String(128), default='Anonymous')
   white_player = db.Column(db.String(128), default='Anonymous')
   black_rank = db.Column(db.String(16), default='?')
