@@ -1,14 +1,11 @@
 {% from 'macros.html' import render_kifu_entry %}
 
 
-<div id="list-container">
-  {% block header %}
-    <h2 id="list-title">{{ list_title }}</h2>
-  {% endblock %}
-  {% if kifus %}
+<div class="list-container">
+  {% if items|length != 0 %}
   <div class="kifu-list">
-    {% for kifu in kifus %}
-      {{ render_kifu_entry(kifu) }}
+    {% for item in items %}
+      {{ render_kifu_entry(item) }}
     {% endfor %}
     <div class="page-nav">
         {% block prev_link %}
@@ -45,6 +42,6 @@
     </div>
   </div>
   {% else %}
-    <p id="no-kifu">No Kifus Available</p>
+    <p class="no-kifu">No Kifus Found</p>
   {% endif %}
 </div>
