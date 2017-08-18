@@ -44,7 +44,7 @@ def index():
     user = User(
       email=sign_up_form.sign_up_email.data,
       username=sign_up_form.sign_up_username.data,
-      password=sign_up_oflrm.sign_up_password.data,
+      password=sign_up_form.sign_up_password.data,
       rank_id=sign_up_form.sign_up_rank.data,
       signed_up_on=datetime.datetime.now()
     )
