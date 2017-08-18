@@ -56,35 +56,6 @@ def index():
 
   return render_template('index.html', login_form=login_form, sign_up_form=sign_up_form)
 
-# sign up page
-@app.route('/signup', methods=['GET', 'POST'])
-def signup():
-  form = SignUpForm()
-  if form.validate_on_submit():
-    user = User(
-      email=form.email.data,
-      username=form.username.data,
-      password=form.password.data,
-      signed_up_on=datetime.datetime.now()
-    )
-    db.session.add(user)
-    db.session.commit()
-    flash('You can now log in.')
-    return redirect(url_for('login'))
-  return render_template('signup.html', form=form)
-
-# log in page
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-  form = LoginForm()
-  if form.validate_on_submit():
-    user = User.query.filter_by(email=form.email.data).first()
-    if user is not None and user.verify_password(form.password.data):
-      login_user(user, form.remember_me.data)
-      return redirect(request.args.get('next') or url_for('index'))
-    flash('Invalid email address or password.')
-  return render_template('login.html', form=form)
-
 # log out
 @app.route('/logout', methods=['GET', 'POST'])
 @login_required
@@ -438,27 +409,4 @@ def browse_kifu():
     has_next=sorted_pagination.has_next,
     has_prev=sorted_pagination.has_prev,
     query_string_list=[sort_by, time_frame, display_in]
-  )
-
-# user profile page
-@app.route('/user/<int:user_id>', methods=['GET'])
-@app.route('/user/<int:user_id>/<int:page>', methods=['GET'])
-def profile(user_id, page=1):
-  user = User.query.filter_by(id=user_id).first_or_404()
-  user_kifu = Kifu.query.filter_by(owner_id=user_id).join(User).add_columns(
-    User.username, Kifu.id, Kifu.black_player, Kifu.white_player, Kifu.black_rank, Kifu.white_rank, Kifu.uploaded_on
-  ).order_by(Kifu.uploaded_on.desc()).paginate(
-    page=page,
-    per_page=current_app.config['PERPAGE'],
-    error_out=True
-  )
-  print(user.username)
-  return render_template(
-    'user-kifulist.html',
-    user_id=user.id,
-    username=user.username,
-    kifus=user_kifu.items,
-    page_num=user_kifu.page,
-    has_next=user_kifu.has_next,
-    has_prev=user_kifu.has_prev
   )
