@@ -1,5 +1,6 @@
 from flask import render_template, redirect, url_for, flash, request, abort, jsonify, current_app, send_file
 from flask_login import login_user, logout_user, login_required, current_user
+from sqlalchemy.sql import func
 import datetime, os, base64, urllib.request
 from PIL import Image
 
@@ -26,7 +27,7 @@ def thumbnail_dataurl(kifu):
     # append dataurl prefix
     return 'data:image/jpeg;base64,' + f.read()
 
-# home page (also browse kifu)
+# home page
 @app.route('/', methods=['GET', 'POST'])
 def index():
   login_form = LoginForm()
@@ -378,21 +379,65 @@ def download(kifu_id):
 
 # browse kifu
 @app.route('/browse', methods=['GET'])
-@app.route('/browse/<int:page>', methods=['GET'])
-def browse_kifu(page=1):
-  kifu_pagination = Kifu.query.join(User).add_columns(
-    User.username, Kifu.id, Kifu.black_player, Kifu.white_player, Kifu.black_rank, Kifu.white_rank, Kifu.uploaded_on
-  ).order_by(Kifu.uploaded_on.desc()).paginate(
+def browse_kifu():
+  # get query strings
+  page = int(request.args.get('page')) if request.args.get('page') else 1
+  sort_by = request.args.get('sort-by') if request.args.get('sort-by') else 'date'
+  time_frame = request.args.get('time-frame') if request.args.get('time-frame') else 'week'
+  display_in = request.args.get('display-in') if request.args.get('display-in') else 'desc'
+
+  current_time = datetime.datetime.now()
+  if time_frame == 'day':
+    earliest_time = current_time - datetime.timedelta(days=1)
+  elif time_frame == 'week':
+    earliest_time = current_time - datetime.timedelta(days=7)
+  elif time_frame == 'month':
+    earliest_time = current_time - datetime.timedelta(days=30)
+  elif time_frame == 'year':
+    earliest_time = current_time - datetime.timedelta(days=365)
+  else:
+    earliest_time = None
+
+  # subquery to count number of comments each kifu has
+  count_query = db.session.query(Comment.kifu_id, func.count('*').label('comment_count')).group_by(Comment.kifu_id).subquery()
+  # query to get all the kifu info
+  kifu_query = db.session.query(Kifu, User, count_query.c.comment_count).join(User).outerjoin(count_query, Kifu.id==count_query.c.kifu_id)
+
+  # filter query by upload date
+  if earliest_time is not None:
+    ref_time = datetime.datetime.now()
+    kifu_query = kifu_query.filter(Kifu.uploaded_on >= earliest_time)
+
+  # order query based on query strings
+  if sort_by == 'date':
+    if display_in == 'desc':
+      sorted_query = kifu_query.order_by(Kifu.uploaded_on.desc())
+    else:
+      sorted_query = kifu_query.order_by(Kifu.uploaded_on.asc())
+  else:
+    if display_in == 'desc':
+      sorted_query = kifu_query.order_by(count_query.c.comment_count.desc())
+    else:
+      sorted_query = kifu_query.order_by(count_query.c.comment_count.asc())
+
+  # paginate
+  sorted_pagination = sorted_query.paginate(
     page=page,
     per_page=current_app.config['PERPAGE'],
     error_out=True
   )
+
+  for i in sorted_pagination.items:
+    print(i)
+  # Kifu, User, count
+
   return render_template(
-    'kifulist.html',
-    kifus=kifu_pagination.items,
-    page_num=kifu_pagination.page,
-    has_next=kifu_pagination.has_next,
-    has_prev=kifu_pagination.has_prev
+    'browse.html',
+    items=sorted_pagination.items,
+    page_num=sorted_pagination.page,
+    has_next=sorted_pagination.has_next,
+    has_prev=sorted_pagination.has_prev,
+    query_string_list=[sort_by, time_frame, display_in]
   )
 
 # user profile page
