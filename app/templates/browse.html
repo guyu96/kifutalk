@@ -1,0 +1,26 @@
+{% extends 'layout.html' %}
+{% from 'macros.html' import render_field %}
+
+{% block title %}Kifutalk - Conversations about Go made easy{% endblock %}
+{% block css %}
+  {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/browse-sidebar.css') }}"> 
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/kifu-list.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/browse.css') }}">
+{% endblock %}
+{% block body %}
+  {{ super() }}
+  <div class="container">
+    {% include('components/browse-sidebar.html') %}
+    {% with
+      prev_url=url_for('browse_kifu', page=page_num-1),
+      next_url=url_for('browse_kifu', page=page_num+1)
+    %}
+      {% include('components/kifu-list.html') %}
+    {% endwith %}
+  </div>
+  <script type="text/javascript">
+    var queryStringList = {{ query_string_list|tojson }};
+  </script>
+  <script src="{{ url_for('static', filename='js/browse.js') }}"></script>
+{% endblock %}

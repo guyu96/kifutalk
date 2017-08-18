@@ -1,0 +1,22 @@
+.container {
+  font-size: 0;
+  position: absolute;
+  top: 60px;
+  bottom: 22px;
+  left: 0;
+  right: 0;
+  height: 772px;
+  width: 1110px;
+  margin: auto;
+}
+
+.browse-sidebar {
+  display: inline-block;
+  vertical-align: top;
+  margin-right: 30px;
+}
+
+.list-container {
+  display: inline-block;
+  vertical-align: top;
+}
