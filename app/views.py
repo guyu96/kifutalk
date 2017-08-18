@@ -265,17 +265,16 @@ def get_external_sgf():
     abort(400)
 
 # create a new, empty kifu
-@app.route('/new', methods=['POST'])
+@app.route('/new', methods=['GET'])
 def new():
   # must be logged in
   if not current_user.is_authenticated:
     flash('You must log in to create a new kifu')
-    return jsonify({'redirect': url_for('login')})
-
-  kifu_json = request.get_json()
+    return redirect(url_for('index'))
 
   # insert kifu into database
   kifu = Kifu(
+    title='New Kifu by ' + current_user.username,
     uploaded_on=datetime.datetime.now(),
     owner_id=current_user.id
   )
@@ -284,14 +283,13 @@ def new():
 
   # write empty SGF to file
   with open(kifu.filepath, 'w') as f:
-    f.write('()')
+    f.write(standardize_sgf('()'))
 
   # save kifu thumbnail
-  save_thumbnail(kifu, kifu_json['img'])
+  with open(current_app.config['EMPTY_BOARD_DATAURL'], 'r') as f:
+    save_thumbnail(kifu, f.read())
 
-  return jsonify({
-    'redirect': url_for('kifu_get', kifu_id=kifu.id, _external=True)
-  })
+  return redirect(url_for('kifu_get', kifu_id=kifu.id))
 
 # star a kifu
 @app.route('/star/kifu/<int:kifu_id>', methods=['POST'])
