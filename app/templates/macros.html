@@ -11,14 +11,23 @@
   {% endif %}
 {% endmacro %}
 
-{% macro render_kifu_entry(kifu) %}
+{% macro render_kifu_entry(item) %}
+  {% with
+    kifu=item[0],
+    user=item[1],
+    comment_count=0 if item[2] is none else item[2]
+  %}
   <a href="{{ url_for('kifu_get', kifu_id=kifu.id) }}">
     <div class="kifu-entry">
       <img class="kifu-thumbnail" src="{{ url_for('static', filename='assets/thumbnail/' ~ kifu.id ~ '.jpg') }}" alt="">
       <div class="kifu-info">
-        <p class="kifu-title">{{ kifu.black_player + ' vs. ' + kifu.white_player}}</p>
-        <p class="kifu-upload">Uploaded on {{ kifu.uploaded_on.strftime('%Y-%m-%d') }} by {{ kifu.username }}</p>
+        <p class="kifu-title">{{ kifu.title }}</p>
+        <p class="number-of-comments">({{ comment_count }} comments)</p>
+        <p class="player-info">Black: {{ kifu.black_player }} ({{ kifu.black_rank }})</p>
+        <p class="player-info">White: {{ kifu.white_player }} ({{ kifu.white_rank }})</p>
+        <p class="kifu-upload">Uploaded on {{ kifu.uploaded_on.strftime('%Y-%m-%d') }} by {{ user.username }}</p>
       </div>
     </div>
   </a>
+  {% endwith %}
 {% endmacro %}
