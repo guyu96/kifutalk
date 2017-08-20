@@ -170,6 +170,8 @@ def kifu_update(kifu_id):
     kifu.komi = data['komi']
   if 'result' in data:
     kifu.result = data['result']
+  if 'description' in data:
+    kifu.description = data['description']
 
   db.session.add(kifu)
   db.session.commit()
