@@ -5,21 +5,19 @@
   {{ super() }}
   <link rel="stylesheet" href="{{ url_for('static', filename='css/kifu/kifu.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/svgicons.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/kifu/info-panel.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/kifu/action-bar.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/kifu/info.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/kifu/nav_edit.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/kifu/comment.css') }}">
 {% endblock %}
 {% block body %}
   {{ super() }}
   <main>
-    <div id="action-bar">
-      {% include('kifu/kifu-action-bar.html') %}
+    <div id="info">
+      {% include('kifu/kifu-info-panel.html') %}
     </div>
     <div id="game">
-      <div id="info">
-        {% include('kifu/kifu-info.html') %}
-      </div>
+      {% include('kifu/kifu-action-bar.html') %}
       <canvas id="board"></canvas>
     </div>
     <div id="control">

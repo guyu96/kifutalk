@@ -6,17 +6,16 @@ main {
   left: 0;
   right: 0;
   margin: auto;
-  width: 1100px;
+  width: 1330px;
   height: 680px;
 }
 
-#action-bar {
-  position: absolute;
-  width: 60px;
-  height: 660px;
-  left: 0;
-  top: 0;
+#info {
   margin-top: 10px;
+  margin-right: 10px;
+  width: 280px;
+  height: 640px;
+  padding: 10px 0;
 }
 
 #game {
@@ -24,7 +23,7 @@ main {
   width: 620px;
   height: 660px;
   top: 0;
-  left: 60px;
+  left: 290px;
   margin-top: 10px;
 }
 
