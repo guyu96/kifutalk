@@ -13,12 +13,13 @@ var Controller = function(kifu, kifuComments, boardCanvas) {
     'commentInput': document.getElementById('comment-input'),
     'commentSubmit': document.getElementById('comment-submit'),
     // info
-    'blackPlayer': document.getElementById('black-player'),
-    'blackRank': document.getElementById('black-rank'),
-    'whitePlayer': document.getElementById('white-player'),
-    'whiteRank': document.getElementById('white-rank'),
-    'komi': document.getElementById('komi').children[1],
-    'result': document.getElementById('result').children[1],
+    'blackPlayer': document.querySelector('#info .black-player'),
+    'blackRank': document.querySelector('#info .black-rank'),
+    'whitePlayer': document.querySelector('#info .white-player'),
+    'whiteRank': document.querySelector('#info .white-rank'),
+    'komi': document.querySelector('#info .komi span'),
+    'result': document.querySelector('#info .result span'),
+    'description': document.querySelector('#info .description p'),
     // navigation
     'play': document.getElementById('play'),
     'pause': document.getElementById('pause'),
@@ -298,22 +299,24 @@ Controller.prototype.updateCommentList = function() {
 Controller.prototype.initStarAuth = function() {
   // display star/unstar button
   if (this.starred) {
-    this.html.unstarKifu.display = 'block';
+    this.html.unstarKifu.display = 'inline-block';
     this.html.starKifu.style.display = 'none';
   } else {
-    this.html.starKifu.display = 'block';
+    this.html.starKifu.display = 'inline-block';
     this.html.unstarKifu.style.display = 'none';
   }
 
   switch(this.authStatus) {
     case 0:
-      // not logged in, disable comments and edit button
+      // not logged in, disable comments and edit button, remove delete button
       this.html.commentInput.disabled = true;
       this.html.commentSubmit.disabled = true;
       this.html.toggleEdit.disabled = true;
       // also hide star buttons
       this.html.starKifu.style.display = 'none';
       this.html.unstarKifu.style.display = 'none';
+      
+      this.html.deleteKifu.remove();
       break;
     case 1:
       // not owner, remove delete button
@@ -689,6 +692,7 @@ Controller.prototype.addInfoEventListeners = function() {
   addListener(this.html.whiteRank, 'whiteRank');
   addListener(this.html.komi, 'komi');
   addListener(this.html.result, 'result');
+  addListener(this.html.description, 'description');
 };
 
 // add event listeners to comment-list and comment-form
@@ -834,7 +838,7 @@ Controller.prototype.starKifu = function(kifuID) {
     if (xhr.readyState === 4 && xhr.status === 200) {
       self.starred = true;
       self.html.starKifu.style.display = 'none';
-      self.html.unstarKifu.style.display = 'block';
+      self.html.unstarKifu.style.display = 'inline-block';
     // post failed
     } else if (xhr.readyState === 4 && xhr.status !== 200) {
       throw new exceptions.NetworkError(4, "Kifu Star/Unstar Failed");
@@ -855,7 +859,7 @@ Controller.prototype.unstarKifu = function(kifuID) {
     // if post successful
     if (xhr.readyState === 4 && xhr.status === 200) {
       self.starred = false;
-      self.html.starKifu.style.display = 'block';
+      self.html.starKifu.style.display = 'inline-block';
       self.html.unstarKifu.style.display = 'none';
     // post failed
     } else if (xhr.readyState === 4 && xhr.status !== 200) {
