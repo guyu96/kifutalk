@@ -1,29 +1,38 @@
 #action-bar {
-  background: none;
+  background: #4b5e76;
+  width: 600px;
+  height: 60px;
+  margin: 0 10px;
+  font-size: 0;
 }
 
 #action-bar button {
+  text-align: center;
+  vertical-align: top;
   height: 60px;
-  width: 60px;
+  width: 150px;
   padding: 0;
-  display: block;
+  display: inline-block;
   background: none;
   border: 0;
 }
 
 #action-bar button:hover {
-  background: #1a3c67;
+  background: #3b4e66;
+}
+
+#action-bar button span {
+  vertical-align: top;
+  line-height: 60px;
+  font-size: 18px;
+  font-family: 'Open Sans', sans-serif;
+  color: #e8e8e8;
+  margin-left: 5px;
 }
 
 #action-bar svg {
-  height: 30px;
+  height: 60px;
   width: 30px;
-  margin: 0 15px;
-}
-
-#delete-kifu {
-  position: absolute;
-  bottom: 0;
 }
 
 #unstar svg path {
