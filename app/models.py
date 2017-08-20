@@ -98,6 +98,8 @@ class Kifu(db.Model):
     return {
       'id': self.id,
       'owner': User.query.get(self.owner_id).username,
+      'title': self.title,
+      'description': self.description,
       'black_player': self.black_player,
       'white_player': self.white_player,
       'black_rank': self.black_rank,
