@@ -13,6 +13,7 @@
 {% block body %}
   {{ super() }}
   <main>
+    <p contentEditable="true" id="kifu-title">{{ kifu.title }}</p>
     <div id="info">
       {% include('kifu/kifu-info-panel.html') %}
     </div>

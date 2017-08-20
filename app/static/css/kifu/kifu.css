@@ -7,10 +7,32 @@ main {
   right: 0;
   margin: auto;
   width: 1330px;
-  height: 680px;
+  height: 750px;
+}
+
+#kifu-title {
+  display: block;
+  position: absolute;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 40px;
+  line-height: 70px;
+  height: 70px;
+  font-weight: bold;
+  color: #f8f8f8;
+  letter-spacing: 1px;
+  overflow: hidden;
+  max-width: 1300px;
+  max-height: 70px;
+}
+
+#kifu-title:focus {
+  padding: 0 10px;
+  background: #456997;
 }
 
 #info {
+  position: absolute;
+  top: 70px;
   margin-top: 10px;
   margin-right: 10px;
   width: 280px;
@@ -22,7 +44,7 @@ main {
   position: absolute;
   width: 620px;
   height: 660px;
-  top: 0;
+  top: 70px;
   left: 290px;
   margin-top: 10px;
 }
@@ -42,7 +64,7 @@ main {
   width: 400px;
   height: 660px;
   margin: 10px;
-  top: 0;
+  top: 70px;
   right: 0;
 }
 
