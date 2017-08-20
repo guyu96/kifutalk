@@ -4,7 +4,7 @@
   letter-spacing: 0.7px;
   line-height: 30px;
   background: #355987;
-  width: 800px;
+  width: 950px;
 }
 
 .list-container a {
@@ -24,8 +24,8 @@
 
 .kifu-info {
   font-size: 18px;
-  width: 600px;
-  max-width: 610px;
+  width: 750px;
+  max-width: 760px;
   overflow: hidden;
 }
 
@@ -52,6 +52,12 @@
 
 .kifu-title {
   margin-right: 5px;
+  max-height: 30px;
+  max-width: 565px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  vertical-align: top;
 }
 
 .player-info, .kifu-upload {
@@ -89,7 +95,7 @@
 .page-nav a {
   display: inline-block;
   vertical-align: top;
-  padding: 0 177px;
+  padding: 0 214.5px;
   height: inherit;
   line-height: 40px;
   vertical-align: center;
@@ -103,7 +109,7 @@
   font-size: 40px;
   font-weight: bold;
   letter-spacing: 1px;
-  width: 800px;
+  width: 950px;
   height: 770px;
   line-height: 770px;
   text-align: center;
