@@ -1,0 +1,100 @@
+#info {
+  background: #4b5e76;
+  color: #e8e8e8;
+  font-size: 0;
+  font-family: 'Open Sans', sans-serif;
+  letter-spacing: 0.7px;
+}
+
+#info .info-entry {
+  margin-left: 8px;
+  height: 50px;
+  line-height: 50px;
+  font-size: 18px;
+}
+
+#info .black span, #info .white span {
+  display: inline-block;
+}
+
+#info svg {
+  vertical-align: top;
+  display: inline-block;
+  height: 50px;
+  width: 30px;
+}
+
+#info svg.black-circle {
+  fill: #363636;
+}
+
+#info svg.white-circle {
+  fill: #f8f8f8;
+}
+
+#info .black-player, #info .white-player {
+  max-width: 140px;
+  max-height: 50px;
+  overflow: hidden;
+  vertical-align: top;
+}
+
+#info .black-rank, #info .white-rank {
+  max-width: 50px;
+  max-height: 50px;
+  overflow: hidden;
+  vertical-align: top;
+}
+
+#info .komi span, #info .result span {
+  display: inline-block;
+  max-width: 140px;
+  max-height: 50px;
+  overflow: hidden;
+  vertical-align: top;
+}
+
+#info label {
+  font-weight: bold;
+  margin-right: 5px;
+}
+
+#info .description label {
+  display: block;
+  margin-left: 8px;
+  height: 50px;
+  line-height: 50px;
+  font-size: 18px;
+}
+
+#info .description p {
+  margin: 0 8px;
+  padding: 5px;
+  width: 250px;
+  height: 340px;
+  max-height: 340px;
+  overflow: auto;
+  font-size: 16px;
+  line-height: 24px;
+  letter-spacing: 0.5px;
+}
+
+#info .upload-info {
+  margin-left: 8px;
+  height: 50px;
+  line-height: 50px;
+  font-size: 15px;
+}
+
+#info span[contentEditable="true"] {
+  padding: 0 3px;
+}
+
+#info span[contentEditable="true"]:focus {
+  padding: 0 5px;
+  background: #5b6e86;
+}
+
+#info p[contentEditable="true"]:focus {
+  background: #5b6e86;
+}
