@@ -76,7 +76,7 @@ var Controller = function(kifu, kifuComments, boardCanvas) {
   // attach event listeners
   this.addActionEventListeners();
   this.addCanvasEventListeners();
-  this.addKeyboardEventListeners();
+  // this.addKeyboardEventListeners();
   this.addNavigationEventListeners();
   this.addCommentEventListeners();
   this.addEditEventListeners();
