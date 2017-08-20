@@ -13,6 +13,7 @@ var Controller = function(kifu, kifuComments, boardCanvas) {
     'commentInput': document.getElementById('comment-input'),
     'commentSubmit': document.getElementById('comment-submit'),
     // info
+    'title': document.getElementById('kifu-title'),
     'blackPlayer': document.querySelector('#info .black-player'),
     'blackRank': document.querySelector('#info .black-rank'),
     'whitePlayer': document.querySelector('#info .white-player'),
@@ -693,6 +694,7 @@ Controller.prototype.addInfoEventListeners = function() {
   addListener(this.html.komi, 'komi');
   addListener(this.html.result, 'result');
   addListener(this.html.description, 'description');
+  addListener(this.html.title, 'title');
 };
 
 // add event listeners to comment-list and comment-form
