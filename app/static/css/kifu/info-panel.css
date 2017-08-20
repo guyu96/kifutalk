@@ -7,7 +7,8 @@
 }
 
 #info .info-entry {
-  margin-left: 8px;
+  border-bottom: 1px solid #3b4e66;
+  padding-left: 8px;
   height: 50px;
   line-height: 50px;
   font-size: 18px;
@@ -80,9 +81,10 @@
 }
 
 #info .upload-info {
-  margin-left: 8px;
-  height: 50px;
-  line-height: 50px;
+  border-top: 1px solid #3b4e66;
+  padding-left: 8px;
+  height: 45px;
+  line-height: 45px;
   font-size: 15px;
 }
 
