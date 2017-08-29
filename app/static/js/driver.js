@@ -314,6 +314,10 @@ Driver.prototype.navigateTo = function(nodeID) {
   dfs(this.gameTree.currentNode);
   // node does not exist
   if (!node) {
+    // navigate to first node
+    while (!this.gameTree.atFirstNode()) {
+      this.next();
+    }
     return false;
   }
   // node exists, backtrack to find the path
