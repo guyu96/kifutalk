@@ -84,6 +84,10 @@ def post_comment(kifu_id, node_id):
 # kifu main page
 @app.route('/kifu/<int:kifu_id>', methods=['GET'])
 def kifu_get(kifu_id):
+  # get query strings
+  node_id = request.args.get('node-id')
+  edit = request.args.get('edit')
+
   # get kifu
   kifu = Kifu.query.filter_by(id=kifu_id).first_or_404()
 
@@ -130,7 +134,9 @@ def kifu_get(kifu_id):
     kifu=kifu.serialize,
     kifu_comments=comments_dict,
     auth_status=auth_status,
-    starred=starred
+    starred=starred,
+    node_id=node_id,
+    edit=edit
   )
 
 # update kifu
@@ -293,7 +299,7 @@ def new():
   with open(current_app.config['EMPTY_BOARD_DATAURL'], 'r') as f:
     save_thumbnail(kifu, f.read())
 
-  return redirect(url_for('kifu_get', kifu_id=kifu.id))
+  return redirect(url_for('kifu_get', kifu_id=kifu.id, edit=True))
 
 # star a kifu
 @app.route('/star/kifu/<int:kifu_id>', methods=['POST'])
