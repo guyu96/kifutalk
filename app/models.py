@@ -130,6 +130,7 @@ class Comment(db.Model):
       'timestamp': self.timestamp.strftime('%Y-%m-%d %H:%M:%S'),
       'author_id': self.author,
       'author_username': User.query.get(self.author).username,
+      'author_rank': User.query.get(self.author).rank,
       'kifu_id': self.kifu_id,
       'node_id': self.node_id
     }

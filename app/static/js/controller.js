@@ -262,7 +262,7 @@ Controller.prototype.createCommentElement = function(comment) {
   var timestamp = document.createElement('span');
   var text = document.createElement('p');
 
-  author.textContent = comment.author_username;
+  author.textContent = comment.author_username + ' (' + comment.author_rank + ')';
   timestamp.textContent = comment.timestamp;
   text.textContent = comment.content;
 
