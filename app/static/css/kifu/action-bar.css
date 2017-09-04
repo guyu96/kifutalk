@@ -24,7 +24,8 @@
 #action-bar button span {
   vertical-align: top;
   line-height: 60px;
-  font-size: 18px;
+  font-size: 16px;
+  letter-spacing: 0.5px;
   font-family: 'Open Sans', sans-serif;
   color: #e8e8e8;
   margin-left: 5px;
