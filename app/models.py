@@ -50,6 +50,10 @@ class User(UserMixin, db.Model):
     db.session.commit()
     return True
 
+  @property
+  def unread_notifications(self):
+    return [n.serialize for n in Notification.query.filter_by(receiver_id=self.id, read=False).order_by(Notification.id.desc()).all()]
+
 class Role(db.Model):
   __tablename__ = 'roles'
   id = db.Column(db.Integer, primary_key=True)
@@ -126,6 +130,7 @@ class Comment(db.Model):
   @property
   def serialize(self):
     return {
+      'id': self.id,
       'content': self.content,
       'timestamp': self.timestamp.strftime('%Y-%m-%d %H:%M:%S'),
       'author_id': self.author,
@@ -146,3 +151,35 @@ class Rank(db.Model):
   id = db.Column(db.Integer, primary_key=True)
   rank_en = db.Column(db.String(16))
   rank_cn = db.Column(db.String(16))
+
+class Notification(db.Model):
+  __tablename__ = 'notifications'
+  id = db.Column(db.Integer, primary_key=True)
+  # category == 1: kifu that user uploaded received a new comment
+  # category == 2: a node that user commented on received another comment
+  category = db.Column(db.Integer, nullable=False)
+  # user receiving the notification
+  receiver_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+  # comment that triggered the notification
+  # from the comment, kifu_id, node_id, and commenter_id will be known
+  comment_id = db.Column(db.Integer, db.ForeignKey('comments.id'), nullable=False)
+  # whether notification has already been read
+  read = db.Column(db.Boolean, default=False)
+
+  @property
+  def serialize(self):
+    comment = Comment.query.get(self.comment_id)
+    kifu = Kifu.query.get(comment.kifu_id)
+    return {
+      'id': self.id,
+      'category': self.category,
+      'read': self.read,
+      'comment_id': self.comment_id,
+      'content': comment.content,
+      'timestamp': comment.timestamp.strftime('%Y-%m-%d %H:%M:%S'),
+      'kifu_id': kifu.id,
+      'kifu_title': kifu.title,
+      'node_id': comment.node_id,
+      'author_username': User.query.get(comment.author).username,
+      'author_rank': User.query.get(comment.author).rank
+    }
