@@ -17,8 +17,13 @@
 
 .comment {
   padding: 15px;
-  border-bottom: 1px solid #a3a3a3;
+  border-bottom: 1px solid #d8d8d8;
   color: #464646;
+}
+
+.comment.highlight {
+  background: #d8d8d8;
+  color: #363636;
 }
 
 .comment .user, .comment .time {
@@ -42,6 +47,10 @@
   margin: 15px 5px;
   padding: 5px;
   background: #d8d8d8;
+}
+
+.comment.highlight .text {
+  background: #c8c8c8;
 }
 
 #comment-input {
