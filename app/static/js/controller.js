@@ -258,6 +258,8 @@ Controller.prototype.updateNavEdit = function() {
 
 Controller.prototype.createCommentElement = function(comment) {
   var c = document.createElement('li');
+  c.setAttribute('comment-id', comment.id);
+  
   var author = document.createElement('span');
   var timestamp = document.createElement('span');
   var text = document.createElement('p');
