@@ -1,0 +1,77 @@
+.notification .header {
+  font-weight: bold;
+  line-height: 60px;
+  padding: 0 20px;
+  letter-spacing: 1px;
+  font-size: 16px;
+  color: #97afcf;
+  cursor: pointer;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
+
+.notification .header:hover {
+  background: #254977!important;
+}
+
+.notification .header span {
+  display: inline-block;
+  line-height: 24px;
+  padding: 5px 8px;
+  margin: 0 4px;
+  border-radius: 5px;
+  background: #df4257;
+  color: #c7dfff;
+}
+
+.notification .list {
+  position: absolute;
+  right: 0;
+  background: #e8e8e8;
+  color: #464646;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 16px;
+}
+
+.notification .list a {
+  text-decoration: none;
+  color: #464646;
+}
+
+.notification .list li {
+  padding: 15px;
+  border-bottom: 1px solid #c8c8c8;
+}
+
+.notification .list li:hover {
+  cursor: pointer;
+  background: #d8d8d8;
+  color: #363636;
+}
+
+.notification .list li p {
+  margin: 10px;
+}
+
+.notification .author {
+  font-weight: bold;
+  margin-right: 5px;
+}
+
+.notification .title {
+  font-weight: bold;
+  margin-left: 5px;
+}
+
+.notification p.content {
+  height: 20px;
+  line-height: 20px;
+  max-height: 20px;
+  max-width: 650px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  background: #c8c8c8;
+  padding: 10px;
+}

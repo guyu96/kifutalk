@@ -1,0 +1,34 @@
+{% with uns = current_user.unread_notifications %}
+  <div class="notification">
+    <p class="header">
+      {% if uns|length == 0 %}
+        {{ current_user.username }}, you have no new notifications
+      {% elif uns|length == 1 %}
+        {{ current_user.username }}, you have <span>1</span> notification
+      {% else %}
+        {{ current_user.username }}, you have
+        <span>{{ uns|length }}</span>
+        notifications
+      {% endif %}
+    </p>
+
+    <ul class="list" style="display: none;">
+      {% for un in uns %}
+      <a href="{{ url_for('kifu_get', kifu_id=un.kifu_id, node_id=un.node_id, comment_id=un.comment_id) }}" nid="{{ un.id }}"><li>
+        <p class="info">
+          <span class="author">{{ un.author_username }} ({{ un.author_rank }})</span>
+          {% if un.category == 1 %}
+            <span>commented on your kifu </span>
+          {% else %}
+            <span>also commented on kifu</span>
+          {% endif %}
+          <span class="title">{{ un.kifu_title }}</span>
+        </p>
+        <p class="content">
+          {{ un.content }}
+        </p>
+      </li></a>
+      {% endfor %}
+    </ul>
+  </div>
+{% endwith %}
