@@ -9,40 +9,31 @@ header {
   right: 0;
   top: 0;
   z-index: 10;
-  height: 40px;
-  padding: 10px 20px;
+  height: 60px;
   color: #97afcf;
   background: #355987;
 }
 
-header h1 {
+header h1 a {
   font-size: 30px;
+  line-height: 60px;
+  padding: 0 20px;
   display: block;
   float: left;
   font-family: 'Patua One', cursive;
-  letter-spacing: 2px;
-  margin-top: 5px;
-}
-
-header a {
+  font-weight: 100;
+  letter-spacing: 2.5px;
   text-decoration: none;
   color: inherit;
+}
+
+header h1 a:hover {
+  background: #254977;
 }
 
 header nav {
   display: block;
   float: right;
-}
-
-header nav a {
-  display: inline-block;
-  font-size: 15px;
-  padding: 12px 10px;
-  margin: 0 5px;
-}
-
-header nav a:hover {
-  background: #1a3c67;
 }
 
 footer {
