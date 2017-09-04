@@ -5,7 +5,7 @@ import datetime, os, base64, urllib.request
 from PIL import Image
 
 from . import app, db
-from .models import User, Kifu, Comment, KifuStar
+from .models import User, Kifu, Comment, KifuStar, Notification
 from .forms import SignUpForm, LoginForm
 from .sgf import validate_sgf, validate_sub_sgf, get_sgf_info, standardize_sgf
 
@@ -70,6 +70,8 @@ def logout():
 def post_comment(kifu_id, node_id):
   # check if kifu exists
   kifu = Kifu.query.filter_by(id=kifu_id).first_or_404()
+
+  # add comment to database
   comment = Comment(
     content=request.get_json(),
     timestamp=datetime.datetime.now(),
@@ -79,14 +81,53 @@ def post_comment(kifu_id, node_id):
   )
   db.session.add(comment)
   db.session.commit()
+
+  # add notifications to database
+  # first, if the comment is not made by kifu_owner, then
+  # kifu_owner gets a category-1 notification
+  if current_user.id != kifu.owner_id:
+    db.session.add(Notification(
+      category=1,
+      receiver_id=kifu.owner_id,
+      comment_id=comment.id
+    ))
+  # second, other users who have commented on the same node
+  # gets a category-2 notification (excluding the user who
+  # submitted this comment and kifu_owner)
+  other_comments = Comment.query.filter_by(
+    kifu_id=kifu_id,
+    node_id=node_id
+  ).all()
+  # generate a filtered list of users who should receive a notification
+  filtered_authors = []
+  for oc in other_comments:
+    duplicate = False
+    for fa in filtered_authors:
+      if oc.author == fa:
+        duplicate = True
+    # filter out duplicate users who commented
+    if not duplicate:
+      # filter out kifu_owner and notification-triggerer
+      if oc.author != kifu.owner_id and oc.author != current_user.id:
+        filtered_authors.append(oc.author)
+  for fa in filtered_authors:
+    db.session.add(Notification(
+      category=2,
+      receiver_id=fa,
+      comment_id=comment.id
+    ))
+  db.session.commit()
+
   return jsonify(comment.serialize)
 
 # kifu main page
 @app.route('/kifu/<int:kifu_id>', methods=['GET'])
 def kifu_get(kifu_id):
   # get query strings
-  node_id = request.args.get('node-id')
-  edit = request.args.get('edit')
+  query_node_id = request.args.get('node_id')
+  query_edit = request.args.get('edit')
+  # comment_id should be of a comment on the node with id node_id
+  query_comment_id = request.args.get('comment_id')
 
   # get kifu
   kifu = Kifu.query.filter_by(id=kifu_id).first_or_404()
@@ -135,8 +176,9 @@ def kifu_get(kifu_id):
     kifu_comments=comments_dict,
     auth_status=auth_status,
     starred=starred,
-    node_id=node_id,
-    edit=edit
+    node_id=query_node_id,
+    edit=query_edit,
+    comment_id=query_comment_id
   )
 
 # update kifu
@@ -311,7 +353,7 @@ def star_kifu(kifu_id):
   starred = KifuStar.query.filter_by(
     user_id=current_user.id,
     kifu_id=kifu_id
-  ).first();
+  ).first()
   if starred is not None:
     abort(400)
 
@@ -335,7 +377,7 @@ def unstar_kifu(kifu_id):
   starred = KifuStar.query.filter_by(
     user_id=current_user.id,
     kifu_id=kifu_id
-  ).first();
+  ).first()
   if starred is None:
     abort(400)
 
@@ -418,3 +460,11 @@ def browse_kifu():
     has_prev=sorted_pagination.has_prev,
     query_string_list=[sort_by, time_frame, display_in]
   )
+
+# mark a notification as read
+@app.route('/read-notification/<int:notification_id>', methods=['POST'])
+def read_notification(notification_id):
+  notification = Notification.query.filter_by(id=notification_id).first_or_404()
+  notification.read = True
+  db.session.commit()
+  return jsonify({'success': True})
