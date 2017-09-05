@@ -31,3 +31,27 @@
   </a>
   {% endwith %}
 {% endmacro %}
+
+{% macro render_kifu_info_entry(auth_status, entry, entry_class, auth_fallback_text, unauth_fallback_text, tag="span") %}
+  {% if entry|trim == '' %}
+    {% if auth_status == 2 %}
+      <{{ tag }} contentEditable="true" class="fallback {{ entry_class }}">
+        {{ auth_fallback_text }}
+      </{{ tag }}>
+    {% else %}
+      <{{ tag }} class="fallback {{ entry_class }}">
+        {{ unauth_fallback_text }}
+      </{{ tag }}>
+    {% endif %}
+  {% else %}
+    {% if auth_status == 2 %}
+      <{{ tag }} contentEditable="true" class="{{ entry_class }}">
+        {{ entry }}
+      </{{ tag }}>
+    {% else %}
+      <{{ tag }} class="{{ entry_class }}">
+        {{ entry }}
+      </{{ tag }}>
+    {% endif %}
+  {% endif %}
+{% endmacro %}
