@@ -197,11 +197,18 @@ def kifu_update(kifu_id):
       abort(401)
     # update SGF
     kifu.update_sgf(data['sgf'])
-    # delete comments on deleted nodes
-    for node_id in data['deletedNodes']:
-      comments = Comment.query.filter_by(node_id=node_id).all()
-      for c in comments:
-        db.session.delete(c)
+
+    ### disable comment deletion because as of now, nobody is allowed
+    ### to delete existing nodes in a kifu
+    ### deleting comments based on data['deletedNodes'] alone without
+    ### server-side validation is also unsafe
+
+    # # delete comments on deleted nodes
+    # for node_id in data['deletedNodes']:
+    #   comments = Comment.query.filter_by(node_id=node_id).all()
+    #   for c in comments:
+    #     db.session.delete(c)
+
     # update kifu thumbnail
     save_thumbnail(kifu, data['img'])
   
