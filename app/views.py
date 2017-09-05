@@ -205,23 +205,24 @@ def kifu_update(kifu_id):
     # update kifu thumbnail
     save_thumbnail(kifu, data['img'])
   
-  # update other data
-  if 'blackPlayer' in data:
-    kifu.black_player = data['blackPlayer']
-  if 'whitePlayer' in data:
-    kifu.white_player = data['whitePlayer']
-  if 'blackRank' in data:
-    kifu.black_rank = data['blackRank']
-  if 'whiteRank' in data:
-    kifu.white_rank = data['whiteRank']
-  if 'komi' in data:
-    kifu.komi = data['komi']
-  if 'result' in data:
-    kifu.result = data['result']
-  if 'description' in data:
-    kifu.description = data['description']
-  if 'title' in data:
-    kifu.title = data['title']
+  # update other data (must be kifu owner)
+  if current_user.id == kifu.owner_id:
+    if 'blackPlayer' in data:
+      kifu.black_player = data['blackPlayer']
+    if 'whitePlayer' in data:
+      kifu.white_player = data['whitePlayer']
+    if 'blackRank' in data:
+      kifu.black_rank = data['blackRank']
+    if 'whiteRank' in data:
+      kifu.white_rank = data['whiteRank']
+    if 'komi' in data:
+      kifu.komi = data['komi']
+    if 'result' in data:
+      kifu.result = data['result']
+    if 'description' in data:
+      kifu.description = data['description']
+    if 'title' in data:
+      kifu.title = data['title']
 
   db.session.add(kifu)
   db.session.commit()
@@ -326,7 +327,7 @@ def new():
 
   # insert kifu into database
   kifu = Kifu(
-    title='New Kifu by ' + current_user.username,
+    title='',
     uploaded_on=datetime.datetime.now(),
     owner_id=current_user.id
   )
