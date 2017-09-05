@@ -68,6 +68,7 @@ var Controller = function(kifu, kifuComments, boardCanvas) {
   this.nodesDeletedDuringEdit = []; // keep track of which nodes are deleted during editting
   this.driverBackup = null;
   this.textBackup = ''; // info updating failsafe
+  this.isFallbackContent = false; // also used to info updating
   this.cursorMode = constants.cursor.PLAY_AND_SELECT;
 
   // update navigation, edit, and comment interface
@@ -653,14 +654,24 @@ Controller.prototype.addInfoEventListeners = function() {
     // clicking on editable info backs the info up
     contentElement.addEventListener('focus', function() {
       self.textBackup = contentElement.textContent;
+      self.isFallbackContent = contentElement.classList.contains('fallback');
+      // if contentElement is fallback, then clear the text and remove the fallback class
+      if (self.isFallbackContent) {
+        contentElement.textContent = '';
+        contentElement.classList.remove('fallback');
+      }
     });
 
     var update = function() {
       var xhr = new XMLHttpRequest();
-      // revert to backup if change failed
       xhr.addEventListener('readystatechange', function() {
+        // revert to backup if change failed
+        // also re-add fallback class if content was originally fallback
         if (xhr.readyState === 4 && xhr.status !== 200) {
           contentElement.textContent = self.textBackup;
+          if (self.isFallbackContent) {
+            contentElement.classList.add('fallback');
+          }
         }
       });
       // construct url and data
@@ -671,6 +682,9 @@ Controller.prototype.addInfoEventListeners = function() {
       // if content has been changed to empty
       if (contentElement.textContent === '') {
         contentElement.textContent = self.textBackup;
+        if (self.isFallbackContent) {
+          contentElement.classList.add('fallback');
+        }
       // if content has actually been changed
       } else if (self.textBackup !== contentElement.textContent) {
         xhr.open('UPDATE', url);
