@@ -323,12 +323,12 @@ def get_sgf_info(sgf_str):
     return value
 
   sgf_info = {
-    'PB': 'Anonymous', # black player
-    'BR': '?', # black rank
-    'PW': 'Anonymous', # white player
-    'WR': '?', # white rank
-    'KM': '?', # komi
-    'RE': '?' # game result
+    'PB': '', # black player
+    'BR': '', # black rank
+    'PW': '', # white player
+    'WR': '', # white rank
+    'KM': '', # komi
+    'RE': '' # game result
   }
   
   root = SGF().parse(sgf_str)
