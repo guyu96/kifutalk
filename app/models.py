@@ -70,12 +70,12 @@ class Kifu(db.Model):
   # kifu info
   title = db.Column(db.String(512), nullable=False)
   description = db.Column(db.Text, default='')
-  black_player = db.Column(db.String(128), default='Anonymous')
-  white_player = db.Column(db.String(128), default='Anonymous')
-  black_rank = db.Column(db.String(16), default='?')
-  white_rank = db.Column(db.String(16), default='?')
-  komi = db.Column(db.String(8), default='?')
-  result = db.Column(db.String(16), default='?')
+  black_player = db.Column(db.String(128), default='')
+  white_player = db.Column(db.String(128), default='')
+  black_rank = db.Column(db.String(16), default='')
+  white_rank = db.Column(db.String(16), default='')
+  komi = db.Column(db.String(8), default='')
+  result = db.Column(db.String(16), default='')
   
   @property
   def filepath(self):
