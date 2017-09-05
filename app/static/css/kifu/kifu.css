@@ -25,7 +25,12 @@ main {
   max-height: 70px;
 }
 
-#kifu-title:focus {
+#kifu-title[contentEditable="true"]:hover {
+  text-shadow: 1px 0 0 #e8e8e8;
+}
+
+#kifu-title[contentEditable="true"]:focus {
+  min-width: 300px;
   padding: 0 10px;
   background: #456997;
 }

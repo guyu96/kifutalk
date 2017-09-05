@@ -1,7 +1,6 @@
 #info {
   background: #4b5e76;
   color: #e8e8e8;
-  font-size: 0;
   font-family: 'Open Sans', sans-serif;
   letter-spacing: 0.7px;
 }
@@ -11,6 +10,10 @@
   padding-left: 8px;
   height: 50px;
   line-height: 50px;
+  font-size: 0;
+}
+
+#info .info-entry span, #info .info-entry label {
   font-size: 18px;
 }
 
@@ -18,11 +21,16 @@
   display: inline-block;
 }
 
+#info .black-player, #info .white-player {
+  margin-right: 5px;
+}
+
 #info svg {
   vertical-align: top;
   display: inline-block;
   height: 50px;
   width: 30px;
+  margin-right: 5px;
 }
 
 #info svg.black-circle {
@@ -41,10 +49,14 @@
 }
 
 #info .black-rank, #info .white-rank {
-  max-width: 50px;
+  max-width: 75px;
   max-height: 50px;
   overflow: hidden;
   vertical-align: top;
+}
+
+#info .parenthesis {
+  margin: 0 1px;
 }
 
 #info .komi span, #info .result span {
@@ -53,6 +65,11 @@
   max-height: 50px;
   overflow: hidden;
   vertical-align: top;
+}
+
+#info span.fallback, #info p.fallback {
+  letter-spacing: 0;
+  font-size: 16px;
 }
 
 #info label {
@@ -88,15 +105,32 @@
   font-size: 15px;
 }
 
-#info span[contentEditable="true"] {
-  padding: 0 3px;
+#info span[contentEditable="true"]:hover,
+#info p[contentEditable="true"]:hover
+{
+  text-shadow: 1px 0 0 #e8e8e8;
 }
 
 #info span[contentEditable="true"]:focus {
+  min-width: 35px;
   padding: 0 5px;
   background: #5b6e86;
+  line-height: 40px;
+  margin: 5px 0;
 }
 
 #info p[contentEditable="true"]:focus {
   background: #5b6e86;
+}
+
+#info span.black-player[contentEditable="true"]:focus,
+#info span.white-player[contentEditable="true"]:focus
+{
+  min-width: 70px;
+}
+
+#info span.kifu-komi[contentEditable="true"]:focus,
+#info span.kifu-result[contentEditable="true"]:focus
+{
+  min-width: 80px;
 }
