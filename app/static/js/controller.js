@@ -158,12 +158,10 @@ Controller.prototype.updateNavEdit = function() {
     for (var i = 0; i < this.html.editMode.length; i++) {
       this.html.editMode[i].disabled = false;
     }
-    // disable deleteNode if user is not owner and if the game
-    // is at a node that already existed before the edit session
-    if (this.authStatus !== 2) {
-      if (gameTree.currentNode.id < this.driverBackup.gameTree.nextNodeID) {
-        this.html.deleteNode.disabled = true;
-      }
+    // disable deleteNode if the game is at a node that already
+    // existed before the edit session, even if user is kifu owner
+    if (gameTree.currentNode.id < this.driverBackup.gameTree.nextNodeID) {
+      this.html.deleteNode.disabled = true;
     }
     // disable play button
     this.html.play.disabled = true;
