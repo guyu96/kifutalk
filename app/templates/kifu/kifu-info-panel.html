@@ -2,29 +2,88 @@
   <svg class="black-circle" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
      <circle cx="100" cy="100" r="100"/>
   </svg>
-  <span contentEditable="true" class="black-player">{{ kifu.black_player }}</span>
-  (<span contentEditable="true" class="black-rank">{{ kifu.black_rank }}</span>)
+  {{
+    render_kifu_info_entry(
+      auth_status,
+      kifu.black_player,
+      'black-player',
+      'Add player name',
+      'Unknown'
+    )
+  }}
+  <span class="parenthesis">(</span>
+  {{
+    render_kifu_info_entry(
+      auth_status,
+      kifu.black_rank,
+      'black-rank',
+      'Add rank',
+      'Unknown'
+    )
+  }}
+  <span class="parenthesis">)</span>
 </div>
 <div class="white info-entry">
   <svg class="white-circle" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
      <circle cx="100" cy="100" r="100"/>
   </svg>
-  <span contentEditable="true" class="white-player">{{ kifu.white_player }}</span>
-  (<span contentEditable="true" class="white-rank">{{ kifu.white_rank }}</span>)
+  {{
+    render_kifu_info_entry(
+      auth_status,
+      kifu.white_player,
+      'white-player',
+      'Add player name',
+      'Unknown'
+    )
+  }}
+  <span class="parenthesis">(</span>
+  {{
+    render_kifu_info_entry(
+      auth_status,
+      kifu.white_rank,
+      'white-rank',
+      'Add rank',
+      'Unknown'
+    )
+  }}
+  <span class="parenthesis">)</span>
 </div>
 <div class="komi info-entry">
   <label for="komi">Komi:</label>
-  <span contentEditable="true">{{ kifu.komi }}</span>
+  {{
+    render_kifu_info_entry(
+      auth_status,
+      kifu.komi,
+      'kifu-komi',
+      'Add komi',
+      'Unknown'
+    )
+  }}
 </div>
 <div class="result info-entry">
   <label for="result">Result:</label>
-  <span contentEditable="true">{{ kifu.result }}</span>
+  {{
+    render_kifu_info_entry(
+      auth_status,
+      kifu.result,
+      'kifu-result',
+      'Add result',
+      'Unknown'
+    )
+  }}
 </div>
 <div class="description">
   <label for="description">Description</label>
-  <p contentEditable="true">
-    {{ kifu.description }}
-  </p>
+  {{
+    render_kifu_info_entry(
+      auth_status,
+      kifu.description,
+      'kifu-description',
+      'Click to add description',
+      'No description available',
+      'p'
+    )
+  }}
 </div>
 <p class="upload-info">
   {{ kifu.uploaded_on.split(' ')[0] }} by {{ kifu.owner }}
