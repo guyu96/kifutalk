@@ -84,26 +84,31 @@ button:disabled svg line
 
 #toggle-edit {
   width: 150px;
+  background: #d3d3d3;
+}
+
+#toggle-edit:hover {
+  background: #b8b8b8;
 }
 
 #save {
   width: 60px;
-  background: #499c88;
-  color: #e8e8e8;
+  background: #39ac78;
+  color: #f8f8f8;
 }
 
 #cancel {
   width: 90px;
-  background: #938ad3;
-  color: #e8e8e8;
+  background: #df5277;
+  color: #f8f8f8;
 }
 
 #save:hover {
-  background: #186652;
+  background: #198c58;
 }
 
 #cancel:hover {
-  background: #635aa7;
+  background: #bf3257;
 }
 
 #pass {
