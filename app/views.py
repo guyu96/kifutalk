@@ -178,7 +178,8 @@ def kifu_get(kifu_id):
     starred=starred,
     node_id=query_node_id,
     edit=query_edit,
-    comment_id=query_comment_id
+    comment_id=query_comment_id,
+    url=url_for('kifu_get', kifu_id=kifu_id, _external=True)
   )
 
 # update kifu
