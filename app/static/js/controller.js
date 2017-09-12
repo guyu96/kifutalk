@@ -46,7 +46,10 @@ var Controller = function(kifu, kifuComments, boardCanvas) {
     'starKifu': document.getElementById('star'),
     'unstarKifu': document.getElementById('unstar'),
     'deleteKifu': document.getElementById('delete-kifu'),
-    'downloadKifu': document.getElementById('download')
+    'downloadKifu': document.getElementById('download'),
+    'shareKifu': document.getElementById('share'),
+    'shareLabel': document.querySelector('.share-dropdown label'),
+    'shareInput': document.querySelector('.share-dropdown input')
   };
 
   // cursor modes mapped to buttons
@@ -301,11 +304,11 @@ Controller.prototype.updateCommentList = function() {
 Controller.prototype.initStarAuth = function() {
   // display star/unstar button
   if (this.starred) {
-    this.html.unstarKifu.display = 'inline-block';
-    this.html.starKifu.style.display = 'none';
+    this.html.unstarKifu.parentNode.display = 'inline-block';
+    this.html.starKifu.parentNode.style.display = 'none';
   } else {
-    this.html.starKifu.display = 'inline-block';
-    this.html.unstarKifu.style.display = 'none';
+    this.html.starKifu.parentNode.display = 'inline-block';
+    this.html.unstarKifu.parentNode.style.display = 'none';
   }
 
   switch(this.authStatus) {
@@ -516,6 +519,42 @@ Controller.prototype.addActionEventListeners = function() {
   // download kifu
   this.html.downloadKifu.addEventListener('click', function(e) {
     window.location.replace('/download/' + self.kifu.id);
+  });
+
+  // share kifu
+  
+  var setShareLink = function(shareAtThisMove) {
+    var currentNodeID = self.boardCanvas.driver.gameTree.currentNode.id;
+    if (shareAtThisMove) {
+      self.html.shareInput.value = kifuURL + '?node_id=' + currentNodeID;
+    } else {
+      self.html.shareInput.value = kifuURL;
+    }
+  }
+
+  this.html.shareKifu.addEventListener('click', function(e) {
+    // reset share-at-this-move toggle
+    self.html.shareLabel.classList.remove('active');
+    setShareLink(false);
+
+    if (self.html.shareLabel.parentNode.style.display === 'block') {
+      self.html.shareKifu.classList.remove('active');
+      self.html.shareLabel.parentNode.style.display = 'none';
+    } else {
+      self.html.shareKifu.classList.add('active');
+      self.html.shareLabel.parentNode.style.display = 'block'
+    }
+  });
+
+  // toggle share-at-this-move
+  this.html.shareLabel.addEventListener('click', function(e) {
+    if (self.html.shareLabel.classList.contains('active')) {
+      self.html.shareLabel.classList.remove('active');
+      setShareLink(false);
+    } else {
+      self.html.shareLabel.classList.add('active');
+      setShareLink(true);
+    }
   });
 };
 
@@ -853,8 +892,8 @@ Controller.prototype.starKifu = function(kifuID) {
     // if post successful
     if (xhr.readyState === 4 && xhr.status === 200) {
       self.starred = true;
-      self.html.starKifu.style.display = 'none';
-      self.html.unstarKifu.style.display = 'inline-block';
+      self.html.starKifu.parentNode.style.display = 'none';
+      self.html.unstarKifu.parentNode.style.display = 'inline-block';
     // post failed
     } else if (xhr.readyState === 4 && xhr.status !== 200) {
       throw new exceptions.NetworkError(4, "Kifu Star/Unstar Failed");
@@ -875,8 +914,8 @@ Controller.prototype.unstarKifu = function(kifuID) {
     // if post successful
     if (xhr.readyState === 4 && xhr.status === 200) {
       self.starred = false;
-      self.html.starKifu.style.display = 'inline-block';
-      self.html.unstarKifu.style.display = 'none';
+      self.html.starKifu.parentNode.style.display = 'inline-block';
+      self.html.unstarKifu.parentNode.style.display = 'none';
     // post failed
     } else if (xhr.readyState === 4 && xhr.status !== 200) {
       throw new exceptions.NetworkError(4, "Kifu Star/Unstar Failed");

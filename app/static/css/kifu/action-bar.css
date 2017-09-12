@@ -6,13 +6,17 @@
   font-size: 0;
 }
 
+#action-bar .action-container {
+  display: inline-block;
+}
+
 #action-bar button {
   text-align: center;
   vertical-align: top;
   height: 60px;
   width: 150px;
   padding: 0;
-  display: inline-block;
+  display: block;
   background: none;
   border: 0;
 }
@@ -39,4 +43,50 @@
 #unstar svg path {
   stroke: #F4B812;
   stroke-width: 0.5px;
+}
+
+#action-bar #share.active {
+  background: #3b4e66;
+}
+
+#action-bar .share-dropdown {
+  position: absolute;
+  width: 260px;
+  background: #d8d8d8;
+  padding: 20px;
+  text-align: center;
+}
+
+#action-bar .share-dropdown label {
+  display: block;
+  font-size: 16px;
+  line-height: 20px;
+  padding: 15px 5px;
+  background: #c8c8c8;
+  font-weight: bold;
+  cursor: pointer;
+  border: 1px solid #a8a8a8;
+  letter-spacing: 0.2px;
+}
+
+#action-bar .share-dropdown label:hover {
+  background: #b8b8b8;
+}
+
+#action-bar .share-dropdown label.active {
+  background: #a8a8a8;
+}
+
+#action-bar .share-dropdown input {
+  margin-top: 5px;
+  padding: 5px 10px;
+  background: #e8e8e8;
+  color: #363636;
+  width: 240px;
+  height: 30px;
+  line-height: 30px;
+  font-size: 16px;
+  border: 0;
+  outline: none;
+  cursor: text;
 }
