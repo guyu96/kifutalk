@@ -72,7 +72,13 @@
   outline: none;
 }
 
+#comment-input:disabled {
+  background: #f2f2f2;
+  cursor: not-allowed;
+}
+
 #comment-submit {
+  font-family: 'Open Sans', sans-serif;
   width: 70px;
   height: 60px;
   padding: 10px;
@@ -88,4 +94,13 @@
 
 #comment-submit:hover {
   background: #c8c8c8;
+}
+
+#comment-submit:disabled {
+  color: #a8a8a8;
+  background: #d8d8d8;
+  cursor: not-allowed;
+}
+#comment-submit:disabled:hover {
+  background: #d8d8d8;
 }
