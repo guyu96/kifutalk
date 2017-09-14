@@ -46,6 +46,8 @@ var Controller = function(kifu, kifuComments, boardCanvas) {
     'starKifu': document.getElementById('star'),
     'unstarKifu': document.getElementById('unstar'),
     'deleteKifu': document.getElementById('delete-kifu'),
+    'deleteYes': document.getElementById('delete-yes'),
+    'deleteNo': document.getElementById('delete-no'),
     'downloadKifu': document.getElementById('download'),
     'shareKifu': document.getElementById('share'),
     'shareLabel': document.querySelector('.share-dropdown label'),
@@ -513,7 +515,22 @@ Controller.prototype.addActionEventListeners = function() {
 
   // delete kifu
   this.html.deleteKifu.addEventListener('click', function(e) {
+    if (self.html.deleteKifu.style.display === 'none') {
+      self.html.deleteKifu.style.display = 'block';
+      self.html.deleteYes.parentNode.style.display = 'none';
+    } else {
+      self.html.deleteKifu.style.display = 'none';
+      self.html.deleteYes.parentNode.style.display = 'block';
+    }
+  });
+
+  this.html.deleteYes.addEventListener('click', function(e) {
     self.deleteKifu(self.kifu.id);
+  });
+
+  this.html.deleteNo.addEventListener('click', function(e) {
+    self.html.deleteKifu.style.display = 'block';
+    self.html.deleteYes.parentNode.style.display = 'none';
   });
 
   // download kifu
@@ -522,7 +539,6 @@ Controller.prototype.addActionEventListeners = function() {
   });
 
   // share kifu
-  
   var setShareLink = function(shareAtThisMove) {
     var currentNodeID = self.boardCanvas.driver.gameTree.currentNode.id;
     if (shareAtThisMove) {

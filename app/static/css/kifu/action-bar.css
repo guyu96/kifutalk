@@ -7,6 +7,7 @@
 }
 
 #action-bar .action-container {
+  vertical-align: top;
   display: inline-block;
 }
 
@@ -89,4 +90,30 @@
   border: 0;
   outline: none;
   cursor: text;
+}
+
+.confirm-delete button#delete-yes,
+.confirm-delete button#delete-no {
+  vertical-align: top;
+  width: 75px;
+  height: 60px;
+  display: inline-block;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 16px;
+  letter-spacing: 0.3px;
+  line-height: 60px;
+  color: #f8f8f8;
+}
+
+.confirm-delete button#delete-yes {
+  background: #df5277;
+}
+.confirm-delete button#delete-yes:hover {
+  background: #cf3257;
+}
+.confirm-delete button#delete-no {
+  background: #39ac78;
+}
+.confirm-delete button#delete-no:hover {
+  background: #298c58;
 }
