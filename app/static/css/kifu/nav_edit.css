@@ -19,7 +19,7 @@
 }
 
 .navigation:hover, .edit:hover {
-  background: #d8d8d8;
+  background: #bfbfbf;
 }
 
 .navigation {
@@ -84,11 +84,16 @@ button:disabled svg line
 
 #toggle-edit {
   width: 150px;
-  background: #d3d3d3;
+  font-weight: bold;
+  letter-spacing: 0.5px;
 }
 
 #toggle-edit:hover {
-  background: #b8b8b8;
+  background: #bfbfbf;
+}
+
+#toggle-edit:disabled:hover {
+  background: #dddddd;
 }
 
 #save {
@@ -120,15 +125,17 @@ button:disabled svg line
 }
 
 button:disabled {
+  cursor: not-allowed;
+  background: #dddddd;
   color: #a8a8a8;
 }
 
 button:disabled:hover {
-  background: #d8d8d8;
+  background: #dddddd;
 }
 
 .active {
-  background: #d8d8d8;
+  background: #c8c8c8;
 }
 
 #add-stone-menu {
@@ -142,7 +149,7 @@ button:disabled:hover {
 }
 
 #add-stone-menu li {
-  background: #d8d8d8;
+  background: #c8c8c8;
   color: #464646;
   display: block;
   text-align: center;
@@ -154,5 +161,5 @@ button:disabled:hover {
 
 #add-stone-menu li:hover {
   cursor: pointer;
-  background: #c8c8c8;
+  background: #b8b8b8;
 }
