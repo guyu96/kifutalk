@@ -244,15 +244,24 @@ def kifu_delete(kifu_id):
   if (kifu.owner_id != current_user.id):
     abort(401)
 
-  # delete all comments posted on this kifu
+  # delete all notifications triggered by comments on this kifu
   kifu_comments = Comment.query.filter_by(kifu_id=kifu_id).all()
   for kc in kifu_comments:
+    kifu_notifications = Notification.query.filter_by(comment_id=kc.id).all()
+    for kn in kifu_notifications:
+      db.session.delete(kn)
+  db.session.commit()
+
+  # delete all comments posted on this kifu
+  for kc in kifu_comments:
     db.session.delete(kc)
+  db.session.commit()
 
   # delete all kifustars entries of this kifu
   stars = KifuStar.query.filter_by(kifu_id=kifu_id)
   for s in stars:
     db.session.delete(s)
+  db.session.commit()
 
   # delete kifu and commit
   db.session.delete(kifu)
