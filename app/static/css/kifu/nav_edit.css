@@ -104,11 +104,11 @@ button:disabled svg line
 }
 
 #save:hover {
-  background: #198c58;
+  background: #298c58;
 }
 
 #cancel:hover {
-  background: #bf3257;
+  background: #cf3257;
 }
 
 #pass {
