@@ -186,9 +186,11 @@ Controller.prototype.updateNavEdit = function() {
     if (!gameTree.atEnd()) {
       this.html.play.disabled = false;
     }
-    // enable comments
-    this.html.commentInput.disabled = false;
-    this.html.commentSubmit.disabled = false;
+    // enable comments (only when logged in)
+    if (this.authStatus !== 0) {
+      this.html.commentInput.disabled = false;
+      this.html.commentSubmit.disabled = false;
+    }
   }
 
   // check if next variation involves adding stone
