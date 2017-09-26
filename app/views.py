@@ -513,5 +513,6 @@ def browse_kifu(upload_user_id=None, save_user_id=None):
 def read_notification(notification_id):
   notification = Notification.query.filter_by(id=notification_id).first_or_404()
   notification.read = True
+  db.session.add(notification)
   db.session.commit()
   return jsonify({'success': True})

@@ -24,7 +24,7 @@ if (notificationHeader) {
   for (var i = 0; i < notificationUL.children.length; i++) {
     var notificationAnchor = notificationUL.children[i];
     notificationAnchor.addEventListener('click', function(e) {
-      markAsRead(notificationAnchor.getAttribute('nid'));
+      markAsRead(this.getAttribute('nid'));
     });
   }
 }
