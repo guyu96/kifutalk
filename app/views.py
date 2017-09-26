@@ -9,6 +9,7 @@ from .models import User, Kifu, Comment, KifuStar, Notification
 from .forms import SignUpForm, LoginForm
 from .sgf import validate_sgf, validate_sub_sgf, get_sgf_info, standardize_sgf
 
+
 # helper functions to save and retrieve kifu thumbnails
 def save_thumbnail(kifu, base64_str):
   # first write image to temperory file
@@ -416,15 +417,10 @@ def download(kifu_id):
     as_attachment=True
   )
 
-# browse kifu
-@app.route('/browse', methods=['GET'])
-def browse_kifu():
-  # get query strings
-  page = int(request.args.get('page')) if request.args.get('page') else 1
-  sort_by = request.args.get('sort-by') if request.args.get('sort-by') else 'date'
-  time_frame = request.args.get('time-frame') if request.args.get('time-frame') else 'week'
-  display_in = request.args.get('display-in') if request.args.get('display-in') else 'desc'
-
+# helper function that generates a kifu pagination
+# based on constraints of its arguments
+def get_kifu_pagination(page, sort_by, time_frame, display_in, uploaded_by=None, saved_by=None):
+  # kifus uploaded after earliest_time will be included
   current_time = datetime.datetime.now()
   if time_frame == 'day':
     earliest_time = current_time - datetime.timedelta(days=1)
@@ -439,12 +435,20 @@ def browse_kifu():
 
   # subquery to count number of comments each kifu has
   count_query = db.session.query(Comment.kifu_id, func.count('*').label('comment_count')).group_by(Comment.kifu_id).subquery()
+
   # query to get all the kifu info
   kifu_query = db.session.query(Kifu, User, count_query.c.comment_count).join(User).outerjoin(count_query, Kifu.id==count_query.c.kifu_id)
 
+  # filter query if uploaded_by or save_by is specified
+  if uploaded_by is not None:
+    kifu_query = kifu_query.filter(Kifu.owner_id == uploaded_by)
+  elif saved_by is not None:
+    saved_kifu_ids = [sk_id[0] for sk_id in db.session.query(KifuStar.kifu_id).filter(KifuStar.user_id==saved_by).distinct()]
+    # print(saved_kifu_ids)
+    kifu_query = kifu_query.filter(Kifu.id.in_(saved_kifu_ids))
+
   # filter query by upload date
   if earliest_time is not None:
-    ref_time = datetime.datetime.now()
     kifu_query = kifu_query.filter(Kifu.uploaded_on >= earliest_time)
 
   # order query based on query strings
@@ -465,17 +469,38 @@ def browse_kifu():
     per_page=current_app.config['PERPAGE'],
     error_out=True
   )
+  return sorted_pagination
 
-  for i in sorted_pagination.items:
-    print(i)
-  # Kifu, User, count
+# browse kifu
+@app.route('/browse', methods=['GET'])
+@app.route('/browse/user-upload/<int:upload_user_id>', methods=['GET'])
+@app.route('/browse/user-save/<int:save_user_id>', methods=['GET'])
+def browse_kifu(upload_user_id=None, save_user_id=None):
+  # get query strings
+  page = int(request.args.get('page')) if request.args.get('page') else 1
+  sort_by = request.args.get('sort-by') if request.args.get('sort-by') else 'date'
+  time_frame = request.args.get('time-frame') if request.args.get('time-frame') else 'all-time'
+  display_in = request.args.get('display-in') if request.args.get('display-in') else 'desc'
+
+  if upload_user_id is not None:
+    user = User.query.filter_by(id=upload_user_id).first_or_404()
+    kifu_pagination = get_kifu_pagination(page, sort_by, time_frame, display_in, uploaded_by=upload_user_id)
+    base_url = '/browse/user-upload/' + str(upload_user_id)
+  elif save_user_id is not None:
+    user = User.query.filter_by(id=save_user_id).first_or_404()
+    kifu_pagination = get_kifu_pagination(page, sort_by, time_frame, display_in, saved_by=save_user_id)
+    base_url = '/browse/user-save/' + str(save_user_id)
+  else:
+    kifu_pagination = get_kifu_pagination(page, sort_by, time_frame, display_in)
+    base_url = '/browse'
 
   return render_template(
     'browse.html',
-    items=sorted_pagination.items,
-    page_num=sorted_pagination.page,
-    has_next=sorted_pagination.has_next,
-    has_prev=sorted_pagination.has_prev,
+    base_url=base_url,
+    items=kifu_pagination.items,
+    page_num=kifu_pagination.page,
+    has_next=kifu_pagination.has_next,
+    has_prev=kifu_pagination.has_prev,
     query_string_list=[sort_by, time_frame, display_in]
   )
 

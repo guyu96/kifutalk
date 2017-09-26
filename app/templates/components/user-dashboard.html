@@ -4,8 +4,8 @@
     <a href="{{ url_for('logout') }}">Log out</a>
   </div>
   <div class="actions">
-    <a href="#" id="view-uploads" class="action">View My Uploads</a>
-    <a href="#" id="view-saved" class="action">View Saved Kifus</a>
+    <a href="{{ url_for('browse_kifu', upload_user_id=current_user.id) }}" id="view-uploads" class="action">View My Uploads</a>
+    <a href="{{ url_for('browse_kifu', save_user_id=current_user.id) }}" id="view-saved" class="action">View Saved Kifus</a>
     <a href="#" id="view-comments" class="action">View My Comments</a>
   </div>
 </div>

@@ -20,7 +20,7 @@ var initListeners = function() {
 
   // add listener to update list button
   updateList.addEventListener('click', function(e) {
-    window.location.replace('/browse?page=1' + generateQueryString());
+    window.location.replace(baseURL + '?page=1' + generateQueryString());
   });
 }
 
