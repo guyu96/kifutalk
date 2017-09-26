@@ -6,21 +6,31 @@
   text-align: center;
 }
 
+.browse-sidebar h3 {
+  background: #254977;
+  font-size: 25px;
+  font-weight: bold;
+  line-height: 40px;
+  height: 80px;
+  padding: 10px 20px;
+  max-width: 280px;
+  max-height: 80px;
+}
+
 .browse-sidebar ul label {
   display: block;
-  padding: 25px 0;
-  font-size: 24px;
-  line-height: 30px;
-  height: 30px;
+  font-size: 26px;
+  line-height: 70px;
+  height: 70px;
   font-weight: bold;
   letter-spacing: 0.7px;
 }
 
 .browse-sidebar ul li {
-  padding: 9px 0;
   display: block;
-  font-size: 20px;
-  line-height: 30px;
+  font-size: 18px;
+  line-height: 40px;
+  height: 40px;
   cursor: pointer;
 }
 

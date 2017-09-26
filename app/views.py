@@ -486,17 +486,21 @@ def browse_kifu(upload_user_id=None, save_user_id=None):
     user = User.query.filter_by(id=upload_user_id).first_or_404()
     kifu_pagination = get_kifu_pagination(page, sort_by, time_frame, display_in, uploaded_by=upload_user_id)
     base_url = '/browse/user-upload/' + str(upload_user_id)
+    browse_title = 'Uploads by %s (%s)' % (user.username, user.rank)
   elif save_user_id is not None:
     user = User.query.filter_by(id=save_user_id).first_or_404()
     kifu_pagination = get_kifu_pagination(page, sort_by, time_frame, display_in, saved_by=save_user_id)
     base_url = '/browse/user-save/' + str(save_user_id)
+    browse_title = 'Kifus saved by %s (%s)' % (user.username, user.rank)
   else:
     kifu_pagination = get_kifu_pagination(page, sort_by, time_frame, display_in)
     base_url = '/browse'
+    browse_title = 'All uploads on Kifutalk'
 
   return render_template(
     'browse.html',
     base_url=base_url,
+    browse_title=browse_title,
     items=kifu_pagination.items,
     page_num=kifu_pagination.page,
     has_next=kifu_pagination.has_next,
