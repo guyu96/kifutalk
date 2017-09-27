@@ -55,3 +55,26 @@
     {% endif %}
   {% endif %}
 {% endmacro %}
+
+{% macro render_comment_entry(item) %}
+  {% with
+    comment=item[0],
+    kifu_title=item[1],
+    username=item[2],
+    user_rank=item[3]
+  %}
+  <div class="comment-entry">
+    <p class="comment-header">
+      <span class="author-info">{{ username }} ({{ user_rank }})</span>
+      <span>commented on</span>
+      <span class="kifu-title">{{ kifu_title }}</span>
+      <span class="comment-time">at {{ comment.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</span>
+    </p>
+    <a href="{{ url_for('kifu_get', kifu_id=comment.kifu_id, node_id=comment.node_id, comment_id=comment.id) }}" class="comment-main">
+      <div class="comment-content">
+        <p class="comment-content">{{ comment.content }}</p>
+      </div>
+    </a>
+  </div>
+  {% endwith %}
+{% endmacro %}
