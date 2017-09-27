@@ -5,7 +5,7 @@ import datetime, os, base64, urllib.request
 from PIL import Image
 
 from . import app, db
-from .models import User, Kifu, Comment, KifuStar, Notification
+from .models import User, Kifu, Comment, KifuStar, Notification, Rank
 from .forms import SignUpForm, LoginForm
 from .sgf import validate_sgf, validate_sub_sgf, get_sgf_info, standardize_sgf
 
@@ -466,7 +466,7 @@ def get_kifu_pagination(page, sort_by, time_frame, display_in, uploaded_by=None,
   # paginate
   sorted_pagination = sorted_query.paginate(
     page=page,
-    per_page=current_app.config['PERPAGE'],
+    per_page=current_app.config['KIFU_PERPAGE'],
     error_out=True
   )
   return sorted_pagination
@@ -506,6 +506,25 @@ def browse_kifu(upload_user_id=None, save_user_id=None):
     has_next=kifu_pagination.has_next,
     has_prev=kifu_pagination.has_prev,
     query_string_list=[sort_by, time_frame, display_in]
+  )
+
+@app.route('/comments/user/<int:user_id>', methods=['GET'])
+def browse_comment(user_id):
+  page = int(request.args.get('page')) if request.args.get('page') else 1
+  user = User.query.filter_by(id=user_id).first_or_404();
+  comment_query = db.session.query(Comment, Kifu.title, User.username, Rank.rank_en).join(Kifu, Comment.kifu_id==Kifu.id).join(User, Comment.author==User.id).join(Rank, User.rank_id==Rank.id).filter(Comment.author==user_id).order_by(Comment.timestamp.desc())
+  comment_pagination = comment_query.paginate(
+    page=page,
+    per_page=current_app.config['COMMENT_PERPAGE'],
+    error_out=True
+  )
+  return render_template(
+    'browse-comments.html',
+    uid=user_id,
+    items=comment_pagination.items,
+    page_num=comment_pagination.page,
+    has_next=comment_pagination.has_next,
+    has_prev=comment_pagination.has_prev
   )
 
 # mark a notification as read
