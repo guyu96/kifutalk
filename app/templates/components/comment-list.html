@@ -1,0 +1,46 @@
+{% from 'macros.html' import render_comment_entry %}
+
+
+<div class="list-container">
+  {% if items|length != 0 %}
+  <div class="comment-list">
+    {% for item in items %}
+      {{ render_comment_entry(item) }}
+    {% endfor %}
+    <div class="page-nav">
+      {% block prev_link %}
+        <a
+          id="prev"
+          {% if has_prev %}
+            href="{{ prev_url }}"
+          {% else %}
+            href="#"
+          {% endif %}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="20" y1="12" x2="4" y2="12"/>
+            <polyline points="10 18 4 12 10 6"/>
+          </svg>
+        </a>
+      {% endblock %}
+      <span id="page-num">{{ page_num }}</span>
+      {% block next_link %}
+        <a
+        id="next"
+        {% if has_next %}
+          href="{{ next_url }}"
+        {% else %}
+          href="#"
+        {% endif %}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="4" y1="12" x2="20" y2="12"/>
+            <polyline points="14 6 20 12 14 18"/>
+          </svg>
+        </a>
+      {% endblock %}
+    </div>
+  {% else %}
+    <p class="no-comment">No Comments Found</p>
+  {% endif %}
+</div>

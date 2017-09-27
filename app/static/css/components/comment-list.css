@@ -1,0 +1,114 @@
+.list-container {
+  font-family: 'Open Sans', sans-serif;
+  background: #355987;
+}
+
+.list-container .comment-header {
+  padding: 5px 15px;
+  height: 30px;
+  width: 960px;
+  line-height: 30px;
+  font-size: 18px;
+  color: #e8e8e8;
+}
+
+.list-container .comment-header .author-info {
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+.list-container .comment-header .kifu-title {
+  font-weight: bold;
+  margin-left: 10px;
+}
+
+.list-container .comment-header .comment-time {
+  font-size: 16px;
+  display: inline-block;
+  float: right;
+}
+
+.list-container .comment-main {
+  text-decoration: none;
+  display: block;
+  width: 920px;
+  padding: 20px;
+  background: #e8e8e8;
+  border-left: 15px solid #355987;
+  border-right: 15px solid #355987;
+}
+
+.list-container .comment-main:hover {
+  background: #e0e0e0;
+}
+
+.list-container .comment-main .comment-content {
+  background: #d0d0d0;
+  padding: 10px;
+}
+
+.list-container .comment-main .comment-content p {
+  padding: 0;
+  width: 900px;
+  max-height: 25px;
+  max-width: 900px;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 25px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  color: #525252;
+}
+
+.list-container .page-nav {
+  width: 990px;
+  background: #355987;
+  font-size: 0;
+  line-height: 30px;
+  height: 30px;
+  font-weight: bold;
+}
+
+.list-container .page-nav svg {
+  height: 30px;
+  width: 25px;
+}
+
+.list-container .page-nav svg line,
+.list-container .page-nav svg polyline {
+  stroke: #f8f8f8;
+}
+
+.list-container .page-nav span {
+  color: #f8f8f8;
+  font-size: 18px;
+  display: inline-block;
+  height: inherit;
+  width: 40px;
+  text-align: center;
+  vertical-align: top;
+}
+
+.list-container .page-nav a {
+  display: inline-block;
+  vertical-align: top;
+  padding: 0 225px;
+  height: inherit;
+  line-height: 40px;
+}
+
+.list-container .page-nav a:hover {
+  background: #254977;
+}
+
+.list-container .no-comment {
+  color: #f8f8f8;
+  font-size: 40px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  width: 990px;
+  height: 780px;
+  line-height: 780px;
+  text-align: center;
+}

@@ -1,0 +1,19 @@
+{% extends 'layout.html' %}
+
+{% block title %}Kifutalk - Conversations about Go made easy{% endblock %}
+{% block css %}
+  {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/comment-list.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/browse-comments.css') }}">
+{% endblock %}
+{% block body %}
+  {{ super() }}
+  <div class="container">
+    {% with
+      prev_url=url_for('browse_comment', user_id=uid, page=page_num-1),
+      next_url=url_for('browse_comment', user_id=uid, page=page_num+1)
+    %}
+      {% include('components/comment-list.html') %}
+    {% endwith %}
+  </div>
+{% endblock %}
