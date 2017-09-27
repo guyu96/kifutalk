@@ -10,12 +10,24 @@
 }
 
 .greeting p {
-  padding: 60px;
-  height: 40px;
-  line-height: 40px;
+  padding: 60px 50px;
   font-size: 25px;
   letter-spacing: 0.5px;
   font-weight: bold;
+}
+
+.greeting p span {
+  height: 40px;
+  line-height: 40px;
+  display: inline-block;
+  overflow: hidden;
+}
+
+.greeting p .username {
+  max-width: 230px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
 .greeting a {

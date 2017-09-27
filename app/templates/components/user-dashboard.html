@@ -1,6 +1,9 @@
 <div class="user-dashboard">
   <div class="greeting">
-    <p>Hello, <span>{{ current_user.username }}</span> (<span>{{ current_user.rank }}</span>)</p>
+    <p>
+      <span class="username">Hello, {{ current_user.username }}</span>
+      <span>({{ current_user.rank }})</span>
+    </p>
     <a href="{{ url_for('logout') }}">Log out</a>
   </div>
   <div class="actions">
