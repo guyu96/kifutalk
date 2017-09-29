@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/browse.css') }}">
 {% endblock %}
 {% block body %}
-  {{ super() }}
   <div class="container">
     {% include('components/browse-sidebar.html') %}
     {% with
@@ -19,6 +18,8 @@
       {% include('components/kifu-list.html') %}
     {% endwith %}
   </div>
+{% endblock %}
+{% block script %}
   <script type="text/javascript">
     var queryStringList = {{ query_string_list|tojson }};
     var baseURL = {{ base_url|tojson }};

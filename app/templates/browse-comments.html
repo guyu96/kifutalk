@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/browse-comments.css') }}">
 {% endblock %}
 {% block body %}
-  {{ super() }}
   <div class="container">
     {% with
       prev_url=url_for('browse_comment', user_id=uid, page=page_num-1),

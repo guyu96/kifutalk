@@ -13,7 +13,6 @@
     {% endif %}
 {% endblock %}
 {% block body %}
-  {{ super() }}
   <div class="container">
     {% include('components/banner.html') %}
     {% if current_user.is_authenticated %}
@@ -22,6 +21,8 @@
       {% include('components/login-signup.html') %}
     {% endif %}
   </div>
+{% endblock %}
+{% block script %}
   <script type="text/javascript">
     // set proper container height
     var container = document.querySelector('.container');

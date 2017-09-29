@@ -12,7 +12,6 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/kifu/comment.css') }}">
 {% endblock %}
 {% block body %}
-  {{ super() }}
   <main>
     {% if kifu.title|trim == '' %}
       {% if auth_status == 2 %}
@@ -54,7 +53,9 @@
       </div>
     </div>
   </main>
+{% endblock %}
 
+{% block script %}
   <script>
     var kifu = {{ kifu|tojson }};
     var kifuComments = {{ kifu_comments|tojson }};

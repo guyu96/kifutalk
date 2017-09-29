@@ -11,7 +11,6 @@
   {% endblock %}
 </head>
 <body spellcheck="false">
-  {% block body %}
   {# Only navigation bar is included #}
   <header>
     <h1><a href="{{ url_for('index') }}">Kifutalk</a></h1>
@@ -34,7 +33,9 @@
   {% endif %}
   {% endwith %}
 
+  {% block body %}
   {% endblock %}
+
   <footer>
     <p>Guyu Fan 2017 <a href="https://github.com/guyu96/kifutalk">GitHub</a></p>
   </footer>
@@ -47,5 +48,8 @@
     });
   </script>
   <script src="{{ url_for('static', filename='js/notification.js') }}"></script>
+  
+  {% block script %}
+  {% endblock %}
 </body>
 </html>

@@ -7,7 +7,6 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/upload.css') }}">
 {% endblock %}
 {% block body %}
-  {{ super() }}
   <div class="container">
     <form id="upload-form" method="post">
       <section id="sgf-input">
@@ -46,6 +45,8 @@
       </section>
     </form>
   </div>
+{% endblock %}
+{% block script %}
   <script src="{{ url_for('static', filename='js/config.js') }}"></script>
   <script src="{{ url_for('static', filename='js/constants.js') }}"></script>
   <script src="{{ url_for('static', filename='js/exceptions.js') }}"></script>
