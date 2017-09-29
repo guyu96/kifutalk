@@ -6,15 +6,19 @@
   text-align: center;
 }
 
-.browse-sidebar h3 {
+.browse-sidebar h3{
   background: #254977;
   font-size: 25px;
   font-weight: bold;
   line-height: 40px;
   height: 80px;
   padding: 10px 20px;
+}
+
+.browse-sidebar h3 div{
   max-width: 280px;
   max-height: 80px;
+  overflow: hidden;
 }
 
 .browse-sidebar ul label {
