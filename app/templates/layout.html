@@ -46,6 +46,24 @@
         this.parentNode.parentNode.removeChild(this.parentNode);
       });
     });
+
+    // set global zoom level
+    var adjustZoom = function() {
+      var body = document.querySelector('body');
+      var viewportHeight = window.innerHeight;
+      // header + main container + footer + margin
+      var desiredHeight = 60 + 800 + 20 + 10;
+
+      var zoomRatio = viewportHeight / desiredHeight;
+      // for webkit browsers
+      body.style.zoom = Math.floor(zoomRatio * 100) + "%";
+      // for firefox, apply no zoom
+      if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1) {
+        zoomRatio = 1;
+      }
+      return zoomRatio;
+    }
+    var globalZoom = adjustZoom();
   </script>
   <script src="{{ url_for('static', filename='js/notification.js') }}"></script>
   

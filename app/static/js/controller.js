@@ -420,9 +420,16 @@ Controller.prototype.addCanvasEventListeners = function() {
   bc.canvas.addEventListener('click', function(e) {
     // get board coordinates
     var rect = bc.canvas.getBoundingClientRect();
-    var bx = utils.c2b(e.clientX - rect.left, config.canvas.sp/bc.scale, config.canvas.lw);
-    var by = utils.c2b(e.clientY - rect.top, config.canvas.sp/bc.scale, config.canvas.lw);
-
+    var bx = utils.c2b(
+      e.clientX - Math.floor(rect.left * globalZoom) + 1,
+      config.canvas.sp * globalZoom / bc.scale,
+      config.canvas.lw * globalZoom
+    );
+    var by = utils.c2b(
+      e.clientY - Math.floor(rect.top * globalZoom) + 1,
+      config.canvas.sp * globalZoom / bc.scale,
+      config.canvas.lw * globalZoom
+    );
     // check for invalid coordinates
     if (bx == -1 || by == -1) {
       return;
