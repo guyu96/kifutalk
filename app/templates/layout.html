@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>{% block title %}{% endblock %}</title>
+  <link rel="shortcut icon" href="{{ url_for('static', filename='assets/favicon.ico') }}">
   {% block css %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/reset.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
