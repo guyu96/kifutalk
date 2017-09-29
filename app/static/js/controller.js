@@ -489,6 +489,9 @@ Controller.prototype.addCanvasEventListeners = function() {
 Controller.prototype.addKeyboardEventListeners = function() {
   var self = this;
   document.onkeydown = function(e) {
+    if (document.activeElement == self.html.commentInput || document.activeElement.contentEditable == "true") {
+      return;
+    }
     switch (e.keyCode) {
       // left arrow goes to parent node 
       case 37:
