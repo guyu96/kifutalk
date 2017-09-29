@@ -83,7 +83,7 @@ var Controller = function(kifu, kifuComments, boardCanvas) {
   // attach event listeners
   this.addActionEventListeners();
   this.addCanvasEventListeners();
-  // this.addKeyboardEventListeners();
+  this.addKeyboardEventListeners();
   this.addNavigationEventListeners();
   this.addCommentEventListeners();
   this.addEditEventListeners();
@@ -492,16 +492,12 @@ Controller.prototype.addKeyboardEventListeners = function() {
     switch (e.keyCode) {
       // left arrow goes to parent node 
       case 37:
-        self.prev();
+        self.html.prev.click();
         break;
       // right arrow goes to next node (first child)
       case 39:
-        self.next();
+        self.html.next.click();
         break;
-      // // 'p' passes
-      // case 80:
-      //   self.pass();
-      //   break;
     }
   }
 };
