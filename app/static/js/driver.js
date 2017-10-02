@@ -122,12 +122,15 @@ Driver.prototype.execAction = function(action) {
     // black or white plays
     case 'B':
     case 'W':
-      if (this.board.toPlay.toUpperCase() !== action.prop) {
-        console.error('SGF error: wrong player');
-        return false;
-      } else if (action.value === '' || action.value === 'tt') {
+      if (action.value === '' || action.value === 'tt') {
         this.board.pass();
       } else {
+        if (this.board.toPlay.toUpperCase() !== action.prop) {
+          // player mismatch could happen - for instance, white plays the first move in a handicapped game
+          // so only a warning is printed, and the play is allowed
+          this.board.toPlay = (this.board.toPlay === 'b') ? 'w' : 'b';
+          console.error('SGF error: wrong player');
+        }
         var row = utils.l2n(action.value[1]);
         var col = utils.l2n(action.value[0]);
         // illegal play
