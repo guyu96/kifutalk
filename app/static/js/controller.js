@@ -493,6 +493,14 @@ Controller.prototype.addKeyboardEventListeners = function() {
       return;
     }
     switch (e.keyCode) {
+      // spacebar starts/stops playback
+      case 32:
+        if (self.isAutoplaying) {
+          self.html.pause.click();
+        } else {
+          self.html.play.click();
+        }
+        break;
       // left arrow goes to parent node 
       case 37:
         self.html.prev.click();
